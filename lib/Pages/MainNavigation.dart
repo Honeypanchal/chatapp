@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
 // import 'package:chat_application/Pages/HomePage.dart';
 // import 'package:chat_application/Pages/Profile.dart';
-// file is updated
+// file is updated1
 class MainNavigationPage extends StatefulWidget {
   final CustomClass currentUser;
   MainNavigationPage({required this.currentUser});
