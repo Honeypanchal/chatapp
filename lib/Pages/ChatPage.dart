@@ -1,3 +1,4 @@
+import 'package:chatapp/Pages/GroupChatLayout/new_group_definition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/chat_layout.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class _ChatPageState extends State<ChatPage> {
   dynamic _Chatdatabase = '';
   bool isMakingGroupChat=false;
   List _chatUsers = [];
-  List _groupChatUsers=[];
+  List<dynamic> groupChatUsers=[];
 
   Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() async {
     if(_searchText.text.isNotEmpty){
@@ -131,7 +132,7 @@ class _ChatPageState extends State<ChatPage> {
                     padding: EdgeInsets.symmetric(vertical: height*0.012,horizontal: width*0.012),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: _groupChatUsers.map((x) {
+                      children: groupChatUsers.map((x) {
                         return CircleAvatar(
                           backgroundColor: Colors.white,
                           child: Icon(
@@ -201,7 +202,7 @@ class _ChatPageState extends State<ChatPage> {
                               if(isMakingGroupChat)
                                 {
                                  setState(() {
-                                   _groupChatUsers.add(_chatUsers[index]);
+                                   groupChatUsers.add(_chatUsers[index]);
                                  });
 
                                 }
@@ -251,12 +252,13 @@ class _ChatPageState extends State<ChatPage> {
       floatingActionButton: FloatingActionButton(
 
         onPressed: () {
-          if(isMakingGroupChat && _groupChatUsers.isNotEmpty){
-
+          if(isMakingGroupChat && groupChatUsers.isNotEmpty){
+print(groupChatUsers.length);
+Navigator.of(context).push(MaterialPageRoute(builder: (context)=>NewGroupDefinition(members: groupChatUsers)));
 
             isMakingGroupChat=!isMakingGroupChat;
            setState(() {
-             _groupChatUsers.clear();
+             groupChatUsers.clear();
            });
           }else
             {
