@@ -15,20 +15,41 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final _database = FirebaseFirestore.instance.collection('Users');
   dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
+  TextEditingController _searchText = new TextEditingController();
   dynamic _Chatdatabase = '';
   List _chatUsers = [];
 
   Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() async {
-    final users = await _database.get();
-    return users.docs;  // Return the list of documents
+    if(_searchText.text.isNotEmpty){
+
+      final users = await _database
+          .where("firstName",isEqualTo: _searchText.text.trim().toString())
+          .get();
+      return users.docs;
+    }else
+      {
+        final users = await _database.get();
+        return users.docs;
+      }
+
   }
 
   @override
   void initState() {
     super.initState();
+    _searchText.addListener((){
+      fetchUsers();
+    });
   }
 
-  void _filterUsers(String query) {}
+  @override
+  void dispose() {
+    _searchText.removeListener(() {});
+    _searchText.dispose(); // Don't forget to dispose of the controller
+    super.dispose();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,15 +66,16 @@ class _ChatPageState extends State<ChatPage> {
               Navigator.of(context).pop();
             },
             child: Container(
-              height:  width > 600?width*0.1: width * 0.045,
-              width: width > 600?width*0.1:  width * 0.035,
-              decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              height: width > 600 ? width * 0.1 : width * 0.045,
+              width: width > 600 ? width * 0.1 : width * 0.035,
+              decoration:
+                  BoxDecoration(color: Colors.white, shape: BoxShape.circle),
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.only(left: width * 0.019),
                   child: Icon(
                     Icons.arrow_back_ios,
-                    size:  width > 600?width*0.6: width * 0.044,
+                    size: width > 600 ? width * 0.6 : width * 0.044,
                   ),
                 ),
               ),
@@ -64,17 +86,15 @@ class _ChatPageState extends State<ChatPage> {
         title: Text(
           'Chats',
           style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'Poppins',
-
-              fontWeight: FontWeight.bold,
-            fontSize: width > 600 ? width * 0.05 : width * 0.052,),
+            color: Colors.white,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.bold,
+            fontSize: width > 600 ? width * 0.05 : width * 0.052,
+          ),
         ),
-
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // Adjustments for web (larger screens)
           bool isWeb = constraints.maxWidth > 800;
 
           return Container(
@@ -85,7 +105,6 @@ class _ChatPageState extends State<ChatPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Container(
                   height: height * 0.052,
                   width: isWeb ? width * 0.8 : width * 0.9,
@@ -94,6 +113,7 @@ class _ChatPageState extends State<ChatPage> {
                       borderRadius: BorderRadius.circular(width * 0.09),
                       border: Border.all(color: Colors.white, width: 0.2)),
                   child: TextField(
+                    controller: _searchText,
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'Raleway',
@@ -104,7 +124,8 @@ class _ChatPageState extends State<ChatPage> {
                         fontFamily: 'Raleway',
                       ),
                       hintText: 'Search',
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 12.0),
                       prefixIcon: Icon(Icons.search, color: Colors.grey),
                       border: InputBorder.none,
                     ),
@@ -113,7 +134,8 @@ class _ChatPageState extends State<ChatPage> {
                 SizedBox(height: height * 0.025),
 
                 // FutureBuilder to fetch users
-                FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+                FutureBuilder<
+                    List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
                   future: fetchUsers(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -137,9 +159,9 @@ class _ChatPageState extends State<ChatPage> {
                         itemBuilder: (context, index) {
                           return ListTile(
                             onTap: () {
-
                               String docId = widget.currentUser.uid
-                                  .compareTo(_chatUsers[index]['uid']) < 0
+                                          .compareTo(_chatUsers[index]['uid']) <
+                                      0
                                   ? "${widget.currentUser.uid}_${_chatUsers[index]['uid']}"
                                   : "${_chatUsers[index]['uid']}_${widget.currentUser.uid}";
                               _Chatdatabase = chatsDB.doc(docId);
@@ -177,6 +199,16 @@ class _ChatPageState extends State<ChatPage> {
             ),
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Color(0xFF25D366),
+        tooltip: 'Create New Group',
+        child: Icon(
+          Icons.group_add,
+          color: Colors.white,
+          size: width < 600 ? width * 0.08 : width * 0.09,
+        ), // Tooltip for the button
       ),
     );
   }
