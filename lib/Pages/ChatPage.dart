@@ -17,11 +17,12 @@ class _ChatPageState extends State<ChatPage> {
   dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
   TextEditingController _searchText = new TextEditingController();
   dynamic _Chatdatabase = '';
+  bool isMakingGroupChat=false;
   List _chatUsers = [];
+  List _groupChatUsers=[];
 
   Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() async {
     if(_searchText.text.isNotEmpty){
-
       final users = await _database
           .where("firstName",isEqualTo: _searchText.text.trim().toString())
           .get();
@@ -83,15 +84,34 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
         backgroundColor: Color(0xFF242935),
-        title: Text(
-          'Chats',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-            fontSize: width > 600 ? width * 0.05 : width * 0.052,
-          ),
+        title: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isMakingGroupChat?
+             'New Group': 'Chats',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                fontSize: width > 600 ? width * 0.05 : width * 0.052,
+              ),
+            ),
+
+            if(isMakingGroupChat)
+              Text(
+               "Add members",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Poppins',
+
+                  fontSize: width > 600 ? width * 0.04 : width * 0.032,
+                ),
+              )
+          ],
         ),
+
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -105,6 +125,24 @@ class _ChatPageState extends State<ChatPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                if(isMakingGroupChat)
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: height*0.012,horizontal: width*0.012),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: _groupChatUsers.map((x) {
+                        return CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.person,
+                            color: Color(0xFF995BF8),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+,
                 Container(
                   height: height * 0.052,
                   width: isWeb ? width * 0.8 : width * 0.9,
@@ -154,10 +192,20 @@ class _ChatPageState extends State<ChatPage> {
 
                     return Expanded(
                       child: ListView.builder(
+
                         shrinkWrap: true,
                         itemCount: _chatUsers.length,
                         itemBuilder: (context, index) {
                           return ListTile(
+                            onLongPress: (){
+                              if(isMakingGroupChat)
+                                {
+                                 setState(() {
+                                   _groupChatUsers.add(_chatUsers[index]);
+                                 });
+
+                                }
+                            },
                             onTap: () {
                               String docId = widget.currentUser.uid
                                           .compareTo(_chatUsers[index]['uid']) <
@@ -201,11 +249,27 @@ class _ChatPageState extends State<ChatPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+
+        onPressed: () {
+          if(isMakingGroupChat && _groupChatUsers.isNotEmpty){
+
+
+            isMakingGroupChat=!isMakingGroupChat;
+           setState(() {
+             _groupChatUsers.clear();
+           });
+          }else
+            {
+              setState(() {
+                isMakingGroupChat=!isMakingGroupChat;
+              });
+            }
+
+        },
         backgroundColor: Color(0xFF25D366),
         tooltip: 'Create New Group',
         child: Icon(
-          Icons.group_add,
+          isMakingGroupChat?Icons.arrow_forward:Icons.group_add,
           color: Colors.white,
           size: width < 600 ? width * 0.08 : width * 0.09,
         ), // Tooltip for the button
