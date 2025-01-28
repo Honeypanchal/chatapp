@@ -8,6 +8,9 @@ class Group {
   final String createdBy;
   final List<String> participants;
   final Timestamp createdAt;
+  final bool groupSettings;
+  final bool sendMessages;
+  final bool addOtherMembers;
 
   Group({
     required this.groupId,
@@ -17,6 +20,12 @@ class Group {
     required this.createdBy,
     required this.participants,
     required this.createdAt,
+    this.groupSettings=true,
+    this.sendMessages=true,
+    this.addOtherMembers=true,
+
+
+
   });
 
   Map<String, dynamic> toMap() {
@@ -28,6 +37,9 @@ class Group {
       'createdBy': createdBy,
       'participants': participants,
       'createdAt': createdAt,
+      'groupSettings':groupSettings,
+      "sendMessages":sendMessages,
+      "addOtherMembers":addOtherMembers,
     };
   }
 
@@ -41,6 +53,9 @@ class Group {
       createdBy: doc['createdBy'],
       participants: List<String>.from(doc['participants']),
       createdAt: doc['createdAt'],
+      groupSettings: doc['groupSettings'],
+      sendMessages: doc['sendMessages'],
+      addOtherMembers: doc['addOtherMembers'],
     );
   }
 }
