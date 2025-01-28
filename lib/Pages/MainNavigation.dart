@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
 // import 'package:chat_application/Pages/HomePage.dart';
 // import 'package:chat_application/Pages/Profile.dart';
-
+// file is updated
 class MainNavigationPage extends StatefulWidget {
   final CustomClass currentUser;
-
   MainNavigationPage({required this.currentUser});
 
   @override
@@ -34,7 +33,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       _selectedIndex = index;
     });
   }
-
+//
   @override
   Widget build(BuildContext context) {
     return Scaffold(
