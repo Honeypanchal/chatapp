@@ -1,4 +1,4 @@
-import 'package:chatapp/Authentication/CustomClass.dart';
+import 'package:chatapp/models/CustomClass.dart';
 
 import 'package:flutter/material.dart';
 
