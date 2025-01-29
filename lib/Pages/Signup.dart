@@ -34,8 +34,7 @@ class _SignupPageState extends State<SignupPage> {
       final firstName = _firstnameController.text.trim();
       final lastName = _lastnameController.text.trim();
       try {
-        CustomClass? user = await signUpUser(firstName, lastName,
-            groupValue, email, password);
+        CustomClass? user = await signUpUser(firstName, email, password);
         if (user != null) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
