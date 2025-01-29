@@ -1,4 +1,4 @@
-import 'package:chatapp/Authentication/CustomClass.dart';
+import 'package:chatapp/models/CustomClass.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,11 +8,10 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 
 Future<CustomClass?> signUpUser(
     String firstName,
-    String lastName,
-String email,
-String password,
 
- ) async {
+
+    String email,
+    String password) async {
   try {
     UserCredential user = await _auth.createUserWithEmailAndPassword(
       email: email,
@@ -22,18 +21,21 @@ String password,
       CustomClass newUser = CustomClass(
         uid: user.user!.uid,
           firstName: firstName,
-          lastName: lastName,
-
 
           email: email,
           password: password);
       await _cloudFirestore.doc(user.user!.uid).set({
         "uid": user.user!.uid,
         "firstName": firstName,
-        "lastName": lastName,
 
         "email": email,
-        "password": password
+        "password": password,
+        "profilePic": "",
+        "groups": [],
+        "activeChats": [],
+        "notifications": [],
+        "createdAt": DateTime.timestamp().millisecondsSinceEpoch,
+        "isActive": true
       });
       return newUser;
     }
@@ -57,7 +59,7 @@ Future<CustomClass?> signInUser(String email, String password) async {
         CustomClass newUser = CustomClass(
           uid: foundUser['uid'],
           firstName: foundUser['firstName'],
-          lastName: foundUser['lastName'],
+
 
           email: foundUser['email'],
           password: foundUser['password'],
@@ -102,17 +104,22 @@ Future<CustomClass?> signInWithGoogle() async {
 
       _cloudFirestore.doc(user.uid).set({
 "uid":user.uid,
-        "gender": user.uid,
+
         "firstName": user.displayName!,
-        "lastName": user.displayName!,
+
         "email": user.email!,
-        "photoURL": user.photoURL
+        "profilePic": "",
+        "groups": [],
+        "activeChats": [],
+        "notifications": [],
+        "createdAt": DateTime.timestamp().millisecondsSinceEpoch,
+        "isActive": true
       });
       CustomClass newUser = CustomClass(
 uid: user.uid,
 
           firstName: user.displayName!,
-          lastName: user.displayName!,
+
           email: user.email!,
           photoURL: user.photoURL);
       return newUser;
@@ -120,6 +127,7 @@ uid: user.uid,
   } catch (e) {
     print("Error during Google Sign-In: $e");
     throw Exception("Error during Google Sign-In: ${e.toString()}");
+
   }
   return null;
 }

@@ -1,6 +1,6 @@
 import 'package:chatapp/Authentication/CustomClass.dart';
 import 'package:flutter/material.dart';
-import 'package:chatapp/Authentication/auth_services.dart';
+import 'package:chatapp/services/auth_services.dart';
 import 'MainNavigation.dart';
 import 'Profile.dart';
 import 'SigninPage.dart';
@@ -1094,7 +1094,7 @@ class _SignupPageState extends State<SignupPage> {
                               },
                               decoration: InputDecoration(
 
-                                
+
 
                                   // errorBorder: OutlineInputBorder(
                                   //     borderSide: BorderSide(

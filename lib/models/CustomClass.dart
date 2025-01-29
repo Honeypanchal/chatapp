@@ -1,7 +1,7 @@
 class CustomClass {
   String firstName;
-  String lastName;
-String uid;
+
+  String uid;
 
   String email;
 
@@ -10,9 +10,10 @@ String uid;
 
   CustomClass(
       {required this.firstName,
-      required this.lastName,
+
 required this.uid,
       required this.email,
+
       this.password,
       this.photoURL});
 }
