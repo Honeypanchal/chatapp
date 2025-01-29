@@ -21,7 +21,7 @@ class _ChatPageState extends State<ChatPage> {
   bool isMakingGroupChat = false;
 
   List _chatUsers = [];
-  List<dynamic> groupChatUsers = [];
+  List<String> groupChatUsers = [];
 
   Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() async {
     if (_searchText.text.isNotEmpty) {
@@ -56,7 +56,7 @@ class _ChatPageState extends State<ChatPage> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Color(0xFF242935),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Padding(
           padding: EdgeInsets.only(left: width * 0.064),
@@ -136,29 +136,40 @@ class _ChatPageState extends State<ChatPage> {
                       }).toList(),
                     ),
                   ),
-                Container(
-                  height: height * 0.052,
-                  width: isWeb ? width * 0.8 : width * 0.9,
-                  decoration: BoxDecoration(
-                      color: Color(0xFF2C313F),
-                      borderRadius: BorderRadius.circular(width * 0.09),
-                      border: Border.all(color: Colors.white, width: 0.2)),
-                  child: TextField(
-                    controller: _searchText,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Raleway',
-                    ),
-                    decoration: InputDecoration(
-                      hintStyle: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Raleway',
+                Align(
+                  alignment: Alignment.center,child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: width*0.032),
+                    child: Container(
+                      height: height * 0.052,
+                      width: isWeb ? width * 0.8 : width * 0.8,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black,
+                            spreadRadius: 1
+                    ,blurRadius: 1                      )
+                        ],
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(width * 0.09),
+                          border: Border.all(color: Colors.white, width: 0.2)),
+                      child: TextField(
+                        controller: _searchText,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'Raleway',
+                        ),
+                        decoration: InputDecoration(
+                          hintStyle: TextStyle(
+                            color: Colors.black,
+                            fontFamily: 'Raleway',
+                          ),
+                          hintText: 'Search',
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 12.0),
+                          prefixIcon: Icon(Icons.search, color: Colors.grey),
+                          border: InputBorder.none,
+                        ),
                       ),
-                      hintText: 'Search',
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 12.0),
-                      prefixIcon: Icon(Icons.search, color: Colors.grey),
-                      border: InputBorder.none,
                     ),
                   ),
                 ),
@@ -193,13 +204,13 @@ class _ChatPageState extends State<ChatPage> {
                               if (isMakingGroupChat) {
                                 setState(() {
                                   bool exists = groupChatUsers.any((x) =>
-                                      x['uid'] == _chatUsers[index]['uid']);
+                                      x == _chatUsers[index]['uid']);
 
                                   if (exists) {
                                     groupChatUsers.removeWhere((x) =>
-                                        x['uid'] == _chatUsers[index]['uid']);
+                                        x == _chatUsers[index]['uid']);
                                   } else {
-                                    groupChatUsers.add(_chatUsers[index]);
+                                    groupChatUsers.add(_chatUsers[index]['uid']);
                                   }
                                 });
 
@@ -229,7 +240,7 @@ class _ChatPageState extends State<ChatPage> {
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                     color: groupChatUsers.any((x) =>
-                                            x['uid'] ==
+                                            x ==
                                             _chatUsers[index]['uid'])
                                         ? Colors.green
                                         : Colors.black,
@@ -246,7 +257,7 @@ class _ChatPageState extends State<ChatPage> {
                             title: Text(
                               "${_chatUsers[index]['firstName']}  ${_chatUsers[index]['lastName']}",
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'Raleway',
                                 fontWeight: FontWeight.w500,
                               ),
@@ -265,10 +276,11 @@ class _ChatPageState extends State<ChatPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (isMakingGroupChat && groupChatUsers.isNotEmpty) {
-            print(groupChatUsers.length);
+           //pushing currentUser
+            groupChatUsers.add(widget.currentUser.uid);
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) =>
-                    NewGroupDefinition(members: List.from(groupChatUsers)))).then((_){
+                    NewGroupDefinition(createdBy:widget.currentUser,members: List.from(groupChatUsers)))).then((_){
               isMakingGroupChat = !isMakingGroupChat;
               setState(() {
                 groupChatUsers.clear();
