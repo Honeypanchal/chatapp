@@ -1,24 +1,24 @@
+import 'package:chatapp/models/CustomClass.dart';
+import 'package:chatapp/models/Group.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:chatapp/services/groupChat.dart';
+import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 
 class NewGroupDefinition extends StatefulWidget {
-  final List<dynamic> members;
+  final List<String> members;
+  final CustomClass createdBy;
 
-  const NewGroupDefinition({super.key,
-
-    required this.members,
-  }
-  );
-
+  const NewGroupDefinition(
+      {super.key, required this.members, required this.createdBy});
 
   @override
   State<NewGroupDefinition> createState() => _NewGroupDefinitionState();
 }
 
-class _NewGroupDefinitionState extends State<NewGroupDefinition>{
-
+class _NewGroupDefinitionState extends State<NewGroupDefinition> {
   @override
   Widget build(BuildContext context) {
-
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     TextEditingController _groupName = TextEditingController();
@@ -26,7 +26,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition>{
     return Scaffold(
       appBar: AppBar(
         title: Text('Group Details'),
-        backgroundColor:  Colors.green, // WhatsApp color
+        backgroundColor: Colors.blue[600], // WhatsApp color
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -37,17 +37,17 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition>{
               // Group Name Section
               TextFormField(
                 controller: _groupName,
-                decoration: InputDecoration(
-                    hintText: 'Group Name'
-                ),
+                decoration: InputDecoration(hintText: 'Group Name'),
                 style: TextStyle(
                   fontSize: width * 0.08,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
-                validator: (val){
-                  if(val!.isEmpty) return 'Enter Group Name';
-                  else return null ;
+                validator: (val) {
+                  if (val!.isEmpty)
+                    return 'Enter Group Name';
+                  else
+                    return null;
                 },
               ),
               SizedBox(height: height * 0.02),
@@ -75,7 +75,6 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition>{
                       color: Colors.black,
                     ),
                   ),
-
                 ],
               ),
               SizedBox(height: height * 0.02),
@@ -97,7 +96,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition>{
                           ),
                           SizedBox(height: height * 0.01),
                           Text(
-                            widget.members[index]['firstName']!,
+                            widget.members[index],
                             style: TextStyle(
                               fontSize: width * 0.04,
                               color: Colors.black,
@@ -113,12 +112,34 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition>{
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: (){
-
-      },backgroundColor: Colors.green,child: Icon(Icons.arrow_forward,color: Colors.white,),),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          if (_groupName.text.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                "Enter Group Name",
+                style: TextStyle(fontFamily: 'Raleway', color: Colors.white),
+              ),
+              backgroundColor: Colors.red.shade300,
+            ));
+          } else {
+            Group newGroup = await createNewGroup(
+                _groupName.text.trim().toString(),
+                "assets/images/jpg",
+                "groupDescription",
+                widget.createdBy.uid,
+                widget.members,
+                Timestamp.now());
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => Groupchatpage(newGroup: newGroup)));
+          }
+        },
+        backgroundColor: Colors.blue[600],
+        child: Icon(
+          Icons.arrow_forward,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }
-
-
-

@@ -1,7 +1,8 @@
+import 'package:chatapp/models/CustomClass.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Group {
-  final String groupId;
+
   final String groupName;
   final String groupIcon;
   final String groupDescription;
@@ -13,7 +14,6 @@ class Group {
   final bool addOtherMembers;
 
   Group({
-    required this.groupId,
     required this.groupName,
     required this.groupIcon,
     required this.groupDescription,
@@ -30,7 +30,7 @@ class Group {
 
   Map<String, dynamic> toMap() {
     return {
-      'groupId': groupId,
+
       'groupName': groupName,
       'groupIcon': groupIcon,
       'groupDescription': groupDescription,
@@ -46,11 +46,11 @@ class Group {
 
   Group getGroupDetails(DocumentSnapshot doc) {
     return Group(
-      groupId: doc.id,
+
       groupName: doc['groupName'],
       groupIcon: doc['groupIcon'],
       groupDescription: doc['groupDescription'],
-      createdBy: doc['createdBy'],
+      createdBy: doc['createdBy'].uid,
       participants: List<String>.from(doc['participants']),
       createdAt: doc['createdAt'],
       groupSettings: doc['groupSettings'],
