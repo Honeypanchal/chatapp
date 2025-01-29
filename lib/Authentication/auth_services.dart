@@ -9,10 +9,10 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 Future<CustomClass?> signUpUser(
     String firstName,
     String lastName,
+String email,
+String password,
 
-    String gender,
-    String email,
-    String password) async {
+ ) async {
   try {
     UserCredential user = await _auth.createUserWithEmailAndPassword(
       email: email,
@@ -24,7 +24,7 @@ Future<CustomClass?> signUpUser(
           firstName: firstName,
           lastName: lastName,
 
-          gender: gender,
+
           email: email,
           password: password);
       await _cloudFirestore.doc(user.user!.uid).set({
@@ -32,7 +32,6 @@ Future<CustomClass?> signUpUser(
         "firstName": firstName,
         "lastName": lastName,
 
-        "gender": gender,
         "email": email,
         "password": password
       });
@@ -60,7 +59,6 @@ Future<CustomClass?> signInUser(String email, String password) async {
           firstName: foundUser['firstName'],
           lastName: foundUser['lastName'],
 
-          gender: foundUser['gender'],
           email: foundUser['email'],
           password: foundUser['password'],
         );
@@ -112,7 +110,7 @@ Future<CustomClass?> signInWithGoogle() async {
       });
       CustomClass newUser = CustomClass(
 uid: user.uid,
-          gender: user.uid,
+
           firstName: user.displayName!,
           lastName: user.displayName!,
           email: user.email!,
