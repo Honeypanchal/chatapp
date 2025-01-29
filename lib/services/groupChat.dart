@@ -4,26 +4,40 @@ import 'package:chatapp/models/Group.dart';
 
 CollectionReference groupsDb = FirebaseFirestore.instance.collection("groups");
 
-Future<Group> createNewGroup(
+Future<Group?> createNewGroup(
     String groupName,
     String groupIcon,
     String groupDescription,
     CustomClass createdBy,
-    List<Map<String,dynamic>> participants) async {
-  Group newGroup = Group(
-    groupId: '',
-    groupName: groupName,
-    groupIcon: groupIcon,
-    groupDescription:groupDescription,
-    createdBy: createdBy.toMap(),
-    participants: participants,
-    createdAt: Timestamp.now(),
-  );
+    List<Map<String, dynamic>> participants) async {
+  try {
+    if (groupName.isEmpty) {
+      throw Exception(" Group name cannot be empty. ");
+    }
 
-  final newGroupRef = await groupsDb.add(newGroup.toMap());
-  String newGroupId = newGroupRef.id;
-  newGroup.addId(newGroupId);
+    if (participants.isEmpty) {
+      throw Exception("A group must have at least one participant.");
+    }
 
-
-  return newGroup;
+    Group newGroup = Group(
+      groupId: '',
+      groupName: groupName,
+      groupIcon: groupIcon,
+      groupDescription: groupDescription,
+      createdBy: createdBy.toMap(),
+      participants: participants,
+      createdAt: Timestamp.now(),
+    );
+    final newGroupRef = await groupsDb.add(newGroup.toMap());
+    String newGroupId = newGroupRef.id;
+    newGroup.addId(newGroupId);
+    print(" Group created successfully with ID: $newGroupId ");
+    return newGroup;
+  } on FirebaseException catch (e) {
+    print(" Firestore error: ${e.message} ");
+    return null;
+  } on Exception catch (e) {
+    print(" Error: $e ");
+    return null;
+  }
 }

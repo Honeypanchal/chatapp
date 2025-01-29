@@ -231,15 +231,27 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               backgroundColor: Colors.red.shade300,
             ));
           } else {
-            Group newGroup = await createNewGroup(
-                _groupName.text.trim().toString(),
-                "assets/images/jpg",
+            try {
+              Group? newGroup = await createNewGroup(
+                _groupName.text.trim(),
+                "assets/images/images.jpg",
                 "groupDescription",
                 widget.createdBy,
                 widget.members,
-            );
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => Groupchatpage(newGroup: newGroup)));
+              );
+
+              if (newGroup != null) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => Groupchatpage(newGroup: newGroup)));
+                print("Group created successfully: ${newGroup.groupId}");
+              } else {
+                print("Group creation failed.");
+              }
+            } catch (e, stackTrace) {
+              print("Unexpected error: $e");
+              print("StackTrace: $stackTrace");
+            }
+
           }
         },
         backgroundColor: Colors.blue[600],

@@ -1070,7 +1070,7 @@ class _SignupPageState extends State<SignupPage> {
                                 ),
                                 SizedBox(height: height * 0.015),
                                 Text(
-                                  'RE-TYPE PASSWORD',
+                                  'RE-ENTER PASSWORD',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: width * 0.03,
