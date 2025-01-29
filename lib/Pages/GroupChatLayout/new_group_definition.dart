@@ -24,31 +24,51 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
     TextEditingController _groupName = TextEditingController();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Group Details'),
+        title: Text('New  Group',style: TextStyle(fontFamily: 'Raleway'),),
         backgroundColor: Colors.blue[600], // WhatsApp color
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.symmetric(horizontal: width*0.052,vertical: height*0.032),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Group Name Section
-              TextFormField(
-                controller: _groupName,
-                decoration: InputDecoration(hintText: 'Group Name'),
-                style: TextStyle(
-                  fontSize: width * 0.08,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                validator: (val) {
-                  if (val!.isEmpty)
-                    return 'Enter Group Name';
-                  else
-                    return null;
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: CircleAvatar(
+                      radius: width*0.066,
+                      backgroundColor: Colors.blue.shade300,
+                      child: Icon(Icons.camera_alt,color: Colors.white,),
+                    ),
+                  ),SizedBox(width: width*0.012,),
+                  Expanded(flex: 4,
+                    child: TextFormField(
+                      controller: _groupName,
+                      decoration: InputDecoration(focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.blue, width: 2.0), // Color when focused
+                      ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey, width: 1.0), // Color when not focused
+                          ),hintText: 'Group Name'),
+                      style: TextStyle(
+                        fontSize: width * 0.06,
+                        fontFamily: 'Raleway',
+
+                        color: Colors.black,
+                      ),
+                      validator: (val) {
+                        if (val!.isEmpty)
+                          return 'Enter Group Name';
+                        else
+                          return null;
+                      },
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: height * 0.02),
               // Permissions Section
