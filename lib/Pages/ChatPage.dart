@@ -81,7 +81,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
         ),
-        backgroundColor: Color(0xFF242935),
+        backgroundColor: Colors.blue[600],
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +130,7 @@ class _ChatPageState extends State<ChatPage> {
                           backgroundColor: Colors.white,
                           child: Icon(
                             Icons.person,
-                            color: Color(0xFF995BF8),
+                            color: Colors.blue[600],
                           ),
                         );
                       }).toList(),
@@ -242,7 +242,7 @@ class _ChatPageState extends State<ChatPage> {
                                     color: groupChatUsers.any((x) =>
                                             x ==
                                             _chatUsers[index]['uid'])
-                                        ? Colors.green
+                                        ? Colors.blue.shade600
                                         : Colors.black,
                                     width: width * 0.007), // Border color
                               ),
@@ -250,7 +250,7 @@ class _ChatPageState extends State<ChatPage> {
                                 backgroundColor: Colors.white,
                                 child: Icon(
                                   Icons.person,
-                                  color: Color(0xFF995BF8),
+                                  color: Colors.blue[600],
                                 ),
                               ),
                             ),
@@ -294,7 +294,7 @@ class _ChatPageState extends State<ChatPage> {
             });
           }
         },
-        backgroundColor: Color(0xFF25D366),
+        backgroundColor: Colors.blue[600],
         tooltip: 'Create New Group',
         child: Icon(
           isMakingGroupChat ? Icons.arrow_forward : Icons.group_add,
