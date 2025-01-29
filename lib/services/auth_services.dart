@@ -8,9 +8,8 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 
 Future<CustomClass?> signUpUser(
     String firstName,
-    String lastName,
 
-    String gender,
+
     String email,
     String password) async {
   try {
@@ -22,17 +21,13 @@ Future<CustomClass?> signUpUser(
       CustomClass newUser = CustomClass(
         uid: user.user!.uid,
           firstName: firstName,
-          lastName: lastName,
 
-          gender: gender,
           email: email,
           password: password);
       await _cloudFirestore.doc(user.user!.uid).set({
         "uid": user.user!.uid,
         "firstName": firstName,
-        "lastName": lastName,
 
-        "gender": gender,
         "email": email,
         "password": password,
         "profilePic": "",
@@ -64,9 +59,8 @@ Future<CustomClass?> signInUser(String email, String password) async {
         CustomClass newUser = CustomClass(
           uid: foundUser['uid'],
           firstName: foundUser['firstName'],
-          lastName: foundUser['lastName'],
 
-          gender: foundUser['gender'],
+
           email: foundUser['email'],
           password: foundUser['password'],
         );
@@ -110,9 +104,9 @@ Future<CustomClass?> signInWithGoogle() async {
 
       _cloudFirestore.doc(user.uid).set({
 "uid":user.uid,
-        "gender": user.uid,
+
         "firstName": user.displayName!,
-        "lastName": user.displayName!,
+
         "email": user.email!,
         "profilePic": "",
         "groups": [],
@@ -123,9 +117,9 @@ Future<CustomClass?> signInWithGoogle() async {
       });
       CustomClass newUser = CustomClass(
 uid: user.uid,
-          gender: user.uid,
+
           firstName: user.displayName!,
-          lastName: user.displayName!,
+
           email: user.email!,
           photoURL: user.photoURL);
       return newUser;
