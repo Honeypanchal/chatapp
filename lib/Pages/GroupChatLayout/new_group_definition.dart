@@ -116,7 +116,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                             'Disappearing messages ',
                             style: TextStyle(
                               fontSize: width * 0.042,
-                              fontFamily: 'Poppins',
+
                               color: Colors.black87,
                             ),
                           ),Spacer(),
@@ -129,12 +129,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                         ],
                       ),
                       Opacity(
-                        opacity: 0.8,
+                        opacity: 0.9,
                         child: Text(
                           'Off',
                           style: TextStyle(
                             fontSize: width * 0.03,
-                            fontFamily: 'Poppins',
+
                             color: Colors.black87,
                           ),
                         ),
@@ -145,12 +145,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                             'Group Permissions',
                             style: TextStyle(
                               fontSize: width * 0.042,
-                              fontFamily: 'Poppins',
+
                               color: Colors.black87,
                             ),
                           ),Spacer(),
                           Opacity(
-                              opacity: 0.8,
+                              opacity: 0.9,
                               child: Icon(
                                 Icons.settings,
                                 color: Colors.grey,
@@ -162,21 +162,28 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 ),
               ),
               SizedBox(height: height * 0.02),
-
-              SizedBox(height: height * 0.03),
+              Divider(
+                height: height * 0.01,
+                color: Colors.grey.shade100,
+                thickness: width * 0.005,
+              ),
               // Member Count Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${widget.members.length} Members',
-                    style: TextStyle(
-                      fontSize: width * 0.05,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.032, vertical: height * 0.012),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Members : ${widget.members.length}',
+                      style: TextStyle(
+                        fontSize: width * 0.035,
+
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               SizedBox(height: height * 0.02),
               // Member Profiles Section

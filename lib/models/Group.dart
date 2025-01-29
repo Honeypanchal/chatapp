@@ -30,7 +30,7 @@ required this.groupId,
 
   Map<String, dynamic> toMap() {
     return {
-
+'groupId':groupId,
       'groupName': groupName,
       'groupIcon': groupIcon,
       'groupDescription': groupDescription,
