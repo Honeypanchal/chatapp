@@ -121,7 +121,7 @@ uid: user.uid,
           firstName: user.displayName!,
 
           email: user.email!,
-          photoURL: user.photoURL);
+      );
       return newUser;
     }
   } catch (e) {

@@ -1,3 +1,5 @@
+
+
 import 'package:chatapp/Pages/GroupChatLayout/new_group_definition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/chat_layout.dart';
@@ -21,7 +23,7 @@ class _ChatPageState extends State<ChatPage> {
   bool isMakingGroupChat = false;
 
   List _chatUsers = [];
-  List<String> groupChatUsers = [];
+  List<Map<String,dynamic>> groupChatUsers = [];
 
   Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() async {
     if (_searchText.text.isNotEmpty) {
@@ -203,13 +205,13 @@ class _ChatPageState extends State<ChatPage> {
                               if (isMakingGroupChat) {
                                 setState(() {
                                   bool exists = groupChatUsers.any((x) =>
-                                      x == _chatUsers[index]['uid']);
+                                      x['uid'] == _chatUsers[index]['uid']);
 
                                   if (exists) {
                                     groupChatUsers.removeWhere((x) =>
-                                        x == _chatUsers[index]['uid']);
+                                        x['uid'] == _chatUsers[index]['uid']);
                                   } else {
-                                    groupChatUsers.add(_chatUsers[index]['uid']);
+                                    groupChatUsers.add(_chatUsers[index].data());
                                   }
                                 });
 
@@ -239,7 +241,7 @@ class _ChatPageState extends State<ChatPage> {
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                     color: groupChatUsers.any((x) =>
-                                            x ==
+                                            x['uid'] ==
                                             _chatUsers[index]['uid'])
                                         ? Colors.blue.shade600
                                         : Colors.black,
@@ -257,7 +259,7 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                             
                             title: Text(
-                              "${_chatUsers[index]['firstName']}  ${_chatUsers[index]['lastName']}",
+                              "${_chatUsers[index]['firstName']} ",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontFamily: 'Raleway',
@@ -279,7 +281,7 @@ class _ChatPageState extends State<ChatPage> {
         onPressed: () {
           if (isMakingGroupChat && groupChatUsers.isNotEmpty) {
            //pushing currentUser
-            groupChatUsers.add(widget.currentUser.uid);
+            groupChatUsers.add(widget.currentUser.toMap());
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) =>
                     NewGroupDefinition(createdBy:widget.currentUser,members: List.from(groupChatUsers)))).then((_){
