@@ -11,19 +11,20 @@ Future<Group> createNewGroup(
     String createdBy,
     List<String> participants,
     Timestamp createdAt) async {
+  Group newGroup = Group(
+    groupId: '',
+    groupName: 'My Group',
+    groupIcon: 'icon_url',
+    groupDescription: 'This is a group.',
+    createdBy: 'User1',
+    participants: ['User1', 'User2'],
+    createdAt: Timestamp.now(),
+  );
 
-  Group newGroup=Group(
-      groupName: groupName,
-      groupIcon: groupIcon,
-      groupDescription: groupDescription,
-      createdBy: createdBy,
-      participants: participants,
-      createdAt: createdAt);
-  //
-  // final newGroupId =  groupsDb.add( newGroup.toMap() );
-  // print(newGroupId);
-  DocumentReference docRef = await groupsDb.add(newGroup.toMap()); // Await Firestore add operation
-  String groupId = docRef.id;
-  print(groupId);// Get the generated document ID
+  final newGroupRef = await groupsDb.add(newGroup.toMap());
+  String newGroupId = newGroupRef.id;
+  newGroup.addId(newGroupId);
+
+
   return newGroup;
 }

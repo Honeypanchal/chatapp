@@ -20,7 +20,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
   void sendMessage() async {
     if (_messageController.text.trim().isNotEmpty) {
-      await _firestore.collection('groups').doc(widget.newGroup.groupName).collection('messages').add({
+      await _firestore.collection('groups').doc(widget.newGroup.groupId).collection('messages').add({
         'sender': _auth.currentUser!.uid,
         'message': _messageController.text.trim(),
         'timestamp': FieldValue.serverTimestamp(),
@@ -42,7 +42,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
             child: StreamBuilder(
               stream: _firestore
                   .collection('groups')
-                  .doc(widget.newGroup.groupName)
+                  .doc(widget.newGroup.groupId)
                   .collection('messages')
                   .orderBy('timestamp', descending: true)
                   .snapshots(),
@@ -81,6 +81,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
             child: Row(
               children: [
                 Expanded(
+
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
@@ -95,6 +96,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   icon: Icon(Icons.send, color: Colors.blue),
                   onPressed: sendMessage,
                 ),
+               // Text(widget.newGroup.groupId),
               ],
             ),
           ),
