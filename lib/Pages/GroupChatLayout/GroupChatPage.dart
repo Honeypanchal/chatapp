@@ -12,7 +12,9 @@ class _GroupchatpageState extends State<Groupchatpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+body: Container(
+  child: Text(widget.newGroup.groupId!),
+),
     );
   }
 }
