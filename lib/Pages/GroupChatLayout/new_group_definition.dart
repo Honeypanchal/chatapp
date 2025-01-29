@@ -26,38 +26,56 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('New  Group',style: TextStyle(fontFamily: 'Raleway'),),
+        title: Text(
+          'New  Group',
+          style: TextStyle(fontFamily: 'Raleway'),
+        ),
         backgroundColor: Colors.blue[600], // WhatsApp color
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: width*0.052,vertical: height*0.032),
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.032, vertical: height * 0.032),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Group Name Section
               Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: CircleAvatar(
-                      radius: width*0.066,
+                      radius: width * 0.066,
                       backgroundColor: Colors.blue.shade300,
-                      child: Icon(Icons.camera_alt,color: Colors.white,),
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),SizedBox(width: width*0.012,),
-                  Expanded(flex: 4,
+                  ),
+                  SizedBox(
+                    width: width * 0.012,
+                  ),
+                  Expanded(
+                    flex: 4,
                     child: TextFormField(
                       controller: _groupName,
-                      decoration: InputDecoration(focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.blue, width: 2.0), // Color when focused
-                      ),
+                      decoration: InputDecoration(
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.blue,
+                                width: 2.0), // Color when focused
+                          ),
                           enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey, width: 1.0), // Color when not focused
-                          ),hintText: 'Group Name'),
+                            borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 1.0), // Color when not focused
+                          ),
+                          hintText: 'Group Name'),
                       style: TextStyle(
-                        fontSize: width * 0.06,
+                        fontSize: width * 0.05,
                         fontFamily: 'Raleway',
-
                         color: Colors.black,
                       ),
                       validator: (val) {
@@ -71,13 +89,76 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 ],
               ),
               SizedBox(height: height * 0.02),
+              Divider(
+                height: height * 0.012,
+                color: Colors.grey.shade100,
+                thickness: width * 0.02,
+              ),
+              SizedBox(
+                height: height * 0.012,
+              ),
               // Permissions Section
-              Text(
-                'Group Permissions',
-                style: TextStyle(
-                  fontSize: width * 0.06,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.032, vertical: height * 0.012),
+                child: Container(
+                  width: width,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            'Disappearing messages ',
+                            style: TextStyle(
+                              fontSize: width * 0.042,
+                              fontFamily: 'Poppins',
+                              color: Colors.black87,
+                            ),
+                          ),Spacer(),
+                          Opacity(
+                              opacity: 0.8,
+                              child: Icon(
+                                Icons.timer,
+                                color: Colors.grey,
+                              size: width*0.06,))
+                        ],
+                      ),
+                      Opacity(
+                        opacity: 0.8,
+                        child: Text(
+                          'Off',
+                          style: TextStyle(
+                            fontSize: width * 0.03,
+                            fontFamily: 'Poppins',
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),SizedBox(height: height*0.014,),
+                      Row(
+                        children: [
+                          Text(
+                            'Group Permissions',
+                            style: TextStyle(
+                              fontSize: width * 0.042,
+                              fontFamily: 'Poppins',
+                              color: Colors.black87,
+                            ),
+                          ),Spacer(),
+                          Opacity(
+                              opacity: 0.8,
+                              child: Icon(
+                                Icons.settings,
+                                color: Colors.grey,
+                                size: width*0.06,))
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: height * 0.02),
