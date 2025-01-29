@@ -2,7 +2,7 @@ import 'package:chatapp/models/CustomClass.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Group {
-  String? groupId;
+      String? groupId;
   final String groupName;
   final String groupIcon;
   final String groupDescription;
@@ -23,14 +23,14 @@ class Group {
     this.groupSettings=true,
     this.sendMessages=true,
     this.addOtherMembers=true,
-    required this.groupId,
+required this.groupId,
 
 
   });
 
   Map<String, dynamic> toMap() {
     return {
-      'groupId':groupId,
+'groupId':groupId,
       'groupName': groupName,
       'groupIcon': groupIcon,
       'groupDescription': groupDescription,
@@ -42,9 +42,10 @@ class Group {
       "addOtherMembers":addOtherMembers,
     };
   }
-void addId(String Id)
+void addId(String id )
 {
-  this.groupId;
+  this.groupId=id;
+
 }
 
   Group getGroupDetails(DocumentSnapshot doc) {
@@ -59,7 +60,7 @@ void addId(String Id)
       groupSettings: doc['groupSettings'],
       sendMessages: doc['sendMessages'],
       addOtherMembers: doc['addOtherMembers'],
-      groupId: doc['groupId'],
+      groupId: doc['groupId']
     );
   }
 }
