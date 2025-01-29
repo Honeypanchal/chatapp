@@ -96,6 +96,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   icon: Icon(Icons.send, color: Colors.blue),
                   onPressed: sendMessage,
                 ),
+               Text(widget.newGroup.groupId!)
                // Text(widget.newGroup.groupId),
               ],
             ),
