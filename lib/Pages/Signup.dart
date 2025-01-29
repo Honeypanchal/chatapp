@@ -1,4 +1,4 @@
-import 'package:chatapp/Authentication/CustomClass.dart';
+import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/auth_services.dart';
 import 'MainNavigation.dart';
@@ -845,7 +845,7 @@ class _SignupPageState extends State<SignupPage> {
       print("$email");
       try {
         CustomClass? user =
-            await signUpUser(firstName, lastName, email, password) ;
+            await signUpUser(firstName, email, password) ;
         if (user != null) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(

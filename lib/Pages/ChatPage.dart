@@ -64,21 +64,22 @@ class _ChatPageState extends State<ChatPage> {
             onTap: () {
               Navigator.of(context).pop();
             },
-            child: Container(
-              height: width > 600 ? width * 0.1 : width * 0.045,
-              width: width > 600 ? width * 0.1 : width * 0.035,
-              decoration:
-                  BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: width * 0.019),
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    size: width > 600 ? width * 0.6 : width * 0.044,
-                  ),
-                ),
-              ),
-            ),
+            // child: Container(
+            //   height: width > 600 ? width * 0.1 : width * 0.045,
+            //   width: width > 600 ? width * 0.1 : width * 0.035,
+            //   decoration:
+            //       BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            //   child: Center(
+            //     child: Padding(
+            //       padding: EdgeInsets.only(left: width * 0.019),
+            //       child: Icon(
+            //         Icons.arrow_back_ios,
+            //         size: width > 600 ? width * 0.6 : width * 0.044,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            child: Icon(Icons.arrow_back_ios,color: Colors.white,size: width>600 ? width *0.6 :width*0.06,),
           ),
         ),
         backgroundColor: Colors.blue[600],
@@ -91,8 +92,9 @@ class _ChatPageState extends State<ChatPage> {
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-                fontSize: width > 600 ? width * 0.05 : width * 0.052,
+                fontWeight: FontWeight.w500,
+                
+                fontSize: width > 600 ? width * 0.05 : width * 0.06,
               ),
             ),
             if (isMakingGroupChat)
@@ -138,20 +140,17 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 Align(
                   alignment: Alignment.center,child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: width*0.032),
+                    padding: EdgeInsets.only(left: width*0.01,right: width*0.01,top: height*0.018,bottom: height*0.01),
                     child: Container(
                       height: height * 0.052,
-                      width: isWeb ? width * 0.8 : width * 0.8,
+                      width: isWeb ? width * 0.9 : width * 0.9,
                       decoration: BoxDecoration(
                         boxShadow: [
-                          BoxShadow(
-                            color: Colors.black,
-                            spreadRadius: 1
-                    ,blurRadius: 1                      )
+
                         ],
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(width * 0.09),
-                          border: Border.all(color: Colors.white, width: 0.2)),
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(width * 0.03),
+                          ),
                       child: TextField(
                         controller: _searchText,
                         style: TextStyle(
@@ -244,16 +243,19 @@ class _ChatPageState extends State<ChatPage> {
                                             _chatUsers[index]['uid'])
                                         ? Colors.blue.shade600
                                         : Colors.black,
-                                    width: width * 0.007), // Border color
+                                    width: width * 0.002), // Border color
                               ),
                               child: CircleAvatar(
                                 backgroundColor: Colors.white,
-                                child: Icon(
-                                  Icons.person,
-                                  color: Colors.blue[600],
-                                ),
+                                child: 
+                                // Icon(
+                                //   Icons.person,
+                                //   color: Colors.blue[600],
+                                // ),
+                                Text("${_chatUsers[index]['firstName'][0].toUpperCase()}")
                               ),
                             ),
+                            
                             title: Text(
                               "${_chatUsers[index]['firstName']}  ${_chatUsers[index]['lastName']}",
                               style: TextStyle(

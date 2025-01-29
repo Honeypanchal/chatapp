@@ -326,8 +326,8 @@
 //   }
 // }
 
-import 'package:chatapp/Authentication/CustomClass.dart';
-import 'package:chatapp/Authentication/auth_services.dart';
+import 'package:chatapp/models/CustomClass.dart';
+import 'package:chatapp/services/auth_services.dart';
 import 'package:chatapp/Pages/FirstPage.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/Signup.dart';
