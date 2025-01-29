@@ -34,7 +34,7 @@ dependencies:
   firebase_auth:
   cloud_firestore:
   firebase_database:
-
+  fluttertoast: ^8.2.4
   google_sign_in:
   flutter_chat_bubble:
 

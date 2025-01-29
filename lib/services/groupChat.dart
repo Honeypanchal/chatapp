@@ -19,7 +19,11 @@ Future<Group> createNewGroup(
       createdBy: createdBy,
       participants: participants,
       createdAt: createdAt);
-
-  final newGroupId =  groupsDb.add(  newGroup.toMap() );
+  //
+  // final newGroupId =  groupsDb.add( newGroup.toMap() );
+  // print(newGroupId);
+  DocumentReference docRef = await groupsDb.add(newGroup.toMap()); // Await Firestore add operation
+  String groupId = docRef.id;
+  print(groupId);// Get the generated document ID
   return newGroup;
 }

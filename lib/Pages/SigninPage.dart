@@ -1,9 +1,12 @@
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/services/auth_services.dart';
 import 'package:chatapp/Pages/FirstPage.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/Signup.dart';
 import 'MainNavigation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SigninPage extends StatefulWidget {
   @override
@@ -15,7 +18,62 @@ class _SigninPageState extends State<SigninPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-bool showPass=true;
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
+
+  bool showPass=true;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _phoneController = TextEditingController();
+  String _verificationId = '';
+  final TextEditingController _otpController = TextEditingController();
+
+  Future<void> _verifyPhoneNumber() async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: _phoneController.text,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Automatically sign in the user if verification is completed (e.g., on Android devices).
+        await _auth.signInWithCredential(credential);
+        _showSnackBar('Authentication successful!');
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        _showSnackBar('Verification failed: ${e.message}');
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        // Save the verification ID and show the OTP input field.
+        setState(() {
+          _verificationId = verificationId;
+        });
+        _showSnackBar('OTP sent to your phone.');
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        // Handle timeout (optional).
+      },
+      timeout: Duration(seconds: 60),
+    );
+  }
+
+  Future<void> _signInWithOTP() async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId,
+        smsCode: _otpController.text,
+      );
+      await _auth.signInWithCredential(credential);
+      _showSnackBar('Authentication successful!');
+    } catch (e) {
+      _showSnackBar('Failed to authenticate: $e');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+
+
+
   bool _isValidEmail(String email) {
     return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
         .hasMatch(email);
@@ -50,6 +108,7 @@ bool showPass=true;
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -239,6 +298,40 @@ suffixIcon: IconButton(onPressed: (){
                               ),
                               SizedBox(
                                 height: screenHeight * 0.012,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  children: [
+                                    TextField(
+                                      controller: _phoneController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Phone Number',
+                                        hintText: '+1234567890',
+                                      ),
+                                      keyboardType: TextInputType.phone,
+                                    ),
+                                    SizedBox(height: 20),
+                                    ElevatedButton(
+                                      onPressed: _verifyPhoneNumber,
+                                      child: Text('Send OTP'),
+                                    ),
+                                    SizedBox(height: 20),
+                                    TextField(
+                                      controller: _otpController,
+                                      decoration: InputDecoration(
+                                        labelText: 'OTP',
+                                        hintText: 'Enter OTP',
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                    SizedBox(height: 20),
+                                    ElevatedButton(
+                                      onPressed: _signInWithOTP,
+                                      child: Text('Verify OTP'),
+                                    ),
+                                  ],
+                                ),
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
