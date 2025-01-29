@@ -8,16 +8,15 @@ Future<Group> createNewGroup(
     String groupName,
     String groupIcon,
     String groupDescription,
-    String createdBy,
-    List<String> participants,
-    Timestamp createdAt) async {
+    CustomClass createdBy,
+    List<Map<String,dynamic>> participants) async {
   Group newGroup = Group(
     groupId: '',
-    groupName: 'My Group',
-    groupIcon: 'icon_url',
-    groupDescription: 'This is a group.',
-    createdBy: 'User1',
-    participants: ['User1', 'User2'],
+    groupName: groupName,
+    groupIcon: groupIcon,
+    groupDescription:groupDescription,
+    createdBy: createdBy.toMap(),
+    participants: participants,
     createdAt: Timestamp.now(),
   );
 

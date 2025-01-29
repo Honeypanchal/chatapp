@@ -6,7 +6,7 @@ import 'package:chatapp/services/groupChat.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 
 class NewGroupDefinition extends StatefulWidget {
-  final List<String> members;
+  final List<Map<String,dynamic>> members;
   final CustomClass createdBy;
 
   const NewGroupDefinition(
@@ -204,7 +204,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           ),
                           SizedBox(height: height * 0.01),
                           Text(
-                            widget.members[index],
+                            widget.members[index]['firstName'],
                             style: TextStyle(
                               fontSize: width * 0.04,
                               color: Colors.black,
@@ -235,9 +235,9 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 _groupName.text.trim().toString(),
                 "assets/images/jpg",
                 "groupDescription",
-                widget.createdBy.uid,
+                widget.createdBy,
                 widget.members,
-                Timestamp.now());
+            );
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => Groupchatpage(newGroup: newGroup)));
           }
