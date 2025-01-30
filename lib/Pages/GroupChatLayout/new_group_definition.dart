@@ -1,3 +1,4 @@
+import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/models/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +7,7 @@ import 'package:chatapp/services/groupChat.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 
 class NewGroupDefinition extends StatefulWidget {
-  final List<Map<String,dynamic>> members;
+  final List<Map<String, dynamic>> members;
   final CustomClass createdBy;
 
   const NewGroupDefinition(
@@ -17,19 +18,35 @@ class NewGroupDefinition extends StatefulWidget {
 }
 
 class _NewGroupDefinitionState extends State<NewGroupDefinition> {
+
+  bool groupSettings=true;
+
+  bool sendMessages=true;
+
+  bool addOtherMembers=true;
+  TextEditingController _groupName = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    TextEditingController _groupName = TextEditingController();
+
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           'New  Group',
-          style: TextStyle(fontFamily: 'Raleway'),
+          style: TextStyle(fontFamily: 'Raleway',color: Colors.white),
         ),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            )),
         backgroundColor: Colors.blue[600], // WhatsApp color
       ),
       body: SingleChildScrollView(
@@ -116,45 +133,60 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                             'Disappearing messages ',
                             style: TextStyle(
                               fontSize: width * 0.042,
-
                               color: Colors.black87,
                             ),
-                          ),Spacer(),
-                          Opacity(
-                              opacity: 0.8,
-                              child: Icon(
-                                Icons.timer,
-                                color: Colors.grey,
-                              size: width*0.06,))
+                          ),
+                          Spacer(),
+                        IconButton(onPressed: (){
+                          print("Not implemented disappearing messages yet!");
+                        }, icon:   Icon(
+                          Icons.timer,
+                          color: Colors.grey,
+                          size: width * 0.06,
+                        ))
                         ],
                       ),
-                      Opacity(
-                        opacity: 0.9,
-                        child: Text(
-                          'Off',
-                          style: TextStyle(
-                            fontSize: width * 0.03,
-
-                            color: Colors.black87,
-                          ),
+                      Text(
+                        'Off',
+                        style: TextStyle(
+                          fontSize: width * 0.03,
+                          color: Colors.black87,
                         ),
-                      ),SizedBox(height: height*0.014,),
+                      ),
+                      SizedBox(
+                        height: height * 0.014,
+                      ),
                       Row(
                         children: [
                           Text(
                             'Group Permissions',
                             style: TextStyle(
                               fontSize: width * 0.042,
-
                               color: Colors.black87,
                             ),
-                          ),Spacer(),
-                          Opacity(
-                              opacity: 0.9,
-                              child: Icon(
+                          ),
+                          Spacer(),
+                          IconButton(
+                              onPressed: () async{
+                               final result= await  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => Grouppermissions(
+                                      groupSettings: groupSettings,
+                                      sendMessages: sendMessages,
+                                      addOtherMembers: addOtherMembers,
+
+                                    )));
+                              if(result!=null){
+                                groupSettings=result['groupSettings'];
+                                sendMessages=result['sendMessages'];
+                                addOtherMembers=result['addOtherMembers'];
+                                print('$groupSettings $sendMessages $addOtherMembers');
+                              }
+                              },
+                              icon: Icon(
                                 Icons.settings,
                                 color: Colors.grey,
-                                size: width*0.06,))
+                                size: width * 0.06,
+                              ))
                         ],
                       ),
                     ],
@@ -178,7 +210,6 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                       'Members : ${widget.members.length}',
                       style: TextStyle(
                         fontSize: width * 0.035,
-
                         color: Colors.black,
                       ),
                     ),
@@ -199,7 +230,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                         children: [
                           CircleAvatar(
                             radius: width * 0.1,
-                            // Adjusted size for avatars
+
                             child: Icon(Icons.person),
                           ),
                           SizedBox(height: height * 0.01),
@@ -231,15 +262,32 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               backgroundColor: Colors.red.shade300,
             ));
           } else {
-            Group newGroup = await createNewGroup(
-                _groupName.text.trim().toString(),
-                "assets/images/jpg",
+            try {
+              Group? newGroup = await createNewGroup(
+                _groupName.text.trim(),
+                "assets/images/images.jpg",
                 "groupDescription",
                 widget.createdBy,
                 widget.members,
-            );
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => Groupchatpage(newGroup: newGroup)));
+                groupSettings,
+                sendMessages,
+                addOtherMembers
+
+
+              );
+
+              if (newGroup != null) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => Groupchatpage(newGroup: newGroup)));
+                print("Group created successfully: ${newGroup.groupId}");
+                _groupName.clear();
+              } else {
+                print("Group creation failed.");
+              }
+            } catch (e, stackTrace) {
+              print("Unexpected error: $e");
+              print("StackTrace: $stackTrace");
+            }
           }
         },
         backgroundColor: Colors.blue[600],
