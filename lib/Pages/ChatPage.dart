@@ -113,7 +113,6 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
       body: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
         child: Column(
           children: [
             // Search bar section

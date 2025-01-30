@@ -30,7 +30,9 @@ class _FirstpageState extends State<Firstpage> {
 
 
                 Container(
+                  margin: EdgeInsets.only(left: width*0.080,right: width*0.03),
                   height: height * (isWeb ? 0.4 : 0.5),
+                  width: width,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(width * 0.35),
@@ -38,9 +40,9 @@ class _FirstpageState extends State<Firstpage> {
                   ),
                   child: Center(
                     child: Image.asset(
-                      'assets/images/login.webp',
+                      'assets/images/first_page.png',
                       height: height * (isWeb ? 0.5 : 0.6),
-                      width: width * (isWeb ? 0.3 : 0.75),
+                      width: width,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -82,41 +84,41 @@ class _FirstpageState extends State<Firstpage> {
                               ),
                             ),
                           ),
-                          SizedBox(height: height * 0.012),
+
                           // Subtitle text
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
-                            child: Text(
-                              "Chat with people around you easily.",
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: width * (isWeb ? 0.022 : 0.029),
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
-                            child: Text(
-                              "Sign in easily using Google/Facebook",
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: width * (isWeb ? 0.022 : 0.029),
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: height * 0.012),
+                          // Padding(
+                          //   padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
+                          //   child: Text(
+                          //     "Chat with people around you easily.",
+                          //     style: TextStyle(
+                          //       fontFamily: 'Poppins',
+                          //       fontSize: width * (isWeb ? 0.022 : 0.029),
+                          //       color: Colors.black,
+                          //     ),
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
+                          //   child: Text(
+                          //     "Sign in easily using Google/Facebook",
+                          //     style: TextStyle(
+                          //       fontFamily: 'Poppins',
+                          //       fontSize: width * (isWeb ? 0.022 : 0.029),
+                          //       color: Colors.black,
+                          //     ),
+                          //   ),
+                          // ),
+                          SizedBox(height: height * 0.055),
                           // Sign in button
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => SigninPage()));
                             },
                             child: Container(
-                              height: height * 0.06,
-                              width: width,
+                              height: height * 0.08,
+                              width: width*0.8,
                               decoration: BoxDecoration(
-                                  color: Color(0xFF995BF8),
+                                  color: Colors.black,
                                   borderRadius: BorderRadius.circular(width * 0.05)),
                               child: Center(
                                 child: Row(
@@ -129,31 +131,28 @@ class _FirstpageState extends State<Firstpage> {
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
                                         fontSize: width * (isWeb ? 0.04 : 0.05),
-                                        color: Color(0xFF242935),
+                                        color:Colors.white
                                       ),
                                     ),
-                                    SizedBox(width: width * 0.01),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: width * (isWeb ? 0.03 : 0.045),
-                                    ),
+                                    SizedBox(width: width * 0.02),
                                   ],
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: height * 0.012),
+                          SizedBox(height: height * 0.02),
                           // Register button
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignupPage()));
                             },
                             child: Container(
-                              height: height * 0.06,
-                              width: width,
+                              height: height * 0.08,
+                              width: width*0.8,
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                border: Border.all(color: Color(0xFFB485FA), width: 2),
+                                border: Border.all(color: Colors.black,width: 0.5),
+
                                 borderRadius: BorderRadius.circular(width * 0.05),
                               ),
                               child: Center(
@@ -169,11 +168,6 @@ class _FirstpageState extends State<Firstpage> {
                                         fontSize: width * (isWeb ? 0.04 : 0.05),
                                         color: Colors.black,
                                       ),
-                                    ),
-                                    SizedBox(width: width * 0.01),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: width * (isWeb ? 0.03 : 0.045),
                                     ),
                                   ],
                                 ),
