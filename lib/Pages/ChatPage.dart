@@ -23,7 +23,7 @@ class _ChatPageState extends State<ChatPage> {
   bool isMakingGroupChat = false;
 
   List _chatUsers = [];
-  List<Map<String, dynamic>> groupChatUsers = [];
+  List<String> groupChatUsers = [];
 
   // Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchGroups() {
   //
@@ -229,14 +229,14 @@ class _ChatPageState extends State<ChatPage> {
                               if (isMakingGroupChat) {
                                 setState(() {
                                   bool exists = groupChatUsers.any((x) =>
-                                      x['uid'] == _chatUsers[index]['uid']);
+                                      x == _chatUsers[index]['uid']);
 
                                   if (exists) {
                                     groupChatUsers.removeWhere((x) =>
-                                        x['uid'] == _chatUsers[index]['uid']);
+                                        x == _chatUsers[index]['uid']);
                                   } else {
                                     groupChatUsers
-                                        .add(_chatUsers[index].data());
+                                        .add(_chatUsers[index]['uid']);
                                   }
                                 });
 
@@ -265,7 +265,7 @@ class _ChatPageState extends State<ChatPage> {
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: groupChatUsers.any((x) =>
-                                          x['uid'] == _chatUsers[index]['uid'])
+                                          x == _chatUsers[index]['uid'])
                                       ? Colors.blue.shade600
                                       : Colors.black,
                                   width: width * 0.002,
@@ -327,7 +327,7 @@ class _ChatPageState extends State<ChatPage> {
         onPressed: () {
           if (isMakingGroupChat && groupChatUsers.isNotEmpty) {
             //pushing currentUser
-            groupChatUsers.add(widget.currentUser.toMap());
+            groupChatUsers.add(widget.currentUser.uid);
             Navigator.of(context)
                 .push(MaterialPageRoute(
                     builder: (context) => NewGroupDefinition(

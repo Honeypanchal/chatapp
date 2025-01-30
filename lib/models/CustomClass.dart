@@ -26,9 +26,11 @@ required this.activeChats
       });
 
   void addGroupAndAddActiveGroup(String groupId){
-    print("here for group");
-    groups.add(groupId);
-    activeChats.add(groupId);
+    print("here for group $groupId");
+   this.groups.add(groupId);
+
+print(groups.length);
+
   }
 
   Map<String, dynamic> toMap() {
