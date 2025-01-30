@@ -44,7 +44,7 @@ class _ChatPageState extends State<ChatPage> {
       });
     } else {
       return _database.snapshots().map((snapshot) {
-        // Sort the documents by first name
+
         snapshot.docs.sort((a, b) => a['firstName'].compareTo(b['firstName']));
         return snapshot.docs;
       });

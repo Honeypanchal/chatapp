@@ -9,7 +9,10 @@ Future<Group?> createNewGroup(
     String groupIcon,
     String groupDescription,
     CustomClass createdBy,
-    List<Map<String, dynamic>> participants) async {
+    List<Map<String, dynamic>> participants,
+    bool groupSettings,
+    bool sendMessages,
+    bool addOtherMembers) async {
   try {
     if (groupName.isEmpty) {
       throw Exception(" Group name cannot be empty. ");
@@ -27,6 +30,9 @@ Future<Group?> createNewGroup(
       createdBy: createdBy.toMap(),
       participants: participants,
       createdAt: Timestamp.now(),
+      groupSettings: groupSettings,
+      sendMessages: sendMessages,
+      addOtherMembers: addOtherMembers,
     );
     final newGroupRef = await groupsDb.add(newGroup.toMap());
     String newGroupId = newGroupRef.id;
