@@ -20,13 +20,14 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final _database = FirebaseFirestore.instance.collection('Users');
   dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
-  CollectionReference groupsDB = FirebaseFirestore.instance.collection("groups");
+  CollectionReference groupsDB =
+      FirebaseFirestore.instance.collection("groups");
   TextEditingController _searchText = new TextEditingController();
   dynamic _Chatdatabase = '';
   bool isMakingGroupChat = false;
 
   List _chatUsers = [];
-  List<Map<String, dynamic>> groupChatUsers = [];
+  List<String> groupChatUsers = [];
 
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchGroups() {
     return groupsDB.snapshots().map((querySnapshot) {
@@ -44,6 +45,7 @@ class _ChatPageState extends State<ChatPage> {
       });
     } else {
       return _database.snapshots().map((snapshot) {
+
         snapshot.docs.sort((a, b) => a['firstName'].compareTo(b['firstName']));
         return snapshot.docs;
       });
@@ -193,15 +195,16 @@ class _ChatPageState extends State<ChatPage> {
                               }
                             });
 
-                            print(groupChatUsers.length);
-                          }
-                        },
-                        onTap: () {
-                          String docId = widget.currentUser.uid
-                              .compareTo(_chatUsers[index]['uid']) < 0
-                              ? "${widget.currentUser.uid}_${_chatUsers[index]['uid']}"
-                              : "${_chatUsers[index]['uid']}_${widget.currentUser.uid}";
-                          _Chatdatabase = chatsDB.doc(docId);
+                                print(groupChatUsers.length);
+                              }
+                            },
+                            onTap: () {
+                              String docId = widget.currentUser.uid
+                                          .compareTo(_chatUsers[index]['uid']) <
+                                      0
+                                  ? "${widget.currentUser.uid}_${_chatUsers[index]['uid']}"
+                                  : "${_chatUsers[index]['uid']}_${widget.currentUser.uid}";
+                              _Chatdatabase = chatsDB.doc(docId);
 
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => ChatLayout(
@@ -269,9 +272,6 @@ class _ChatPageState extends State<ChatPage> {
                       var members = group['members'] ?? [];
                       int membersCount = members.length;
 
-                      // Check if the current user is a member of the group
-                      bool isMember = members.any((member) =>
-                      member['uid'] == widget.currentUser.uid);  // Compare user's UID
 
                       if (!isMember) {
                         return Container();  // If the user is not a member, don't display the group
@@ -331,6 +331,8 @@ class _ChatPageState extends State<ChatPage> {
         onPressed: () {
           if (isMakingGroupChat && groupChatUsers.isNotEmpty) {
             groupChatUsers.add(widget.currentUser.toMap());
+            //pushing currentUser
+            groupChatUsers.add(widget.currentUser.uid);
             Navigator.of(context)
                 .push(MaterialPageRoute(
                 builder: (context) => NewGroupDefinition(
@@ -354,7 +356,7 @@ class _ChatPageState extends State<ChatPage> {
           isMakingGroupChat ? Icons.arrow_forward : Icons.group_add,
           color: Colors.white,
           size: width < 600 ? width * 0.08 : width * 0.09,
-        ),
+        ), // Tooltip for the button
       ),
     );
   }

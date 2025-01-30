@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
 // import 'package:chat_application/Pages/HomePage.dart';
 // import 'package:chat_application/Pages/Profile.dart';
-
 // file is updated1
 class MainNavigationPage extends StatefulWidget {
   final CustomClass currentUser;
@@ -24,8 +23,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     super.initState();
 
     _pages = [
-      // HomePage(currentUser: widget.currentUser),
-      ChatPage(currentUser: widget.currentUser, ),
+
+      ChatPage(currentUser: widget.currentUser),
       // ProfilePage(currentUser: widget.currentUser),
     ];
   }
@@ -49,12 +48,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           items: const <BottomNavigationBarItem>[
 
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.chat),
               label: 'Chat',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.camera),
+              label: 'Status',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
