@@ -278,7 +278,17 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
 
               if (newGroup != null) {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Groupchatpage(newGroup: newGroup)));
+                    builder: (context) => Groupchatpage(newGroup: newGroup))).
+              catchError((error){
+                  print(error.toString());
+                });
+                //Adding group id to user and participants
+                widget.createdBy.addGroupAndAddActiveGroup(newGroup.groupId!);
+                widget.members.map((singleMember) {
+                  singleMember['groups'].add(newGroup.groupId);
+                  print("Group id added to everyone");
+                });
+
                 print("Group created successfully: ${newGroup.groupId}");
                 _groupName.clear();
               } else {

@@ -5,8 +5,8 @@ class CustomClass {
 
   String email;
 String? profilePicture;
-  List<String?>? groups;
-  List<String?>? activeChats;
+  List<String?> groups;
+  List<String?> activeChats;
  List<String?>? notifications;
 bool isActive=true;
 
@@ -21,8 +21,15 @@ required this.uid,
 
       this.password,
      this.profilePicture,
-
+       required  this.groups,
+required this.activeChats
       });
+
+  void addGroupAndAddActiveGroup(String groupId){
+    print("here for group");
+    groups.add(groupId);
+    activeChats.add(groupId);
+  }
 
   Map<String, dynamic> toMap() {
     return {
