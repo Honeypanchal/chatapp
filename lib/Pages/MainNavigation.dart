@@ -51,10 +51,6 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           items: const <BottomNavigationBarItem>[
 
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.camera),
               label: 'Status',
             ),

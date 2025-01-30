@@ -6,8 +6,8 @@ class Group {
   final String groupName;
   final String groupIcon;
   final String groupDescription;
-  final Map<String,dynamic> createdBy;
-  final List<Map<String,dynamic>> participants;
+  final String createdBy;
+  final List<String?> participants;
   final Timestamp createdAt;
   final bool groupSettings;
   final bool sendMessages;
@@ -55,7 +55,7 @@ void addId(String id )
       groupIcon: doc['groupIcon'],
       groupDescription: doc['groupDescription'],
       createdBy:  doc['createdBy'],
-      participants: List<Map<String,dynamic>>.from(doc['participants']),
+      participants: List<String>.from(doc['participants']),
       createdAt: doc['createdAt'],
       groupSettings: doc['groupSettings'],
       sendMessages: doc['sendMessages'],

@@ -1,13 +1,14 @@
 import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/models/Group.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:chatapp/services/users.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/groupChat.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 
 class NewGroupDefinition extends StatefulWidget {
-  final List<Map<String, dynamic>> members;
+  final List<String> members;
+
   final CustomClass createdBy;
 
   const NewGroupDefinition(
@@ -19,6 +20,15 @@ class NewGroupDefinition extends StatefulWidget {
 
 class _NewGroupDefinitionState extends State<NewGroupDefinition> {
 
+  List<String> membersFirstNameList=[];
+  Future<void> memebersFirstName() async {
+    List<String> fetchedNames = await getUserNames(widget.members);
+    setState(() {
+      membersFirstNameList = fetchedNames;
+    });
+  }
+
+
   bool groupSettings=true;
 
   bool sendMessages=true;
@@ -27,11 +37,14 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
   TextEditingController _groupName = TextEditingController();
 
   @override
+  void initState(){
+    super.initState();
+    memebersFirstName();
+  }
+  @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -47,7 +60,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               Icons.arrow_back,
               color: Colors.white,
             )),
-        backgroundColor: Colors.blue[600], // WhatsApp color
+        backgroundColor: Colors.black, // WhatsApp color
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -64,7 +77,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   Expanded(
                     child: CircleAvatar(
                       radius: width * 0.066,
-                      backgroundColor: Colors.blue.shade300,
+                      backgroundColor: Colors.black12,
                       child: Icon(
                         Icons.camera_alt,
                         color: Colors.white,
@@ -222,7 +235,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 height: height * 0.3, // Adjusted height for members list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: widget.members.length,
+                  itemCount: membersFirstNameList.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -235,7 +248,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           ),
                           SizedBox(height: height * 0.01),
                           Text(
-                            widget.members[index]['firstName'],
+                            membersFirstNameList[index],
                             style: TextStyle(
                               fontSize: width * 0.04,
                               color: Colors.black,
@@ -263,11 +276,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
             ));
           } else {
             try {
+
               Group? newGroup = await createNewGroup(
                 _groupName.text.trim(),
                 "assets/images/images.jpg",
                 "groupDescription",
-                widget.createdBy,
+                widget.createdBy.uid,
                 widget.members,
                 groupSettings,
                 sendMessages,
@@ -278,8 +292,21 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
 
               if (newGroup != null) {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Groupchatpage(newGroup: newGroup)));
+                    builder: (context) => Groupchatpage(newGroup: newGroup))).
+              catchError((error){
+                  print(error.toString());
+                });
+                //Adding group id to user and participants
+                widget.createdBy.addGroupAndAddActiveGroup(newGroup.groupId!);
+                print("Members length ${widget.members.length}");
+
+                for (var singleMember in widget.members) {
+                  print(singleMember);
+                  addGroupAndAddActiveGroupInDatabase(newGroup.groupId!, singleMember);
+                }
+
                 print("Group created successfully: ${newGroup.groupId}");
+                widget.members.clear();
                 _groupName.clear();
               } else {
                 print("Group creation failed.");
