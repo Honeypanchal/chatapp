@@ -1,3 +1,4 @@
+import 'package:chatapp/Pages/statuspage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
@@ -23,10 +24,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     super.initState();
 
     _pages = [
-      // HomePage(currentUser: widget.currentUser),
       ChatPage(currentUser: widget.currentUser),
-      // ProfilePage(currentUser: widget.currentUser),
-    ];
+      Statuspage(),
+      ];
   }
 
   void _onItemTapped(int index) {
@@ -53,7 +53,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.chat),
-              label: 'Chat',
+              label: 'status',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),

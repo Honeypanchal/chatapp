@@ -34,6 +34,8 @@ dependencies:
   firebase_auth:
   cloud_firestore:
   firebase_database:
+  firebase_storage:
+  image_picker:
 
   google_sign_in:
   flutter_chat_bubble:

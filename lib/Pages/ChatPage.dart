@@ -257,7 +257,7 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                             
                             title: Text(
-                              "${_chatUsers[index]['firstName']}  ${_chatUsers[index]['lastName']}",
+                              "${_chatUsers[index]['firstName']}}",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontFamily: 'Raleway',
