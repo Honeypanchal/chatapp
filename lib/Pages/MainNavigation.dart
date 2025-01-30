@@ -1,8 +1,10 @@
 import 'package:chatapp/models/CustomClass.dart';
+import 'package:chatapp/services/groupChat.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
 // import 'package:chat_application/Pages/HomePage.dart';
 // import 'package:chat_application/Pages/Profile.dart';
+
 // file is updated1
 class MainNavigationPage extends StatefulWidget {
   final CustomClass currentUser;
@@ -23,7 +25,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
     _pages = [
       // HomePage(currentUser: widget.currentUser),
-      ChatPage(currentUser: widget.currentUser),
+      ChatPage(currentUser: widget.currentUser, ),
       // ProfilePage(currentUser: widget.currentUser),
     ];
   }
