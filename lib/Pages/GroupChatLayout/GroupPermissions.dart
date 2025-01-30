@@ -29,7 +29,7 @@ class _GrouppermissionsState extends State<Grouppermissions> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.blue[600],
+        backgroundColor: Colors.black,
         title: Text(
           "Group permissions",
           style: TextStyle(
@@ -109,8 +109,8 @@ class _GrouppermissionsState extends State<Grouppermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.blue[600],
-                            focusColor: Colors.blue[600],
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.groupSettings,
                             onChanged: (val) {
                         setState(() {
@@ -145,8 +145,8 @@ class _GrouppermissionsState extends State<Grouppermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.blue[600],
-                            focusColor: Colors.blue[600],
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.sendMessages,
                             onChanged: (val) {
                          setState(() {
@@ -181,8 +181,8 @@ class _GrouppermissionsState extends State<Grouppermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.blue[600],
-                            focusColor: Colors.blue[600],
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.addOtherMembers,
                             onChanged: (val) {
                            setState(() {

@@ -1,5 +1,7 @@
 // import 'package:chatapp/models/Group.dart';
 // import 'package:flutter/material.dart';
+import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 import 'package:chatapp/models/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,10 +33,31 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
   @override
   Widget build(BuildContext context) {
+    final height=MediaQuery.of(context).size.height;
+    final width=MediaQuery.of(context).size.width;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.newGroup.groupName),
-        backgroundColor: Colors.blue,
+      appBar: PreferredSize(
+        preferredSize: Size(width, height*0.072)  ,child: GestureDetector(
+          onTap: (){
+
+Navigator.of(context).push(MaterialPageRoute(builder: (context)=>GroupChatDetails(group: widget.newGroup,)));
+          },child: AppBar(
+
+            leading: IconButton(onPressed: (){
+Navigator.of(context).pop();
+            }, icon: Icon(Icons.arrow_back,color: Colors.white,)),
+            title: Text(widget.newGroup.groupName,style: TextStyle(color: Colors.white),),
+            actions: [
+          Row(children: [
+            IconButton(onPressed: (){}, icon: Icon(Icons.call,color: Colors.white,)),
+             IconButton(onPressed: (){}, icon:      Icon(Icons.video_call,color: Colors.white,),)
+          ],)
+
+            ],
+            backgroundColor: Colors.black,
+          ),
+        ),
       ),
       body: Column(
         children: [

@@ -102,7 +102,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
         ),
-        backgroundColor: Colors.blue[600],
+        backgroundColor: Colors.black,
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,7 +345,7 @@ class _ChatPageState extends State<ChatPage> {
             });
           }
         },
-        backgroundColor: Colors.blue[600],
+        backgroundColor: Colors.black,
         tooltip: 'Create New Group',
         child: Icon(
           isMakingGroupChat ? Icons.arrow_forward : Icons.group_add,

@@ -41,3 +41,11 @@ Future<void> addGroupAndAddActiveGroupInDatabase(String groupId, String path) as
     print("Error: ${e.toString()}");
   }
 }
+
+Future<String> getFirstNameById(String userId)async{
+  final userdata= await usersDb.doc(userId).get();
+
+  return userdata['firstName'];
+}
+
+
