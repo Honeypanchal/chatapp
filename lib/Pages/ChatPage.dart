@@ -113,7 +113,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
       body: SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
+
         child: Column(
           children: [
             // Search bar section
@@ -269,6 +269,14 @@ class _ChatPageState extends State<ChatPage> {
                       var members = group['members'] ?? [];
                       int membersCount = members.length;
 
+                      // Check if the current user is a member of the group
+                      bool isMember = members.any((member) =>
+                      member['uid'] == widget.currentUser.uid);  // Compare user's UID
+
+                      if (!isMember) {
+                        return Container();  // If the user is not a member, don't display the group
+                      }
+
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Colors.blue.shade600,
@@ -296,8 +304,7 @@ class _ChatPageState extends State<ChatPage> {
                             groupIcon: group['groupIcon'] ?? '',
                             groupDescription: group['groupDescription'] ?? '',
                             createdBy: group['createdBy'] ?? {},
-                            participants: List<Map<String, dynamic>>.from(
-                                group['participants'] ?? []),
+                            participants: List<Map<String, dynamic>>.from(group['participants'] ?? []),
                             createdAt: group['createdAt'] ?? Timestamp.now(),
                             groupSettings: group['groupSettings'] ?? true,
                             sendMessages: group['sendMessages'] ?? true,
@@ -316,6 +323,7 @@ class _ChatPageState extends State<ChatPage> {
                 );
               },
             ),
+
           ],
         ),
       ),
