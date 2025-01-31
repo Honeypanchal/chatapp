@@ -2,47 +2,72 @@ import 'package:chatapp/models/Group.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chatapp/services/users.dart';
+import 'package:chatapp/services/groupChat.dart';
 
 class GroupChatDetails extends StatefulWidget {
-  final dynamic group;
+  final String groupId;
 
-  const GroupChatDetails({super.key, required this.group});
+  const GroupChatDetails({super.key, required this.groupId});
 
   @override
   State<GroupChatDetails> createState() => _GroupChatDetailsState();
 }
 
 class _GroupChatDetailsState extends State<GroupChatDetails> {
-  String firstName='';
- 
-  List<String> membersFirstNameList=[];
+  String firstName = '';
+  String groupDescription='';
+  dynamic group;
+
+  List<String> membersFirstNameList = [];
+
+  Future<void> getGroup() async{
+    final anothergroup=await fetchGroupByGroupId(widget.groupId);
+   setState(() {
+     group=anothergroup;
+   print(group['groupId']);
+   });  if (group != null) {
+     setState(() {
+       groupDescription=group['groupDescription'];
+     });
+      await getDataAndUpdateUI();
+      await memebersFirstName();
+    }
+  }
   Future<void> memebersFirstName() async {
-    List<String> fetchedNames = await getUserNames(widget.group.participants);
+    print(group['participants']);
+
+    List<String> participants = (group['participants'] as List<dynamic>).map((e) => e.toString()).toList();
+
+    List<String> fetchedNames = await getUserNames(participants);
+
     setState(() {
       membersFirstNameList = fetchedNames;
     });
   }
 
+
   Future<void> getDataAndUpdateUI() async {
-    String enteredFirstName = await getFirstNameById(widget.group.createdBy); // Await the Future to get the value
+    String enteredFirstName = await getFirstNameById(
+       group['createdBy']); // Await the Future to get the value
 
     setState(() {
-      firstName=enteredFirstName;
+      firstName = enteredFirstName;
     });
   }
+
   @override
   void initState() {
     super.initState();
-
-getDataAndUpdateUI();
-    memebersFirstName();
+    getGroup();
 
   }
 
-  void _showGroupDescriptionModal() {
+  Future<String?> _showGroupDescriptionModal() async {
     TextEditingController descriptionController = TextEditingController();
+    descriptionController.text = group['groupDescription'] ?? "";
 
-    showModalBottomSheet(
+
+    return await showModalBottomSheet<String?>(
       backgroundColor: Colors.white,
       context: context,
       isScrollControlled: true,
@@ -59,49 +84,41 @@ getDataAndUpdateUI();
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title
               Text(
                 "Group Description",
-                style: TextStyle(
-                  fontSize: screenWidth * 0.05,
-
-                ),
+                style: TextStyle(fontSize: screenWidth * 0.05),
               ),
               SizedBox(height: screenHeight * 0.015),
-
-
               TextFormField(
                 controller: descriptionController,
                 decoration: InputDecoration(
-                  focusColor: Colors.black,
-
-                  hintText: "Add group description",
+                  hintText:group['groupDescription']??"Add group description",
                   border: UnderlineInputBorder(),
                 ),
               ),
               SizedBox(height: screenHeight * 0.02),
-
-
               Text(
                 "The group description is visible to members of this group and people invited to this group.",
-                style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+                style:
+                    TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
-
-
               Row(
                 children: [
                   Expanded(
                     child: TextButton(
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero), // No rounded corners
-                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero),
+                        padding: EdgeInsets.symmetric(
+                            vertical: screenHeight * 0.015),
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, null); // Return null if canceled
                       },
-                      child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                      child:
+                          Text("Cancel", style: TextStyle(color: Colors.red)),
                     ),
                   ),
                   SizedBox(width: screenWidth * 0.02),
@@ -109,17 +126,18 @@ getDataAndUpdateUI();
                     child: TextButton(
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.015),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero),
+                        padding: EdgeInsets.symmetric(
+                            vertical: screenHeight * 0.015),
                       ),
                       onPressed: () {
                         String enteredDescription = descriptionController.text;
-                        if(descriptionController.text.isEmpty){
-
-                        }else{
-
+                        if (enteredDescription.isNotEmpty) {
                           print("Group Description: $enteredDescription");
-                          Navigator.pop(context);
+
+                          Navigator.pop(context,
+                              enteredDescription); // Return the entered description
                         }
                       },
                       child: Text("OK", style: TextStyle(color: Colors.white)),
@@ -133,8 +151,6 @@ getDataAndUpdateUI();
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -169,9 +185,9 @@ getDataAndUpdateUI();
               ),
             ),
             SizedBox(height: height * 0.012),
-            Text(widget.group.groupName,
+            Text(group['groupName'],
                 style: TextStyle(fontSize: width * 0.055)),
-            Text('Group · ${widget.group.participants.length} members',
+            Text('Group · ${group['participants'].length} members',
                 style: TextStyle(color: Colors.grey, fontSize: width * 0.042)),
             SizedBox(height: 24),
             Row(
@@ -195,22 +211,39 @@ getDataAndUpdateUI();
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(onTap:(){
-                    _showGroupDescriptionModal();
-                  },
+                  GestureDetector(
+                    onTap: () async {
+                      String? desc = await _showGroupDescriptionModal();
+                      if (desc != null) {
+                        try {
+                          await editGroupInfo(group['groupId'], desc);
+                          // setState(() {
+                          //   group['groupDescription'] = desc;
+                          // });
+    setState(() {
+                            groupDescription=desc;
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content:
+                                Text("Group description edited succesfully"),
+                            backgroundColor: Colors.blue.shade200,
+                          ));
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
                     child: Text(
-                      'Add group description',
+                    groupDescription,
                       style: TextStyle(
                           color: Colors.blue[500], fontSize: width * 0.037),
                     ),
                   ),
                   SizedBox(height: height * 0.005),
-
-                    Text(
-                        'Created by ${firstName}, ${(widget.group.createdAt)}',
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
-
-
+                  Text(
+                    'Created by ${firstName}, ${(group['createdAt'])}',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                 ],
               ),
@@ -347,12 +380,12 @@ getDataAndUpdateUI();
                     // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "${widget.group.participants.length} members ",
+                        "${group['participants'].length} members ",
                         style: TextStyle(fontSize: width * 0.042),
                       ),
                       Spacer(),
                       Padding(
-                        padding: EdgeInsets.only(right: width*0.052),
+                        padding: EdgeInsets.only(right: width * 0.052),
                         child: Icon(
                           Icons.search,
                           size: width * 0.062,
@@ -360,47 +393,66 @@ getDataAndUpdateUI();
                       )
                     ],
                   ),
-                  SizedBox(height: height*0.012,),
-
+                  SizedBox(
+                    height: height * 0.012,
+                  ),
                   SizedBox(
                     width: double.infinity,
                     child: Column(
-                      children: [    ListTile( contentPadding: EdgeInsets.zero,
-                        leading:   CircleAvatar(
-                            backgroundColor: Colors.black,
-                            child:Icon(Icons.group_add_outlined,color: Colors.white,size: width*0.052,)
+                      children: [
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: CircleAvatar(
+                              backgroundColor: Colors.black,
+                              child: Icon(
+                                Icons.group_add_outlined,
+                                color: Colors.white,
+                                size: width * 0.052,
+                              )),
+                          title: Text(
+                            "Add members",
+                            style: TextStyle(fontSize: width * 0.045),
+                          ),
                         ),
-                        title: Text("Add members",style: TextStyle(fontSize: width * 0.045),),
-                      ),
                         ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
-                          itemCount: widget.group.participants.length,
+                          itemCount: group['participants'].length,
                           itemBuilder: (context, index) {
                             return ListTile(
                               contentPadding: EdgeInsets.zero,
                               leading: CircleAvatar(
                                 backgroundColor: Colors.black,
                                 child: Text(
-                                  '${membersFirstNameList[index][0].toUpperCase()}',
+                                  membersFirstNameList[index][0].toUpperCase(),
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),
                               title: Text(membersFirstNameList[index]),
-                              trailing: membersFirstNameList[index]==firstName?Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.shade200,borderRadius: BorderRadius.circular(width*0.01)
-                                ),width: width*0.12,height: height*0.017,
-                               child: Center(child: Text("Admin",style: TextStyle(fontSize: width*0.027,color: Colors.white),),),
-                              ):null,
-
+                              trailing: membersFirstNameList[index] == firstName
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.blue.shade200,
+                                          borderRadius: BorderRadius.circular(
+                                              width * 0.01)),
+                                      width: width * 0.12,
+                                      height: height * 0.017,
+                                      child: Center(
+                                        child: Text(
+                                          "Admin",
+                                          style: TextStyle(
+                                              fontSize: width * 0.027,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    )
+                                  : null,
                             );
                           },
                         ),
                       ],
                     ),
-                  )
-,
+                  ),
                 ],
               ),
             ),
@@ -418,7 +470,6 @@ getDataAndUpdateUI();
                 'Add to Favourites',
                 style: TextStyle(fontSize: width * 0.045),
               ),
-
             ),
             ListTile(
               leading: Icon(
@@ -427,25 +478,24 @@ getDataAndUpdateUI();
               ),
               title: Text('Add to list',
                   style: TextStyle(fontSize: width * 0.045)),
-
             ),
             ListTile(
               leading: Icon(
                 Icons.exit_to_app,
-                size: width * 0.06,color: Colors.red,
+                size: width * 0.06,
+                color: Colors.red,
               ),
               title: Text('Exit group',
-                  style: TextStyle(color: Colors.red,fontSize: width * 0.045)),
-
+                  style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
             ),
             ListTile(
               leading: Icon(
                 Icons.thumb_down_alt_outlined,
-                size: width * 0.06,color: Colors.red,
+                size: width * 0.06,
+                color: Colors.red,
               ),
               title: Text('Report group',
-                  style: TextStyle(color: Colors.red,fontSize: width * 0.045)),
-
+                  style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
             ),
           ],
         ),

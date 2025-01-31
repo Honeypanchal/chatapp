@@ -41,7 +41,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
         preferredSize: Size(width, height*0.072)  ,child: GestureDetector(
           onTap: (){
 
-Navigator.of(context).push(MaterialPageRoute(builder: (context)=>GroupChatDetails(group: widget.newGroup,)));
+Navigator.of(context).push(MaterialPageRoute(builder: (context)=>GroupChatDetails(groupId: widget.newGroup.groupId!)));
           },child: AppBar(
 
             leading: IconButton(onPressed: (){

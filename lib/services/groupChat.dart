@@ -1,4 +1,5 @@
 import 'package:chatapp/models/CustomClass.dart';
+import 'package:chatapp/services/users.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatapp/models/Group.dart';
 
@@ -36,6 +37,7 @@ Future<Group?> createNewGroup(
     );
     final newGroupRef = await groupsDb.add(newGroup.toMap());
     String newGroupId = newGroupRef.id;
+    await groupsDb.doc(newGroupId).update({"groupId":newGroupId});
     newGroup.addId(newGroupId);
     print(" Group created successfully with ID: $newGroupId ");
     return newGroup;
@@ -48,4 +50,25 @@ Future<Group?> createNewGroup(
   }
 }
 
+Future<dynamic> fetchGroupByGroupId(String groupId)async{
+  try{
 
+print("HEREKHNFSEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+    final group= await groupsDb.doc(groupId).get();
+
+    print(groupId);
+    return group;
+  }catch(e){
+    throw e;
+  }
+}
+
+Future<void> editGroupInfo(String groupId, String desc)async{
+ try{
+   print('$groupId');
+   final data= await groupsDb.doc(groupId).update({"groupDescription":desc});
+   print("Edited succesfully");
+ }catch(e){
+   throw e ;
+ }
+}
