@@ -92,28 +92,38 @@ class _GroupchatpageState extends State<Groupchatpage> {
     final width=MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(
-        title: selectedMessages.isNotEmpty
-            ? Text("${selectedMessages.length} selected")
-            : isSearching
-            ? TextField(
-          autofocus: true,
-          decoration: const InputDecoration(hintText: "Search messages"),
-          onChanged: (query) => setState(() => searchQuery = query),
-        )
-            : Text(widget.newGroup.groupName),
-        backgroundColor: Colors.blue,
-        actions: [
-          if (selectedMessages.isNotEmpty) ...[
-            IconButton(icon: const Icon(Icons.push_pin, color: Colors.yellow), onPressed: togglePinnedForSelected),
-            IconButton(icon: const Icon(Icons.star, color: Colors.orange), onPressed: toggleFavoriteForSelected),
-            IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: deleteMessages),
-            IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => setState(() => selectedMessages.clear())),
-          ] else ...[
-            if (!isSearching) IconButton(icon: const Icon(Icons.search), onPressed: startSearch),
-            if (isSearching) IconButton(icon: const Icon(Icons.close), onPressed: stopSearch),
+      appBar: PreferredSize(
+        preferredSize: Size(width, height*0.072)  ,
+        child: GestureDetector(
+    onTap: (){
+    Future.delayed(Duration(seconds: 3));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>GroupChatDetails(groupId: widget.newGroup.groupId!)));
+    },
+        child: AppBar(
+          
+          title: selectedMessages.isNotEmpty
+              ? Text("${selectedMessages.length} selected")
+              : isSearching
+              ? TextField(
+            autofocus: true,
+            decoration: const InputDecoration(hintText: "Search messages"),
+            onChanged: (query) => setState(() => searchQuery = query),
+          )
+              : Text(widget.newGroup.groupName,style:TextStyle(color:Colors.white)),
+          backgroundColor: Colors.black,
+          actions: [
+            if (selectedMessages.isNotEmpty) ...[
+              IconButton(icon: const Icon(Icons.push_pin, color: Colors.white), onPressed: togglePinnedForSelected),
+              IconButton(icon: const Icon(Icons.star, color: Colors.white), onPressed: toggleFavoriteForSelected),
+              IconButton(icon: const Icon(Icons.delete, color: Colors.white), onPressed: deleteMessages),
+              IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => setState(() => selectedMessages.clear())),
+            ] else ...[
+              if (!isSearching) IconButton(icon: const Icon(Icons.search,color:Colors.white), onPressed: startSearch),
+              if (isSearching) IconButton(icon: const Icon(Icons.close,color:Colors.white), onPressed: stopSearch),
+            ],
           ],
-        ],
+        ),
+      )
       ),
       body: Column(
         children: [
@@ -206,7 +216,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     ),
                   ),
                 ),
-                IconButton(icon: const Icon(Icons.send, color: Colors.blue), onPressed: sendMessage),
+                IconButton(icon: const Icon(Icons.send, color: Colors.black), onPressed: sendMessage),
               ],
             ),
           ),

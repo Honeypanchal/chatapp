@@ -1,6 +1,7 @@
 import 'package:chatapp/Pages/GroupChatLayout/new_group_definition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/chat_layout.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
@@ -273,12 +274,37 @@ class _ChatPageState extends State<ChatPage> {
                     return Center(child: Text("No groups found"));
                   }
 
+                  // Get current user's ID
+                  String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+                  // Filter groups where the user is a member
+                  var userGroups = snapshot.data!.where((doc) {
+                    var group = doc.data();
+                    List members = group['participants'] ?? [];
+                    return members.contains(currentUserId);
+                  }).toList();
+
+                  if (userGroups.isEmpty) {
+                    return Center(child: Text("You are not a member of any groups"));
+                  }
+
                   return Column(
-                    children: List.generate(snapshot.data!.length, (index) {
-                      var group = snapshot.data![index].data();
-                      var groupName = group['groupName'] ?? 'No Group Name';
-                      var members = group['members'] ?? [];
-                      int membersCount = members.length;
+                    children: List.generate(userGroups.length, (index) {
+                      var groupDoc = userGroups[index];
+
+                      // Use your Group class method
+                      Group groupObj = Group(
+                        groupName: groupDoc['groupName'],
+                        groupIcon: groupDoc['groupIcon'],
+                        groupDescription: groupDoc['groupDescription'],
+                        createdBy: groupDoc['createdBy'],
+                        participants: List<String>.from(groupDoc['participants']),
+                        createdAt: groupDoc['createdAt'],
+                        groupSettings: groupDoc['groupSettings'],
+                        sendMessages: groupDoc['sendMessages'],
+                        addOtherMembers: groupDoc['addOtherMembers'],
+                        groupId: groupDoc.id, // Assign Firestore ID
+                      );
 
                       return ListTile(
                         leading: CircleAvatar(
@@ -286,33 +312,13 @@ class _ChatPageState extends State<ChatPage> {
                           child: Icon(Icons.group, color: Colors.white),
                         ),
                         title: Text(
-                          groupName,
+                          groupObj.groupName,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
-                        subtitle: Text(
-                          'Members: $membersCount',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
                         onTap: () {
-                          var groupDoc = snapshot.data![index];
-                          var groupData = groupDoc.data();
-                          String groupId = groupDoc.id;
-
-                          Group groupObj = Group(
-                            groupId: groupId,
-                            groupName: groupName,
-                            groupIcon: group['groupIcon'] ?? '',
-                            groupDescription: group['groupDescription'] ?? '',
-                            createdBy: group['createdBy'] ?? {},
-                            participants: List<String>.from(group['participants'] ?? []),
-                            createdAt: group['createdAt'] ?? Timestamp.now(),
-                            groupSettings: group['groupSettings'] ?? true,
-                            sendMessages: group['sendMessages'] ?? true,
-                            addOtherMembers: group['addOtherMembers'] ?? true,
-                          );
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => Groupchatpage(newGroup: groupObj),
@@ -324,6 +330,7 @@ class _ChatPageState extends State<ChatPage> {
                   );
                 },
               ),
+
             ],
           ),
         ),
