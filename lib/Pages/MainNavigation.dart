@@ -44,7 +44,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           border: Border.all(color: Colors.white)
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.blue[600],
+          backgroundColor: Colors.black,
           items: const <BottomNavigationBarItem>[
 
             BottomNavigationBarItem(
@@ -61,7 +61,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.indigo[900],
+          selectedItemColor: Colors.blue,
           unselectedItemColor: Colors.white,
           onTap: _onItemTapped,
         ),

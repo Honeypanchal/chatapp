@@ -192,7 +192,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                                 groupSettings=result['groupSettings'];
                                 sendMessages=result['sendMessages'];
                                 addOtherMembers=result['addOtherMembers'];
-                                print('$groupSettings $sendMessages $addOtherMembers');
+
                               }
                               },
                               icon: Icon(
@@ -232,6 +232,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               SizedBox(height: height * 0.02),
               // Member Profiles Section
               Container(
+
                 height: height * 0.3, // Adjusted height for members list
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -280,7 +281,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               Group? newGroup = await createNewGroup(
                 _groupName.text.trim(),
                 "assets/images/images.jpg",
-                "groupDescription",
+                "Group Description",
                 widget.createdBy.uid,
                 widget.members,
                 groupSettings,
@@ -291,22 +292,23 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               );
 
               if (newGroup != null) {
-                Navigator.of(context).push(MaterialPageRoute(
+
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => Groupchatpage(newGroup: newGroup))).
               catchError((error){
                   print(error.toString());
                 });
                 //Adding group id to user and participants
                 widget.createdBy.addGroupAndAddActiveGroup(newGroup.groupId!);
-                print("Members length ${widget.members.length}");
+
 
                 for (var singleMember in widget.members) {
-                  print(singleMember);
+
                   addGroupAndAddActiveGroupInDatabase(newGroup.groupId!, singleMember);
                 }
 
                 print("Group created successfully: ${newGroup.groupId}");
-                widget.members.clear();
+                // widget.members.clear();
                 _groupName.clear();
               } else {
                 print("Group creation failed.");
@@ -317,7 +319,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
             }
           }
         },
-        backgroundColor: Colors.blue[600],
+        backgroundColor: Colors.black,
         child: Icon(
           Icons.arrow_forward,
           color: Colors.white,

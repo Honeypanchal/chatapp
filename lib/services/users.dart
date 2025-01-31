@@ -4,7 +4,7 @@ final CollectionReference usersDb = FirebaseFirestore.instance.collection("Users
 
 Future<List<String>> getUserNames(List<String> usersUid) async {
   List<String> userNames = [];
-
+print("here to fetch firstnames");
   for (String user in usersUid) {
     DocumentSnapshot snapshot = await usersDb.doc(user).get();
     if (snapshot.exists) {
@@ -41,3 +41,11 @@ Future<void> addGroupAndAddActiveGroupInDatabase(String groupId, String path) as
     print("Error: ${e.toString()}");
   }
 }
+
+Future<String> getFirstNameById(String userId)async{
+  final userdata= await usersDb.doc(userId).get();
+
+  return userdata['firstName'];
+}
+
+
