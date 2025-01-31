@@ -37,6 +37,9 @@ dependencies:
   fluttertoast: ^8.2.4
   image_picker:
   file_picker:
+  firebase_storage:
+
+
   google_sign_in:
   flutter_chat_bubble:
 
