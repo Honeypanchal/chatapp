@@ -38,9 +38,9 @@ class _FirstpageState extends State<Firstpage> {
                   ),
                   child: Center(
                     child: Image.asset(
-                      'assets/images/login.webp',
+                      'assets/images/main1.png',
                       height: height * (isWeb ? 0.5 : 0.6),
-                      width: width * (isWeb ? 0.3 : 0.75),
+                      width: width * (isWeb ? 0.3 : 0.90),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -71,7 +71,7 @@ class _FirstpageState extends State<Firstpage> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: width * (isWeb ? 0.12 : 0.064)),
                               child: Text(
-                                "Login/Register to Get started!",
+                                "Let's Get started!",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
@@ -116,8 +116,9 @@ class _FirstpageState extends State<Firstpage> {
                               height: height * 0.06,
                               width: width,
                               decoration: BoxDecoration(
-                                  color: Color(0xFF995BF8),
-                                  borderRadius: BorderRadius.circular(width * 0.05)),
+                                  color: Colors.black,
+                                  border: Border.all(color: Color(0xFF9C9998)),
+                                  borderRadius: BorderRadius.circular(width * 0.03)),
                               child: Center(
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -129,12 +130,13 @@ class _FirstpageState extends State<Firstpage> {
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
                                         fontSize: width * (isWeb ? 0.04 : 0.05),
-                                        color: Color(0xFF242935),
+                                        color: Colors.white,
                                       ),
                                     ),
                                     SizedBox(width: width * 0.01),
                                     Icon(
                                       Icons.arrow_forward_ios,
+                                      color: Colors.white,
                                       size: width * (isWeb ? 0.03 : 0.045),
                                     ),
                                   ],
@@ -153,8 +155,8 @@ class _FirstpageState extends State<Firstpage> {
                               width: width,
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                border: Border.all(color: Color(0xFFB485FA), width: 2),
-                                borderRadius: BorderRadius.circular(width * 0.05),
+                                border: Border.all(color: Colors.black, width: 2),
+                                borderRadius: BorderRadius.circular(width * 0.03),
                               ),
                               child: Center(
                                 child: Row(
