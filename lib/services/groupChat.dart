@@ -5,8 +5,7 @@ import 'package:chatapp/models/Group.dart';
 
 CollectionReference groupsDb = FirebaseFirestore.instance.collection("groups");
 
-Future<Group?> createNewGroup(
-    String groupName,
+Future<Group?> createNewGroup(String groupName,
     String groupIcon,
     String groupDescription,
     String createdBy,
@@ -39,7 +38,7 @@ Future<Group?> createNewGroup(
     );
     final newGroupRef = await groupsDb.add(newGroup.toMap());
     String newGroupId = newGroupRef.id;
-    await groupsDb.doc(newGroupId).update({"groupId":newGroupId});
+    await groupsDb.doc(newGroupId).update({"groupId": newGroupId});
     newGroup.addId(newGroupId);
     print(" Group created successfully with ID: $newGroupId ");
     return newGroup;
@@ -52,25 +51,38 @@ Future<Group?> createNewGroup(
   }
 }
 
-Future<dynamic> fetchGroupByGroupId(String groupId)async{
-  try{
-
-print("HEREKHNFSEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-    final group= await groupsDb.doc(groupId).get();
+Future<dynamic> fetchGroupByGroupId(String groupId) async {
+  try {
+    print("HEREKHNFSEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+    final group = await groupsDb.doc(groupId).get();
 
     print(groupId);
     return group;
-  }catch(e){
+  } catch (e) {
     throw e;
   }
 }
 
-Future<void> editGroupInfo(String groupId, String desc)async{
- try{
-   print('$groupId');
-   final data= await groupsDb.doc(groupId).update({"groupDescription":desc});
-   print("Edited succesfully");
- }catch(e){
-   throw e ;
- }
+Future<void> editGroupInfo(String groupId, String desc) async {
+  try {
+    print('$groupId');
+    final data = await groupsDb.doc(groupId).update({"groupDescription": desc});
+    print("Edited succesfully");
+  } catch (e) {
+    throw e;
+  }
+}
+
+Future<void> updateGroupSettings(String groupId, bool groupSettings,
+    bool sendMessages, bool addOtherMembers,List<String> admins) async{
+  try {
+    final groupDoc = await groupsDb.doc(groupId).update({
+      "groupSettings":groupSettings,
+      "sendMessages":sendMessages,
+      "addOtherMembers":addOtherMembers,
+      "admins":admins,
+    });
+  } catch (e) {
+    print(e.toString());
+  }
 }

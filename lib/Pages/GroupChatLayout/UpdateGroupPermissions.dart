@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../../services/users.dart';
 
-class Grouppermissions extends StatefulWidget {
+class Updategrouppermissions extends StatefulWidget {
   bool groupSettings;
 
   bool sendMessages;
 
   bool addOtherMembers;
   List<String> admins;
-final String currentUser;
+  final String currentUser;
   List<String> members;
 
-  Grouppermissions({
+  Updategrouppermissions({
     super.key,
     required this.groupSettings,
     required this.sendMessages,
@@ -23,10 +23,10 @@ final String currentUser;
   });
 
   @override
-  State<Grouppermissions> createState() => _GrouppermissionsState();
+  State<Updategrouppermissions> createState() => _UpdategrouppermissionsState();
 }
 
-class _GrouppermissionsState extends State<Grouppermissions> {
+class _UpdategrouppermissionsState extends State<Updategrouppermissions> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -48,7 +48,8 @@ class _GrouppermissionsState extends State<Grouppermissions> {
               Navigator.of(context).pop({
                 'groupSettings': widget.groupSettings,
                 "sendMessages": widget.sendMessages,
-                "addOtherMembers": widget.addOtherMembers
+                "addOtherMembers": widget.addOtherMembers,
+                "admins":widget.admins
               });
             },
             icon: Icon(
@@ -193,7 +194,7 @@ class _GrouppermissionsState extends State<Grouppermissions> {
                             onChanged: (val) {
                               setState(() {
                                 widget.addOtherMembers =
-                                    !widget.addOtherMembers;
+                                !widget.addOtherMembers;
                               });
                             }),
                       ),
@@ -252,10 +253,179 @@ class _GrouppermissionsState extends State<Grouppermissions> {
                             child: Switch(value: false, onChanged: (val) {})))
                   ],
                 ),
+                SizedBox(
+                  height: height * 0.012,
+                ),
+                Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      "Group admins : ",
+                      style: TextStyle(
+                        fontSize: width * 0.042,
+                      ),
+                    )),
+                ListTile(
+                  onTap: () {
+                    setState(() async {
+                      widget.admins= await  Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => GroupMembers(
+                              groupMembers: widget.members,
+                              admins: widget.admins,
+                              currentUser:widget.currentUser
+                          )));
+                    });
 
+                  },
+                  leading: Icon(
+                    Icons.group_add_outlined,
+                    size: width * 0.054,
+                  ),
+                  title: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: width * 0.012, vertical: height * 0.012),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: width * 0.012),
+                      child: Text("Edit group admins"),
+                    ),
+                  ),
+                )
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class GroupMembers extends StatefulWidget {
+  final List<String> groupMembers;
+  final List<String> admins;
+  final String currentUser;
+
+  const GroupMembers(
+      {super.key, required this.groupMembers, required this.admins,required this.currentUser});
+
+  @override
+  State<GroupMembers> createState() => _GroupMembersState();
+}
+
+class _GroupMembersState extends State<GroupMembers> {
+  List<String> membersFirstNameList = [];
+
+  bool isCurrentUserAdmin(String userId) {
+    return widget.admins.contains(userId);
+  }
+
+  Future<void> memebersFirstName() async {
+    print(widget.groupMembers);
+
+    List<String> participants = (widget.groupMembers as List<dynamic>)
+        .map((e) => e.toString())
+        .toList();
+
+    List<String> fetchedNames = await getUserNames(participants);
+
+    setState(() {
+      membersFirstNameList = fetchedNames;
+    });
+  }
+  @override
+  void initState(){
+    super.initState();
+    memebersFirstName();
+  }
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop({'admins':widget.admins});
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            )),
+        title: Text("Edit Admin",style: TextStyle(color: Colors.white,fontFamily: 'Raleway'),),
+      ),
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: EdgeInsets.symmetric(horizontal: width*0.052,vertical: height*0.032),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Text("Admins :"),
+
+              ],
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: membersFirstNameList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  onTap: (){
+                    if(!widget.admins.contains(widget.groupMembers[index])){
+                      setState(() {
+                        widget.admins.add(widget.groupMembers[index]);
+                      });
+
+                    }else
+                    {
+                      setState(() {
+                        if(widget.currentUser==widget.groupMembers[index]){}
+                        else{  widget.admins.remove(widget.groupMembers[index]);}
+
+                      });
+                    }
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  leading: Container(
+                    padding: EdgeInsets.all(width * 0.002),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color:  isCurrentUserAdmin(widget.groupMembers[index])
+                            ? Colors.blue.shade600
+                            : Colors.black,
+                        width: width * 0.002,
+                      ),),
+                    child: CircleAvatar(
+                      radius: width*0.055,
+                      backgroundColor: Colors.black,
+                      child: Text(
+                        membersFirstNameList[index][0].toUpperCase(),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  title: Text(membersFirstNameList[index]),
+                  trailing: isCurrentUserAdmin(widget.groupMembers[index])
+                      ? Container(
+                    decoration: BoxDecoration(
+                        color: Colors.blue.shade200,
+                        border: Border.all(color: Colors.blue.shade200),
+                        borderRadius: BorderRadius.circular(width * 0.01)),
+                    width: width * 0.12,
+                    height: height * 0.017,
+                    child: Center(
+                      child: Text(
+                        "Admin",
+                        style: TextStyle(
+                            fontSize: width * 0.027, color: Colors.white),
+                      ),
+                    ),
+                  )
+                      : null,
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
