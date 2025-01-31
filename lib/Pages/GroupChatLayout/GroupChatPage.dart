@@ -40,7 +40,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
       appBar: PreferredSize(
         preferredSize: Size(width, height*0.072)  ,child: GestureDetector(
           onTap: (){
-
+Future.delayed(Duration(seconds: 3));
 Navigator.of(context).push(MaterialPageRoute(builder: (context)=>GroupChatDetails(groupId: widget.newGroup.groupId!)));
           },child: AppBar(
 

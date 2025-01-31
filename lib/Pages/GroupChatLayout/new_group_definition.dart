@@ -284,6 +284,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 "Group Description",
                 widget.createdBy.uid,
                 widget.members,
+                [widget.createdBy.uid],
                 groupSettings,
                 sendMessages,
                 addOtherMembers

@@ -245,7 +245,41 @@ class _GrouppermissionsState extends State<Grouppermissions> {
                             child: Switch(value: false, onChanged: (val) {})))
                   ],
                 ),
+                SizedBox(
+                  height: height * 0.012,
+                ),
+                Opacity(
+                    opacity: 0.5,
+                    child: Text(
+                      "Group admins : ",
+                      style: TextStyle(
+                        fontSize: width * 0.042,
+                      ),
+                    )),
+                ListTile(
+                  onTap: (){
+
+                  },
+                  leading: Icon(Icons.group_add_outlined,      size: width * 0.054,),
+                  title: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: width * 0.012, vertical: height * 0.012),
+                    child: Padding(
+                      padding:  EdgeInsets.only(left: width*0.012),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                        children: [
+                          Text("Edit group admins"),
+
+                        ],
+                      ),
+                    ),
+                  ),
+                )
               ],
+
             ),
           ),
         ),

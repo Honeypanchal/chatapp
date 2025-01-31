@@ -11,6 +11,7 @@ Future<Group?> createNewGroup(
     String groupDescription,
     String createdBy,
     List<String> participants,
+    List<String> admins,
     bool groupSettings,
     bool sendMessages,
     bool addOtherMembers) async {
@@ -30,6 +31,7 @@ Future<Group?> createNewGroup(
       groupDescription: groupDescription,
       createdBy: createdBy,
       participants: participants,
+      admins: admins,
       createdAt: Timestamp.now(),
       groupSettings: groupSettings,
       sendMessages: sendMessages,

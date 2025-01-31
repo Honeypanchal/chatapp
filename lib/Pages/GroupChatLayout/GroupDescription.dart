@@ -1,3 +1,4 @@
+import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
 import 'package:chatapp/models/Group.dart';
 import 'package:flutter/material.dart';
 
@@ -15,28 +16,43 @@ class GroupChatDetails extends StatefulWidget {
 
 class _GroupChatDetailsState extends State<GroupChatDetails> {
   String firstName = '';
-  String groupDescription='';
+  String groupDescription = '';
   dynamic group;
 
   List<String> membersFirstNameList = [];
 
-  Future<void> getGroup() async{
-    final anothergroup=await fetchGroupByGroupId(widget.groupId);
-   setState(() {
-     group=anothergroup;
-   print(group['groupId']);
-   });  if (group != null) {
-     setState(() {
-       groupDescription=group['groupDescription'];
-     });
+  List<String> admins = [];
+
+  Future<void> getGroup() async {
+    final anothergroup = await fetchGroupByGroupId(widget.groupId);
+    setState(() {
+      group = anothergroup;
+      print(group['groupId']);
+    });
+    if (group != null) {
+      setState(() {
+        groupDescription = group['groupDescription'];
+      });
+      setState(() {
+        admins = (group['admins'] as List<dynamic>)
+            .map((e) => e.toString())
+            .toList();
+      });
       await getDataAndUpdateUI();
       await memebersFirstName();
     }
   }
+
+  bool isCurrentUserAdmin(String userId) {
+    return admins.contains(userId);
+  }
+
   Future<void> memebersFirstName() async {
     print(group['participants']);
 
-    List<String> participants = (group['participants'] as List<dynamic>).map((e) => e.toString()).toList();
+    List<String> participants = (group['participants'] as List<dynamic>)
+        .map((e) => e.toString())
+        .toList();
 
     List<String> fetchedNames = await getUserNames(participants);
 
@@ -45,10 +61,9 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
     });
   }
 
-
   Future<void> getDataAndUpdateUI() async {
     String enteredFirstName = await getFirstNameById(
-       group['createdBy']); // Await the Future to get the value
+        group['createdBy']); // Await the Future to get the value
 
     setState(() {
       firstName = enteredFirstName;
@@ -59,13 +74,11 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
   void initState() {
     super.initState();
     getGroup();
-
   }
 
   Future<String?> _showGroupDescriptionModal() async {
     TextEditingController descriptionController = TextEditingController();
     descriptionController.text = group['groupDescription'] ?? "";
-
 
     return await showModalBottomSheet<String?>(
       backgroundColor: Colors.white,
@@ -92,7 +105,8 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
               TextFormField(
                 controller: descriptionController,
                 decoration: InputDecoration(
-                  hintText:group['groupDescription']??"Add group description",
+                  hintText:
+                      group['groupDescription'] ?? "Add group description",
                   border: UnderlineInputBorder(),
                 ),
               ),
@@ -185,8 +199,7 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
               ),
             ),
             SizedBox(height: height * 0.012),
-            Text(group['groupName'],
-                style: TextStyle(fontSize: width * 0.055)),
+            Text(group['groupName'], style: TextStyle(fontSize: width * 0.055)),
             Text('Group · ${group['participants'].length} members',
                 style: TextStyle(color: Colors.grey, fontSize: width * 0.042)),
             SizedBox(height: 24),
@@ -195,7 +208,10 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
               children: [
                 _buildButton(Icons.call, 'Audio'),
                 _buildButton(Icons.videocam, 'Video'),
-                _buildButton(Icons.person_add, 'Add'),
+
+                //Adding a new member to the group ;
+                GestureDetector(
+                    onTap: () {}, child: _buildButton(Icons.person_add, 'Add')),
                 _buildButton(Icons.search, 'Search'),
               ],
             ),
@@ -220,8 +236,8 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                           // setState(() {
                           //   group['groupDescription'] = desc;
                           // });
-    setState(() {
-                            groupDescription=desc;
+                          setState(() {
+                            groupDescription = desc;
                           });
 
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -235,7 +251,7 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                       }
                     },
                     child: Text(
-                    groupDescription,
+                      groupDescription,
                       style: TextStyle(
                           color: Colors.blue[500], fontSize: width * 0.037),
                     ),
@@ -365,6 +381,26 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                     activeColor: Colors.black,
                   )),
             ),
+            if (isCurrentUserAdmin(group['createdBy'])) ...[
+              ListTile(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => Grouppermissions(
+                          groupSettings: group['groupSettings'],
+                          sendMessages: group['sendMessages'],
+                          addOtherMembers: group['addOtherMembers'])));
+                },
+                leading: Icon(
+                  Icons.settings,
+                  size: width * 0.06,
+                ),
+                title: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                  child: Text('Group permissions',
+                      style: TextStyle(fontSize: width * 0.045)),
+                ),
+              )
+            ],
             Divider(
                 height: height * 0.012,
                 thickness: height * 0.007,
@@ -429,10 +465,13 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                                 ),
                               ),
                               title: Text(membersFirstNameList[index]),
-                              trailing: membersFirstNameList[index] == firstName
+                              trailing: isCurrentUserAdmin(
+                                      group['participants'][index])
                                   ? Container(
                                       decoration: BoxDecoration(
                                           color: Colors.blue.shade200,
+                                          border: Border.all(
+                                              color: Colors.blue.shade200),
                                           borderRadius: BorderRadius.circular(
                                               width * 0.01)),
                                       width: width * 0.12,
