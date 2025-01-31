@@ -175,10 +175,12 @@
 //     );
 //   }
 // }
+
 import 'package:chatapp/models/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:chatapp/services/users.dart';
 
 class Groupchatpage extends StatefulWidget {
   final Group newGroup;
@@ -193,15 +195,15 @@ class _GroupchatpageState extends State<Groupchatpage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Set<String> selectedMessages = {};
+  bool isSearching = false;
+  String searchQuery = "";
 
   void sendMessage() async {
     if (_messageController.text.trim().isNotEmpty) {
       String userId = _auth.currentUser!.uid;
-      var user = widget.newGroup.participants.firstWhere(
-            (member) => member['uid'] == userId,
-        orElse: () => {'firstName': 'Unknown'},
-      );
-      String username = user['firstName'];
+      List<String> userNameList = await getUserNames([userId]);
+      String username = userNameList.isNotEmpty ? userNameList.first : "Unknown";
+
       await _firestore.collection('groups').doc(widget.newGroup.groupId).collection('messages').add({
         'senderUid': userId,
         'sender': username,
@@ -210,18 +212,37 @@ class _GroupchatpageState extends State<Groupchatpage> {
         'pinned': false,
         'favorite': false,
       });
+
       _messageController.clear();
     }
   }
 
-  void toggleSelection(String messageId) {
-    setState(() {
-      if (selectedMessages.contains(messageId)) {
-        selectedMessages.remove(messageId);
-      } else {
-        selectedMessages.add(messageId);
-      }
-    });
+  void togglePinnedForSelected() async {
+    for (String messageId in selectedMessages) {
+      DocumentReference messageRef = _firestore
+          .collection('groups')
+          .doc(widget.newGroup.groupId)
+          .collection('messages')
+          .doc(messageId);
+      DocumentSnapshot messageDoc = await messageRef.get();
+      bool currentStatus = messageDoc['pinned'] ?? false;
+      await messageRef.update({'pinned': !currentStatus});
+    }
+    setState(() => selectedMessages.clear());
+  }
+
+  void toggleFavoriteForSelected() async {
+    for (String messageId in selectedMessages) {
+      DocumentReference messageRef = _firestore
+          .collection('groups')
+          .doc(widget.newGroup.groupId)
+          .collection('messages')
+          .doc(messageId);
+      DocumentSnapshot messageDoc = await messageRef.get();
+      bool currentStatus = messageDoc['favorite'] ?? false;
+      await messageRef.update({'favorite': !currentStatus});
+    }
+    setState(() => selectedMessages.clear());
   }
 
   void deleteMessages() async {
@@ -233,59 +254,37 @@ class _GroupchatpageState extends State<Groupchatpage> {
           .doc(messageId)
           .delete();
     }
-    setState(() {
-      selectedMessages.clear();
-    });
+    setState(() => selectedMessages.clear());
   }
 
-  void togglePinned() async {
-    for (String messageId in selectedMessages) {
-      var messageRef = _firestore
-          .collection('groups')
-          .doc(widget.newGroup.groupId)
-          .collection('messages')
-          .doc(messageId);
-      var messageSnapshot = await messageRef.get();
-      bool isPinned = messageSnapshot['pinned'] ?? false;
-      await messageRef.update({'pinned': !isPinned});
-    }
-    setState(() {
-      selectedMessages.clear();
-    });
-  }
-
-  void toggleFavorite() async {
-    for (String messageId in selectedMessages) {
-      var messageRef = _firestore
-          .collection('groups')
-          .doc(widget.newGroup.groupId)
-          .collection('messages')
-          .doc(messageId);
-      var messageSnapshot = await messageRef.get();
-      bool isFavorite = messageSnapshot['favorite'] ?? false;
-      await messageRef.update({'favorite': !isFavorite});
-    }
-    setState(() {
-      selectedMessages.clear();
-    });
-  }
+  void startSearch() => setState(() => isSearching = true);
+  void stopSearch() => setState(() => isSearching = false);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: selectedMessages.isNotEmpty
-          ? AppBar(
-        backgroundColor: Colors.blueGrey,
-        title: Text("${selectedMessages.length} selected"),
-        actions: [
-          IconButton(icon: const Icon(Icons.star), onPressed: toggleFavorite),
-          IconButton(icon: const Icon(Icons.push_pin), onPressed: togglePinned),
-          IconButton(icon: const Icon(Icons.delete), onPressed: deleteMessages),
-        ],
-      )
-          : AppBar(
-        title: Text(widget.newGroup.groupName),
+      appBar: AppBar(
+        title: selectedMessages.isNotEmpty
+            ? Text("${selectedMessages.length} selected")
+            : isSearching
+            ? TextField(
+          autofocus: true,
+          decoration: const InputDecoration(hintText: "Search messages"),
+          onChanged: (query) => setState(() => searchQuery = query),
+        )
+            : Text(widget.newGroup.groupName),
         backgroundColor: Colors.blue,
+        actions: [
+          if (selectedMessages.isNotEmpty) ...[
+            IconButton(icon: const Icon(Icons.push_pin, color: Colors.yellow), onPressed: togglePinnedForSelected),
+            IconButton(icon: const Icon(Icons.star, color: Colors.orange), onPressed: toggleFavoriteForSelected),
+            IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: deleteMessages),
+            IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => setState(() => selectedMessages.clear())),
+          ] else ...[
+            if (!isSearching) IconButton(icon: const Icon(Icons.search), onPressed: startSearch),
+            if (isSearching) IconButton(icon: const Icon(Icons.close), onPressed: stopSearch),
+          ],
+        ],
       ),
       body: Column(
         children: [
@@ -298,65 +297,65 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   .orderBy('timestamp', descending: true)
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                var messages = snapshot.data!.docs;
+
                 return ListView.builder(
                   reverse: true,
-                  itemCount: snapshot.data!.docs.length,
+                  itemCount: messages.length,
                   itemBuilder: (context, index) {
-                    var message = snapshot.data!.docs[index];
+                    var message = messages[index];
                     bool isMe = message['senderUid'] == _auth.currentUser!.uid;
-                    bool isSelected = selectedMessages.contains(message.id);
                     bool isPinned = message['pinned'] ?? false;
                     bool isFavorite = message['favorite'] ?? false;
+                    bool isSearched = searchQuery.isNotEmpty &&
+                        RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b', caseSensitive: false).hasMatch(message['message']);
 
                     return GestureDetector(
-                      onLongPress: () => toggleSelection(message.id),
+                      onLongPress: () {
+                        setState(() {
+                          selectedMessages.contains(message.id)
+                              ? selectedMessages.remove(message.id)
+                              : selectedMessages.add(message.id);
+                        });
+                      },
                       child: Container(
-                        color: isSelected ? Colors.lightBlue.withOpacity(0.3) : Colors.transparent,
+                        color: selectedMessages.contains(message.id) ? Colors.lightBlue.withOpacity(0.3) : Colors.transparent,
                         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        child: Align(
-                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                          child: Stack(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: isMe ? Colors.blue : Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  message['message'],
-                                  style: TextStyle(
-                                    color: isMe ? Colors.white : Colors.black,
-                                  ),
-                                ),
+                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: isMe ? Colors.blue : Colors.grey[300],
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              // Positioning icons below the message
-                              if (isPinned || isFavorite)
-                                Positioned(
-                                  bottom: -4, // Adjust as needed to position it just below the message
-                                  right: 5,
-                                  child: Row(
-                                    children: [
-                                      if (isPinned)
-                                        Icon(
-                                          Icons.push_pin,
-                                          color: Colors.orange,
-                                          size: 16,
-                                        ),
-                                      if (isFavorite)
-                                        Icon(
-                                          Icons.star,
-                                          color: Colors.yellow,
-                                          size: 16,
-                                        ),
-                                    ],
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isPinned)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.push_pin, size: 14, color: Colors.yellow),
+                                        SizedBox(width: 5),
+                                        Text("Pinned", style: TextStyle(fontSize: 12, color: Colors.yellow)),
+                                      ],
+                                    ),
+                                  Text(
+                                    message['message'],
+                                    style: TextStyle(
+                                      color: isMe ? Colors.white : Colors.black,
+                                      backgroundColor: isSearched ? Colors.yellow.withOpacity(0.5) : null,
+                                    ),
                                   ),
-                                ),
-                            ],
-                          ),
+                                  if (isFavorite) Icon(Icons.star, size: 14, color: Colors.orange),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -374,9 +373,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     controller: _messageController,
                     decoration: InputDecoration(
                       hintText: "Type a message",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                     ),
                   ),
                 ),
