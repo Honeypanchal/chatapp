@@ -1,31 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Status
-{
+class Status {
   String uid;
   String username;
-  String photoUrl;
-  List<String> statusImageUrls;
+  String text;
   Timestamp timestamp;
-  List<String> viewBy;
+  List<String> viewedBy;
 
   Status({
     required this.uid,
     required this.username,
-    required this.photoUrl,
-    required this.statusImageUrls,
+    required this.text,
     required this.timestamp,
-    required this.viewBy,
+    required this.viewedBy,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
       'username': username,
-      'photoUrl': photoUrl,
-      'statusImageUrls': statusImageUrls,
+      'text': text,
       'timestamp': timestamp,
-      'viewedBy': viewBy,
+      'viewedBy': viewedBy,
     };
   }
 
@@ -33,10 +29,9 @@ class Status
     return Status(
       uid: map['uid'],
       username: map['username'],
-      photoUrl: map['photoUrl'],
-      statusImageUrls: List<String>.from(map['statusImageUrls']),
+      text: map['text'] ?? "",
       timestamp: map['timestamp'],
-      viewBy: List<String>.from(map['viewedBy']),
+      viewedBy: List<String>.from(map['viewedBy'] ?? []),
     );
   }
 }

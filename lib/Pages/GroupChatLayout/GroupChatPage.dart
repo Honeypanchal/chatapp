@@ -175,6 +175,7 @@
 //     );
 //   }
 // }
+
 import 'package:chatapp/models/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -193,24 +194,38 @@ class _GroupchatpageState extends State<Groupchatpage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Set<String> selectedMessages = {};
-
   void sendMessage() async {
     if (_messageController.text.trim().isNotEmpty) {
       String userId = _auth.currentUser!.uid;
-      var user = widget.newGroup.participants.firstWhere(
-            (member) => member['uid'] == userId,
-        orElse: () => {'firstName': 'Unknown'},
-      );
-      String username = user['firstName'];
-      await _firestore.collection('groups').doc(widget.newGroup.groupId).collection('messages').add({
-        'senderUid': userId,
-        'sender': username,
-        'message': _messageController.text.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
-        'pinned': false,
-        'favorite': false,
-      });
-      _messageController.clear();
+
+      try {
+        // Fetch the user's first name from Firestore
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+
+        // Ensure the document exists and the field is not null
+        String username = 'Unknown';
+        if (userDoc.exists) {
+          var userData = userDoc.data() as Map<String, dynamic>?; // Ensure it's a map
+          username = userData?['firstName'] ?? 'Unknown'; // Fetch 'firstName'
+        }
+
+        // Send the message to Firestore
+        await _firestore.collection('groups')
+            .doc(widget.newGroup.groupId)
+            .collection('messages')
+            .add({
+          'senderUid': userId,
+          'sender': username, // Store the sender's name correctly
+          'message': _messageController.text.trim(),
+          'timestamp': FieldValue.serverTimestamp(),
+          'pinned': false,
+          'favorite': false,
+        });
+
+        _messageController.clear();
+      } catch (e) {
+        print("Error fetching user data: $e"); // Log errors
+      }
     }
   }
 

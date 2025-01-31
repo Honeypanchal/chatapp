@@ -27,7 +27,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     _pages = [
       // HomePage(currentUser: widget.currentUser),
       ChatPage(currentUser: widget.currentUser, ),
-      Statuspage(),
+      StatusPage(),
       // ProfilePage(currentUser: widget.currentUser),
     ];
   }
@@ -49,6 +49,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         child: BottomNavigationBar(
           backgroundColor: Colors.blue[600],
           items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'chat',
+            ),
 
             BottomNavigationBarItem(
               icon: Icon(Icons.camera),

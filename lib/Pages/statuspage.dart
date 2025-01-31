@@ -1,150 +1,136 @@
 import 'package:chatapp/services/status_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/Status.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
 
-class Statuspage extends StatefulWidget {
+class StatusPage extends StatefulWidget {
   @override
-  State<Statuspage> createState() => _StatuspageState();
+  State<StatusPage> createState() => _StatusPageState();
 }
 
-class _StatuspageState extends State<Statuspage> {
+class _StatusPageState extends State<StatusPage> {
   final StatusService _statusService = StatusService();
-  final ImagePicker _picker = ImagePicker();
+  final TextEditingController _statusController = TextEditingController();
 
-  Future<void> _uploadStatus() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      _statusService.uploadStatus([image.path]);
+  void _uploadTextStatus() {
+    if (_statusController.text.trim().isNotEmpty) {
+      _statusService.uploadStatus(_statusController.text.trim());
+      _statusController.clear();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black,
         title: Text(
           'Status',
           style: TextStyle(
-              fontFamily: 'poppins',
+              color: Colors.white,
+              fontFamily: 'Poppins',
               fontWeight: FontWeight.w600,
               fontSize: width * 0.06),
         ),
-
       ),
-      body: StreamBuilder(stream: _statusService.getStatuses(), builder: (context,snapshot)
-      {
-        if(!snapshot.hasData) return Center(child: CircularProgressIndicator(),);
-        List<Status> statuses=snapshot.data!;
-        return ListView.builder(itemCount: statuses.length,itemBuilder: (context,index)
-        {
-          Status status=statuses[index];
-          return ListTile(
-            leading: CircleAvatar(backgroundImage: NetworkImage(status.photoUrl),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _statusController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your status...',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send, color: Colors.black),
+                  onPressed: _uploadTextStatus,
+                ),
+              ],
             ),
-            title: Text(status.username),
-            subtitle: Text('${status.timestamp.toDate()}'),
-            onTap:(){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>
-              ViewStatusScreen(status:status)),
-              );
-            }
+          ),
+          Expanded(
+            child: StreamBuilder<List<Status>>(
+              stream: _statusService.getStatuses(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-          );
-        });
-      },
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(
+                    child: Text('No statuses available'),
+                  );
+                }
 
-      ),
-      floatingActionButton: FloatingActionButton(onPressed: (){
-        _uploadStatus();
-      },
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        child: Icon(Icons.add_a_photo,color: Colors.white,size: width*0.04,),
-        
-        
+                List<Status> statuses = snapshot.data!;
+
+                return ListView.builder(
+                  itemCount: statuses.length,
+                  itemBuilder: (context, index) {
+                    Status status = statuses[index];
+
+                    return ListTile(
+                      leading: CircleAvatar(
+                        child: Text(status.username[0].toUpperCase()), // Display first letter of username
+                      ),
+                      title: Text(status.username),
+                      subtitle: Text(status.text),
+                      trailing: Text(
+                        '${status.timestamp.toDate().hour}:${status.timestamp.toDate().minute}',
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ViewStatusScreen(status: status),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+
 class ViewStatusScreen extends StatelessWidget {
   final Status status;
+  final StatusService _statusService = StatusService();
 
- final StatusService _statusService=StatusService();
-
- ViewStatusScreen({required this.status});
+  ViewStatusScreen({required this.status});
 
   @override
   Widget build(BuildContext context) {
-    _statusService.markStatusAsViewed(status.uid);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _statusService.markStatusAsViewed(status.uid);
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Image.network(status.statusImageUrls[0]),
+      appBar: AppBar(title: Text('Status View')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            status.text,
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
     );
   }
 }
-
-//
-// @override
-// Widget build(BuildContext context) {
-//   return Scaffold(
-//     appBar: AppBar(title: Text("Status")),
-//     body: StreamBuilder<List<Status>>(
-//       stream: _statusService.getStatuses(),
-//       builder: (context, snapshot) {
-//         if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-//
-//         List<Status> statuses = snapshot.data!;
-//         return ListView.builder(
-//           itemCount: statuses.length,
-//           itemBuilder: (context, index) {
-//             Status status = statuses[index];
-//             return ListTile(
-//               leading: CircleAvatar(
-//                 backgroundImage: NetworkImage(status.photoUrl),
-//               ),
-//               title: Text(status.username),
-//               subtitle: Text("Posted at: ${status.timestamp.toDate()}"),
-//               onTap: () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(builder: (context) => ViewStatusScreen(status: status)),
-//                 );
-//               },
-//             );
-//           },
-//         );
-//       },
-//     ),
-//     floatingActionButton: FloatingActionButton(
-//       child: Icon(Icons.add),
-//       onPressed: _uploadStatus,
-//     ),
-//   );
-// }
-// }
-//
-// // Status View Screen
-// class ViewStatusScreen extends StatelessWidget {
-//   final Status status;
-//   final StatusService _statusService = StatusService();
-//
-//   ViewStatusScreen({required this.status});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     _statusService.markStatusAsViewed(status.uid);
-//
-//     return Scaffold(
-//       backgroundColor: Colors.black,
-//       body: Center(
-//         child: Image.network(status.statusImageUrls[0]),
-//       ),
-//     );
-//   }
-// }
