@@ -281,7 +281,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               Group? newGroup = await createNewGroup(
                 _groupName.text.trim(),
                 "assets/images/images.jpg",
-                "groupDescription",
+                "Group Description",
                 widget.createdBy.uid,
                 widget.members,
                 groupSettings,
