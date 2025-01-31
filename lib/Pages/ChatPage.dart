@@ -304,6 +304,8 @@ class _ChatPageState extends State<ChatPage> {
                         sendMessages: groupDoc['sendMessages'],
                         addOtherMembers: groupDoc['addOtherMembers'],
                         groupId: groupDoc.id, // Assign Firestore ID
+                        admins: ['woidoijwfw'],
+
                       );
 
                       return ListTile(
