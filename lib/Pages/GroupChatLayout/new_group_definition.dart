@@ -34,12 +34,18 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
   bool sendMessages=true;
 
   bool addOtherMembers=true;
+ List<String> admins=[];
+
   TextEditingController _groupName = TextEditingController();
 
   @override
   void initState(){
     super.initState();
     memebersFirstName();
+   setState(() {
+     admins.add(widget.createdBy.uid);
+   });
+
   }
   @override
   Widget build(BuildContext context) {
@@ -186,6 +192,10 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                                       groupSettings: groupSettings,
                                       sendMessages: sendMessages,
                                       addOtherMembers: addOtherMembers,
+                                      admins: admins,
+                                      members: widget.members,
+                                      currentUser:widget.createdBy.uid
+
 
                                     )));
                               if(result!=null){
@@ -284,6 +294,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 "Group Description",
                 widget.createdBy.uid,
                 widget.members,
+                [widget.createdBy.uid],
                 groupSettings,
                 sendMessages,
                 addOtherMembers
