@@ -1,42 +1,80 @@
+import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
+import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
 import 'package:chatapp/models/Group.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chatapp/services/users.dart';
-import 'package:chatapp/services/groupChat.dart';
+import 'package:chatapp/services/users_services.dart';
+import 'package:chatapp/services/groupChat_services.dart';
 
-class GroupChatDetails extends StatefulWidget {
+class GroupDescription extends StatefulWidget {
   final String groupId;
+  final String currentUser;
 
-  const GroupChatDetails({super.key, required this.groupId});
+  const GroupDescription({super.key, required this.groupId, required this.currentUser});
 
   @override
-  State<GroupChatDetails> createState() => _GroupChatDetailsState();
+  State<GroupDescription> createState() => _GroupDescriptionState();
 }
 
-class _GroupChatDetailsState extends State<GroupChatDetails> {
+class _GroupDescriptionState extends State<GroupDescription> {
   String firstName = '';
-  String groupDescription='';
+  String groupDescription = '';
   dynamic group;
+  bool groupSettings =true;
+      bool sendMessages =true;
+  bool addOtherMembers =true;
 
   List<String> membersFirstNameList = [];
+  List<String> participants = [];
+  List<String> admins = [];
+  bool isLoading = true;
+  Future<void> getGroup() async {
+    try {
+      final anothergroup = await fetchGroupByGroupId(widget.groupId);
+      setState(() {
+        group = anothergroup;
+        print(group['groupId']);
+      });
 
-  Future<void> getGroup() async{
-    final anothergroup=await fetchGroupByGroupId(widget.groupId);
-   setState(() {
-     group=anothergroup;
-   print(group['groupId']);
-   });  if (group != null) {
-     setState(() {
-       groupDescription=group['groupDescription'];
-     });
-      await getDataAndUpdateUI();
-      await memebersFirstName();
+      if (group != null) {
+        setState(() {
+          groupDescription = group['groupDescription'];
+          admins = (group['admins'] as List<dynamic>)
+              .map((e) => e.toString())
+              .toList();
+          groupSettings = group['groupSettings'];
+          sendMessages = group['sendMessages'];
+          addOtherMembers = group['addOtherMembers'];
+        });
+
+        await getDataAndUpdateUI();
+        await membersFirstName();
+      }
+    } catch (e) {
+
+      print('Error fetching group details: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
-  Future<void> memebersFirstName() async {
+
+  bool isCurrentUserAdmin(String userId) {
+    print('Here for the admin purposes : $userId');
+    return admins.contains(userId);
+  }
+
+  Future<void> membersFirstName() async {
     print(group['participants']);
 
-    List<String> participants = (group['participants'] as List<dynamic>).map((e) => e.toString()).toList();
+    setState(() {
+      participants = (group['participants'] as List<dynamic>)
+          .map((e) => e.toString())
+          .toList();
+      print(participants[0]);
+    });
 
     List<String> fetchedNames = await getUserNames(participants);
 
@@ -45,10 +83,9 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
     });
   }
 
-
   Future<void> getDataAndUpdateUI() async {
     String enteredFirstName = await getFirstNameById(
-       group['createdBy']); // Await the Future to get the value
+        group['createdBy']); // Await the Future to get the value
 
     setState(() {
       firstName = enteredFirstName;
@@ -58,6 +95,7 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
   @override
   void initState() {
     super.initState();
+
     getGroup();
 
   }
@@ -65,7 +103,6 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
   Future<String?> _showGroupDescriptionModal() async {
     TextEditingController descriptionController = TextEditingController();
     descriptionController.text = group['groupDescription'] ?? "";
-
 
     return await showModalBottomSheet<String?>(
       backgroundColor: Colors.white,
@@ -75,8 +112,14 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        double screenHeight = MediaQuery.of(context).size.height;
-        double screenWidth = MediaQuery.of(context).size.width;
+        double screenHeight = MediaQuery
+            .of(context)
+            .size
+            .height;
+        double screenWidth = MediaQuery
+            .of(context)
+            .size
+            .width;
 
         return Container(
           padding: EdgeInsets.all(screenWidth * 0.05),
@@ -92,7 +135,8 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
               TextFormField(
                 controller: descriptionController,
                 decoration: InputDecoration(
-                  hintText:group['groupDescription']??"Add group description",
+                  hintText:
+                  group['groupDescription'] ?? "Add group description",
                   border: UnderlineInputBorder(),
                 ),
               ),
@@ -100,7 +144,7 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
               Text(
                 "The group description is visible to members of this group and people invited to this group.",
                 style:
-                    TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+                TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
               Row(
@@ -118,7 +162,7 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                         Navigator.pop(context, null); // Return null if canceled
                       },
                       child:
-                          Text("Cancel", style: TextStyle(color: Colors.red)),
+                      Text("Cancel", style: TextStyle(color: Colors.red)),
                     ),
                   ),
                   SizedBox(width: screenWidth * 0.02),
@@ -154,9 +198,17 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
+if(isLoading){
+  return Center(child: CircularProgressIndicator(),);
+}
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -181,12 +233,11 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                 radius: width * 0.13,
                 backgroundColor: Colors.black,
                 child:
-                    Icon(Icons.group, color: Colors.white, size: width * 0.09),
+                Icon(Icons.group, color: Colors.white, size: width * 0.09),
               ),
             ),
             SizedBox(height: height * 0.012),
-            Text(group['groupName'],
-                style: TextStyle(fontSize: width * 0.055)),
+            Text(group['groupName'], style: TextStyle(fontSize: width * 0.055)),
             Text('Group · ${group['participants'].length} members',
                 style: TextStyle(color: Colors.grey, fontSize: width * 0.042)),
             SizedBox(height: 24),
@@ -195,7 +246,10 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
               children: [
                 _buildButton(Icons.call, 'Audio'),
                 _buildButton(Icons.videocam, 'Video'),
-                _buildButton(Icons.person_add, 'Add'),
+
+                //Adding a new member to the group ;
+                GestureDetector(
+                    onTap: () {}, child: _buildButton(Icons.person_add, 'Add')),
                 _buildButton(Icons.search, 'Search'),
               ],
             ),
@@ -220,13 +274,13 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                           // setState(() {
                           //   group['groupDescription'] = desc;
                           // });
-    setState(() {
-                            groupDescription=desc;
+                          setState(() {
+                            groupDescription = desc;
                           });
 
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content:
-                                Text("Group description edited succesfully"),
+                            Text("Group description edited succesfully"),
                             backgroundColor: Colors.blue.shade200,
                           ));
                         } catch (e) {
@@ -235,7 +289,7 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                       }
                     },
                     child: Text(
-                    groupDescription,
+                      groupDescription,
                       style: TextStyle(
                           color: Colors.blue[500], fontSize: width * 0.037),
                     ),
@@ -365,6 +419,74 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                     activeColor: Colors.black,
                   )),
             ),
+            if (isCurrentUserAdmin(widget.currentUser)) ...[
+              ListTile(
+                onTap: () async {
+                  final result = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UpdateGroupPermissions(
+                              groupSettings: group['groupSettings'],
+                              sendMessages: group['sendMessages'],
+                              addOtherMembers: group['addOtherMembers'],
+                              admins: admins,
+                              members: participants,
+                              currentUser: widget.currentUser,),));
+                  if (result != null) {
+    List<String> newAdmins = result['admins'];
+    List<String> removedAdmins = admins.where((admin) => !newAdmins.contains(admin)).toList();
+    if (!listEquals(admins, newAdmins)) {
+      setState(() {
+        admins = newAdmins;
+      });
+    }
+                    setState(() {
+                      sendMessages=result['sendMessages'];
+                      addOtherMembers=result['addOtherMembers'];
+                      groupSettings=result['groupSettings'];
+                    });
+                   try{
+                     print("Here to update group settings");
+                     updateGroupSettings(
+                         group['groupId'], result['groupSettings'], result['sendMessages'],
+                         result['addOtherMembers'], admins);
+
+
+for(String addedAdmin in newAdmins){
+  print('HER TO Add');
+  updateAdminStatusForCurrentUser(addedAdmin, group['groupId'], true);
+  updateNotificationsForCurrentUser(addedAdmin, true);
+
+}
+                     // if (admins.contains(widget.currentUser)) {
+                     //   updateAdminStatusForCurrentUser(widget.currentUser, group['groupId'], true);
+                     //   updateNotificationsForCurrentUser(widget.currentUser, true);
+                     // } else {
+                     //   updateAdminStatusForCurrentUser(widget.currentUser, group['groupId'], false);
+                     //   updateNotificationsForCurrentUser(widget.currentUser, false);
+                     // }
+
+                     for (String removedAdmin in removedAdmins) {
+               print("Here to remove");        updateAdminStatusForCurrentUser(removedAdmin, group['groupId'], false);
+                       updateNotificationsForCurrentUser(removedAdmin, false);
+                     }
+
+                   }catch(e){
+                     print((e.toString()));
+                   }
+                  }
+                },
+                leading: Icon(
+                  Icons.settings,
+                  size: width * 0.06,
+                ),
+                title: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                  child: Text('Group permissions',
+                      style: TextStyle(fontSize: width * 0.045)),
+                ),
+              )
+            ],
             Divider(
                 height: height * 0.012,
                 thickness: height * 0.007,
@@ -429,23 +551,26 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                                 ),
                               ),
                               title: Text(membersFirstNameList[index]),
-                              trailing: membersFirstNameList[index] == firstName
+                              trailing: isCurrentUserAdmin(
+                                  group['participants'][index])
                                   ? Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.blue.shade200,
-                                          borderRadius: BorderRadius.circular(
-                                              width * 0.01)),
-                                      width: width * 0.12,
-                                      height: height * 0.017,
-                                      child: Center(
-                                        child: Text(
-                                          "Admin",
-                                          style: TextStyle(
-                                              fontSize: width * 0.027,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    )
+                                decoration: BoxDecoration(
+                                    color: Colors.blue.shade200,
+                                    border: Border.all(
+                                        color: Colors.blue.shade200),
+                                    borderRadius: BorderRadius.circular(
+                                        width * 0.01)),
+                                width: width * 0.12,
+                                height: height * 0.017,
+                                child: Center(
+                                  child: Text(
+                                    "Admin",
+                                    style: TextStyle(
+                                        fontSize: width * 0.027,
+                                        color: Colors.white),
+                                  ),
+                                ),
+                              )
                                   : null,
                             );
                           },
@@ -504,8 +629,14 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
   }
 
   Widget _buildButton(IconData icon, String label) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Column(
       children: [
         Container(
