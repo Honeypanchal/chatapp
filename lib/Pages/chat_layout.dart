@@ -32,84 +32,11 @@ class _ChatLayoutState extends State<ChatLayout> {
       "seen": false,
     });
   }
-  /*Future<void> fetchMessagesByCurrentUser() async {
-    print('Fetching messages...');
 
-    // Listen to real-time updates
-    widget.databaseRef.collection("messages").snapshots().listen((QuerySnapshot event) async {
-      print("Processing message changes...");
 
-      setState(() {
-        messages.clear();
 
-        // Loop through the documents and extract data
-        messages.addAll(event.docs.map((doc) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-          // Ensure 'seen' field exists
-          data['seen'] = data.containsKey('seen') ? data['seen'] : false;
-          return data;
-        }).toList());
-
-        // Sort messages by timestamp
-        messages.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
-      });
-
-      // Mark unread messages as seen
-      await widget.databaseRef.collection("messages")
-          .where('sentTo', isEqualTo: widget.currentUser.uid)
-          .where('seen', isEqualTo: false)
-          .get()
-          .then((querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-          doc.reference.update({"seen": true}); // Mark message as seen
-        });
-      });
-    });
-  }*/
-
-  /*Future<void> fetchMessagesByCurrentUser() async {
-    print('Fetching messages...');
-
-    // Listen to real-time updates
-    final newDB = widget.databaseRef.collection("messages").snapshots();
-
-    newDB.listen((QuerySnapshot event) async {
-      // This will trigger every time there's a change to the collection
-      event.docChanges.forEach((change) async {
-        print("Processing message change...");
-
-        // Directly use the event's docs, no need to fetch again
-        setState(() {
-          // Map over the documents, and ensure each has a 'seen' field
-          messages.clear();
-          messages.addAll(event.docs.map((doc) {
-            var data = doc.data() as Map<String, dynamic>;
-            data['seen'] = data.containsKey('seen') ? data['seen'] : false; // Default to false if 'seen' is missing
-            return data;
-          }).toList());
-
-          // Sort the messages by timestamp to display in order
-          messages.sort((a, b) {
-            return a['timestamp'].compareTo(b['timestamp']);
-          });
-        });
-
-        // Optionally update 'seen' field for unread messages when the current user reads them
-        await widget.databaseRef.collection("messages")
-            .where('sentTo', isEqualTo: widget.currentUser.uid)
-            .where('seen', isEqualTo: false)
-            .get()
-            .then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
-            doc.reference.update({"seen": true}); // Mark message as seen
-          });
-        });
-      });
-    });
-  }*/
   // original
-  /*Future<void> fetchMessagesByCurrentUser() async {
+  Future<void> fetchMessagesByCurrentUser() async {
     print('here');
     final newDB = widget.databaseRef.collection("messages").snapshots();
     if (newDB.length == 0) {
@@ -130,77 +57,9 @@ class _ChatLayoutState extends State<ChatLayout> {
         });
       });
     });
-  }*/
-
-  Future<void> fetchMessagesByCurrentUser() async {
-    widget.databaseRef.collection("messages").snapshots().listen((event) {
-      setState(() {
-        messages.clear();
-        messages.addAll(event.docs.map((doc) {
-          Map<String, dynamic> data = doc.data();
-          data['id'] = doc.id; // Store document ID for updating
-          data['seen'] = data.containsKey('seen') ? data['seen'] : false;
-          return data;
-        }).where((message) {
-          // Ensure only messages related to the current user are fetched
-          return message['sentBy'] == widget.currentUser.uid ||
-              message['sentTo'] == widget.user['uid'];
-        }).toList());
-
-        // Sort messages by timestamp
-        messages.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
-      });
-
-      //**Mark unread messages as seen when the current user reads them**
-      event.docs.forEach((doc) {
-        if ((doc['sentTo'] == widget.user['uid'] ||
-            doc['sentBy'] == widget.currentUser.uid)
-            && !doc['seen']) {
-          doc.reference.update({"seen": true});
-        }
-      });
-    });
   }
 
-  /*Future<void> fetchMessagesByCurrentUser() async {
-    print('here');
-    final newDB = widget.databaseRef.collection("messages").snapshots();
-    if (newDB.length == 0) {
-      print('No data present in db');
-    }
-    newDB.listen((QuerySnapshot event) async {
-      event.docChanges.forEach((change) async {
-        print("triggered");
-        final userMessages =
-            await widget.databaseRef.collection("messages").get();
 
-        setState(() {
-          messages.clear();
-          messages.addAll(userMessages.docs.map((doc) {
-            var data = doc.data();
-            data['seen'] = data.containsKey('seen') ? data['seen'] : false;
-            return data;
-          }).toList());
-
-
-          messages.sort((a, b) {
-            return a['timestamp'].compareTo(b['timestamp']);
-          });
-        });
-        // Update the 'seen' status when the current user reads the message
-        await widget.databaseRef
-            .collection("messages")
-            .where('sentTo', isEqualTo: widget.currentUser.uid)
-            .where('seen', isEqualTo: false) // Get unread messages
-            .get()
-            .then((querySnapshot) {
-          querySnapshot.docs.forEach((doc) {
-            doc.reference.update({"seen": true}); // Mark message as seen
-          });
-        });
-      });
-    });
-  }*/
 
   // Call this method when the message is visible on the screen or when user scrolls
   Future<void> markMessageAsSeen(DocumentReference messageRef) async {
@@ -451,39 +310,42 @@ class _ChatLayoutState extends State<ChatLayout> {
                 ),
               ),*/
               // original
-              Padding(
-                padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: width * 0.042,
-                      vertical: height * 0.012),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: width * 0.001),
+              Expanded(
+                flex: 4,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.042, vertical: height * 0.012),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: width * 0.042,
+                        vertical: height * 0.012),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: width * 0.001),
+                      ),
+                      color: Colors.white,
                     ),
-                    color: Colors.white,
-                  ),
-                  child: TextFormField(
-                    controller: message,
-                    decoration: InputDecoration(
-                        hintText: "Type a message",
-                        hintStyle: TextStyle(color: Colors.grey),
-                        border: InputBorder.none,
-                        suffixIcon: IconButton(
-                            onPressed: () async {
-                              setState(() {
-                                messages = [];
-                              });
-                              await sendMessage(message.text.trim());
-                              fetchMessagesByCurrentUser();
-                              message.clear();
-                            },
-                            icon: Icon(
-                              Icons.send,
-                              color: Color(0xFF995BF8),
-                            ))),
+                    child: TextFormField(
+                      controller: message,
+                      decoration: InputDecoration(
+                          hintText: "Type a message",
+                          hintStyle: TextStyle(color: Colors.grey),
+                          border: InputBorder.none,
+                          suffixIcon: IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  messages = [];
+                                });
+                                await sendMessage(message.text.trim());
+                                fetchMessagesByCurrentUser();
+                                message.clear();
+                              },
+                              icon: Icon(
+                                Icons.send,
+                                color: Color(0xFF995BF8),
+                              ))),
+                    ),
                   ),
                 ),
               )
