@@ -6,18 +6,17 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 class ChatLayout extends StatefulWidget {
   final CustomClass currentUser;
   final user;
-  final DocumentReference<Map<String, dynamic>> databaseRef;
+  final DocumentReference<Map<String,dynamic>> databaseRef;
 
-  const ChatLayout(
-      {required this.currentUser,
-      required this.user,
-      required this.databaseRef});
+  const ChatLayout({required this.currentUser, required this.user,required this.databaseRef});
 
   @override
   State<ChatLayout> createState() => _ChatLayoutState();
 }
 
 class _ChatLayoutState extends State<ChatLayout> {
+
+
   List messages = [];
 
   Future<void> sendMessage(String message) async {
@@ -29,44 +28,74 @@ class _ChatLayoutState extends State<ChatLayout> {
       "sentTo": widget.user['uid'],
       "message": message,
       "timestamp": timestamp,
-      "seen": false,
     });
+
   }
 
-
-
-  // original
   Future<void> fetchMessagesByCurrentUser() async {
     print('here');
-    final newDB = widget.databaseRef.collection("messages").snapshots();
-    if (newDB.length == 0) {
+    final newDB =  widget.databaseRef.collection("messages").snapshots();
+    if(newDB.length==0){
       print('No data present in db');
     }
     newDB.listen((QuerySnapshot event) async {
       event.docChanges.forEach((change) async {
         print("triggered");
-        final userMessages =
-            await widget.databaseRef.collection("messages").get();
+        final userMessages = await widget.databaseRef.collection("messages")
+            .get();
 
-        setState(() {
-          messages.clear();
-          messages.addAll(userMessages.docs);
-          messages.sort((a, b) {
-            return a['timestamp'].compareTo(b['timestamp']);
-          });
+        setState(() {  messages.clear();
+        messages.addAll(userMessages.docs);
+        messages.sort((a,b){
+          return a['timestamp'].compareTo(b['timestamp']);
+        });
         });
       });
     });
   }
 
-
-
-  // Call this method when the message is visible on the screen or when user scrolls
-  Future<void> markMessageAsSeen(DocumentReference messageRef) async {
-    await messageRef.update({
-      "seen": true, // Update the "seen" field to true when message is viewed
+  /*void fetchMessagesByCurrentUser() {
+    widget.databaseRef.collection("messages")
+        .where(Filter.or(
+        Filter.and(Filter("sentBy", isEqualTo: widget.currentUser.uid),
+            Filter("sentTo", isEqualTo: widget.user['uid'])),
+        Filter.and(Filter("sentBy", isEqualTo: widget.user['uid']),
+            Filter("sentTo", isEqualTo: widget.currentUser.uid))
+    ))  // ✅ Fetches messages from both sender and receiver
+        .orderBy("timestamp", descending: false)  // ✅ Ensures correct order
+        .snapshots()
+        .listen((QuerySnapshot event) {
+      setState(() {
+        messages = event.docs;  // ✅ Updates messages list
+      });
     });
-  }
+  }*/
+ /* void fetchMessagesByCurrentUser() {
+    widget.databaseRef.collection("messages")
+        .where("sentBy", isEqualTo: widget.currentUser.uid)
+        .where("sentTo", isEqualTo: widget.user['uid'])
+        .orderBy("timestamp")
+        .snapshots()
+        .listen((QuerySnapshot event) {
+      setState(() {
+        messages = event.docs;
+      });
+    });
+
+    widget.databaseRef.collection("messages")
+        .where("sentBy", isEqualTo: widget.user['uid'])
+        .where("sentTo", isEqualTo: widget.currentUser.uid)
+        .orderBy("timestamp")
+        .snapshots()
+        .listen((QuerySnapshot event) {
+      setState(() {
+        messages.addAll(event.docs);
+        messages.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
+      });
+    });
+  }*/
+
+
 
   @override
   void initState() {
@@ -93,7 +122,7 @@ class _ChatLayoutState extends State<ChatLayout> {
               height: width * 0.045,
               width: width * 0.035,
               decoration:
-                  BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              BoxDecoration(color: Colors.white, shape: BoxShape.circle),
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.only(left: width * 0.019),
@@ -127,141 +156,26 @@ class _ChatLayoutState extends State<ChatLayout> {
         ],
       ),
       body: SingleChildScrollView(
-        child: SizedBox(
+        child: Container(
           height: height,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (messages.isNotEmpty)
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: height * 0.12),
-                    child: ListView.builder(
-                      // itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        bool isSentByCurrentUser = messages[index]['sentBy'] == widget.currentUser.uid;
-                        bool seen = messages[index]['seen'];
-
-                      /*itemBuilder: (context, index) {
-                        bool x =
-                            messages[index]['sentBy'] == widget.currentUser.uid;
-
-                        // Check if the 'seen' field exists, otherwise set it to false
-                        bool seen = messages[index].data().containsKey('seen')
-                            ? messages[index]['seen']
-                            : false;*/
-
-                        return ChatBubble(
-                          clipper: ChatBubbleClipper1(
-                            type:isSentByCurrentUser ? BubbleType.sendBubble : BubbleType.receiverBubble,
-                          ),
-                              // original
-                              /*type: x
-                                  ? BubbleType.sendBubble
-                                  : BubbleType.receiverBubble),*/
-                          alignment: isSentByCurrentUser ? Alignment.topRight : Alignment.topLeft,
-                          margin: EdgeInsets.symmetric(
-                              horizontal: width * 0.012,
-                              vertical: height * 0.012),
-                          backGroundColor: isSentByCurrentUser
-                              ? Color(0xFF2C313F)
-                              : Color(0xFF995BF8).withOpacity(0.3),
-                          child: Container(
-                            constraints: BoxConstraints(maxWidth: width * 0.7),
-                            child: Column(
-                              crossAxisAlignment: isSentByCurrentUser
-                                  ? CrossAxisAlignment.end
-                                  : CrossAxisAlignment.start,
-                              children: [
-                                // Display the message text
-                                Text(
-                                  messages[index]['message'],
-                                  style: TextStyle(
-                                      fontFamily: 'Raleway',
-                                      color: Colors.white),
-                                ),
-
-                                // Show the "Seen" status if the message is seen
-                                if (seen) // Show seen status if message is marked as seen
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4.0),
-                                    child: Text(
-                                      "Seen",
-                                      style: TextStyle(
-                                          color: Colors.grey, fontSize: 12),
-                                    ),
-
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      itemCount: messages.length,
-                    ),
-                  ),
-                ),
-
-              /*Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: height * 0.12),
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        bool x = messages[index]['sentBy'] == widget.currentUser.uid;
-                        return ChatBubble(
-                          clipper: ChatBubbleClipper1(
-                              type: x ? BubbleType.sendBubble : BubbleType.receiverBubble),
-                          alignment: x ? Alignment.topRight : Alignment.topLeft,
-                          margin: EdgeInsets.symmetric(horizontal: width * 0.012, vertical: height * 0.012),
-                          backGroundColor: x
-                              ? Color(0xFF2C313F)
-                              : Color(0xFF995BF8).withOpacity(0.3),
-                          child: Container(
-                            constraints: BoxConstraints(maxWidth: width * 0.7),
-                            child: Column(
-                              crossAxisAlignment: x ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                              children: [
-                                // Display the message text
-                                Text(
-                                  messages[index]['message'],
-                                  style: TextStyle(fontFamily: 'Raleway', color: Colors.white),
-                                ),
-                                // Show the "Seen" status if the message is seen
-                                if (messages[index]['seen']) // Show seen status if message is marked as seen
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4.0),
-                                    child: Text(
-                                      "Seen",
-                                      style: TextStyle(color: Colors.grey, fontSize: 12),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      itemCount: messages.length,
-                    ),
-                  ),
-                ),*/
-
-              /*Expanded(
+                /*Expanded(
                     flex: 3,
                     child: Padding(
-                      padding: EdgeInsets.only(top: height * 0.12),
+                      padding:  EdgeInsets.only(top:height*0.12),
                       child: ListView.builder(
                         itemBuilder: (context, index) {
-                          bool x = messages[index]['sentBy'] ==
-                              widget.currentUser.uid;
+                          bool x =
+                              messages[index]['sentBy'] == widget.currentUser.uid;
                           return ChatBubble(
                             clipper: ChatBubbleClipper1(
                                 type: x
                                     ? BubbleType.sendBubble
                                     : BubbleType.receiverBubble),
-                            alignment:
-                                x ? Alignment.topRight : Alignment.topLeft,
+                            alignment: x ? Alignment.topRight : Alignment.topLeft,
                             margin: EdgeInsets.symmetric(
                                 horizontal: width * 0.012,
                                 vertical: height * 0.012),
@@ -269,8 +183,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                                 ? Color(0xFF2C313F)
                                 : Color(0xFF995BF8).withOpacity(0.3),
                             child: Container(
-                              constraints:
-                                  BoxConstraints(maxWidth: width * 0.7),
+                              constraints: BoxConstraints(maxWidth: width * 0.7),
                               child: Text(
                                 messages[index]['message'],
                                 style: TextStyle(
@@ -282,73 +195,71 @@ class _ChatLayoutState extends State<ChatLayout> {
                         itemCount: messages.length,
                       ),
                     )),*/
-              /*Padding(
-                padding: EdgeInsets.symmetric(horizontal: width * 0.042, vertical: height * 0.012),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: message,
-                        decoration: InputDecoration(
-                          hintText: "Type a message",
-                          hintStyle: TextStyle(color: Colors.grey),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.send, color: Color(0xFF995BF8)),
-                      onPressed: () async {
-                        String text = message.text.trim();
-                        if (text.isNotEmpty) {
-                          await sendMessage(text);
-                          message.clear();
-                        }
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: height * 0.12),
+                    child: messages.isNotEmpty
+                        ? ListView.builder(
+                      itemBuilder: (context, index) {
+                        bool isSentByCurrentUser = messages[index]['sentBy'] == widget.currentUser.uid;
+                        return ChatBubble(
+                          clipper: ChatBubbleClipper1(
+                            type: isSentByCurrentUser ? BubbleType.sendBubble : BubbleType.receiverBubble,
+                          ),
+                          alignment: isSentByCurrentUser ? Alignment.topRight : Alignment.topLeft,
+                          margin: EdgeInsets.symmetric(horizontal: width * 0.012, vertical: height * 0.012),
+                          backGroundColor: isSentByCurrentUser ? Color(0xFF2C313F) : Color(0xFF995BF8).withOpacity(0.3),
+                          child: Container(
+                            constraints: BoxConstraints(maxWidth: width * 0.7),
+                            child: Text(
+                              messages[index]['message'],
+                              style: TextStyle(fontFamily: 'Raleway', color: Colors.white),
+                            ),
+                          ),
+                        );
                       },
-                    ),
-                  ],
-                ),
-              ),*/
-              // original
-              Expanded(
-                flex: 4,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.042, vertical: height * 0.012),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: width * 0.042,
-                        vertical: height * 0.012),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                            color: Colors.grey.shade300,
-                            width: width * 0.001),
-                      ),
-                      color: Colors.white,
-                    ),
-                    child: TextFormField(
-                      controller: message,
-                      decoration: InputDecoration(
-                          hintText: "Type a message",
-                          hintStyle: TextStyle(color: Colors.grey),
-                          border: InputBorder.none,
-                          suffixIcon: IconButton(
-                              onPressed: () async {
-                                setState(() {
-                                  messages = [];
-                                });
-                                await sendMessage(message.text.trim());
-                                fetchMessagesByCurrentUser();
-                                message.clear();
-                              },
-                              icon: Icon(
-                                Icons.send,
-                                color: Color(0xFF995BF8),
-                              ))),
-                    ),
+                      itemCount: messages.length,
+                    )
+                        : Center(child: Text("No messages yet!")),  // ✅ Shows message if empty
                   ),
                 ),
-              )
+
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: width * 0.042,
+                            vertical: height * 0.012),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                                color: Colors.grey.shade300,
+                                width: width * 0.001),
+                          ),
+                          color: Colors.white,
+                        ),
+                        child: TextFormField(
+                          controller: message,
+                          decoration: InputDecoration(
+                              hintText: "Type a message",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              border: InputBorder.none,
+                              suffixIcon: IconButton(
+                                  onPressed: () async {
+                                    setState(() {
+                                      messages = [];
+                                    });
+                                    await sendMessage(message.text.trim());
+                                    fetchMessagesByCurrentUser();
+                                    message.clear();
+                                  },
+                                  icon: Icon(
+                                    Icons.send,
+                                    color: Color(0xFF995BF8),
+                                  ))),
+                        ),
+                      )))
             ],
           ),
         ),
