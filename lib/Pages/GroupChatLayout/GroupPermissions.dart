@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../services/users.dart';
 
-class Grouppermissions extends StatefulWidget {
+
+class GroupPermissions extends StatefulWidget {
   bool groupSettings;
 
   bool sendMessages;
@@ -12,7 +12,7 @@ class Grouppermissions extends StatefulWidget {
 final String currentUser;
   List<String> members;
 
-  Grouppermissions({
+  GroupPermissions({
     super.key,
     required this.groupSettings,
     required this.sendMessages,
@@ -23,10 +23,10 @@ final String currentUser;
   });
 
   @override
-  State<Grouppermissions> createState() => _GrouppermissionsState();
+  State<GroupPermissions> createState() => _GroupPermissionsState();
 }
 
-class _GrouppermissionsState extends State<Grouppermissions> {
+class _GroupPermissionsState extends State<GroupPermissions> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;

@@ -1,5 +1,5 @@
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/services/users.dart';
+import 'package:chatapp/services/users_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatapp/models/Group.dart';
 
