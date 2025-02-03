@@ -308,8 +308,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               if (newGroup != null) {
                 Navigator.of(context)
                     .pushReplacement(MaterialPageRoute(
-                        builder: (context) => Groupchatpage(
-                            newGroup: newGroup, currentUser: currentUser)))
+                        builder: (context) => Groupchatpage(currentUser: currentUser,groupId:newGroup.groupId!)))
                     .catchError((error) {
                   print(error.toString());
                 });
