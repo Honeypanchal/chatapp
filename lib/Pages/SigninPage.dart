@@ -398,32 +398,38 @@ class _SigninPageState extends State<SigninPage> {
                 Container(
                   height: height * 0.5,
                   width: width,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0XFF5098FA),
-                        Color(0XFF526CF7),
-                        Color(0XFF533BF1),
-                        Color(0XFF5327EE),
-                        Color(0XFF5317EB),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
+                  // decoration: BoxDecoration(
+                  //   gradient: LinearGradient(
+                  //     colors: [
+                  //       Color(0XFF5098FA),
+                  //       Color(0XFF526CF7),
+                  //       Color(0XFF533BF1),
+                  //       Color(0XFF5327EE),
+                  //       Color(0XFF5317EB),
+                  //     ],
+                  //     begin: Alignment.topCenter,
+                  //     end: Alignment.bottomCenter,
+                  //   ),
+                  // ),
                   child: SafeArea(
                     child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          SizedBox(height: height * 0.065),
-                          ClipOval(
-                            child: SizedBox.fromSize(
-                              size: Size.fromRadius(50),
-                              child: Image.asset(
-                                'assets/images/Icon_homepage.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
+                          // SizedBox(height: height * 0.065),
+                          // ClipOval(
+                          //   child: SizedBox.fromSize(
+                          //     size: Size.fromRadius(50),
+                          //     child: Image.asset(
+                          //       'assets/images/login1.jpg',
+                          //       fit: BoxFit.cover,
+                          //     ),
+                          //   ),
+                          // ),
+                          Image.asset(
+                            'assets/images/login3.jpg',
+                            fit: BoxFit.cover,
+                            height: 500,
+                            width: MediaQuery.of(context).size.width,
                           ),
                         ],
                       ),
@@ -473,10 +479,11 @@ class _SigninPageState extends State<SigninPage> {
                               Text(
                                 'EMAIL',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: width * 0.03,
-                                  color: Colors.blueAccent,
-                                  fontFamily: 'poppins'
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: width * 0.04,
+                                  // color: Colors.blueAccent,
+                                    color: Colors.orangeAccent,
+                                    fontFamily: 'poppins'
                                 ),
                               ),
                               TextFormField(
@@ -506,7 +513,8 @@ class _SigninPageState extends State<SigninPage> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: width * 0.03,
-                                  color: Colors.blueAccent,
+                                  // color: Colors.blueAccent,
+                                  color: Colors.orangeAccent,
                                   fontFamily: 'poppins',
                                 ),
                               ),
@@ -557,7 +565,8 @@ class _SigninPageState extends State<SigninPage> {
                           },
                           child: Text('Login'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0XFF185FED),
+                            // backgroundColor: Color(0XFF185FED),
+                            backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
@@ -596,7 +605,8 @@ class _SigninPageState extends State<SigninPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: width * 0.030,
-                  color: Colors.red,
+                  // color: Colors.red,
+                  color: Colors.orangeAccent,
                 ),
               ),
             ),
