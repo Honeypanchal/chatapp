@@ -50,6 +50,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           backgroundColor: Colors.black,
           items: const <BottomNavigationBarItem>[
 
+
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Home',

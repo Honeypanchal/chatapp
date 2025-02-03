@@ -199,8 +199,9 @@ Future<void> membersFirstName() async {
   }
 
   // Function to handle the action of copying messages
-  void copyMessage(String message) {
-    Clipboard.setData(ClipboardData(text: message));
+  void copyMessage(String messageId) async {
+    String messageText = await getMessageTextById(messageId);
+    Clipboard.setData(ClipboardData(text: messageText));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Message copied to clipboard'),
     ));
@@ -294,7 +295,9 @@ Future<void> membersFirstName() async {
                     ? TextField(
                         autofocus: true,
                         decoration:
-                            InputDecoration(hintText: "Search messages"),
+                            InputDecoration(hintText: "Search messages"
+                            ,
+                                hintStyle:TextStyle(color:Colors.white)),
                         onChanged: (query) =>
                             setState(() => searchQuery = query),
                       )
@@ -316,6 +319,47 @@ Future<void> membersFirstName() async {
                   onPressed: deleteMessages,
                 ),
                 // Display 3 dots when messages are selected
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert, color: Colors.white),
+                  onSelected: (value) async {
+                    String messageId = selectedMessages.first; // Using the first selected message as an example
+                    if (value == 'reply') {
+                      // Perform reply action on selected message
+                      String messageText = await getMessageTextById(messageId);
+                      replyToMessage(messageText, messageId);
+                    } else if (value == 'edit') {
+                      // Perform edit action on selected message
+                      String messageText = await getMessageTextById(messageId);
+                      editMessage(messageText, messageId);
+                    } else if (value == 'copy') {
+                      // Perform copy action on selected message
+                      copyMessage(messageId);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'reply',
+                      child: ListTile(
+                        leading: Icon(Icons.reply),
+                        title: Text("Reply"),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: ListTile(
+                        leading: Icon(Icons.edit),
+                        title: Text("Edit"),
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'copy',
+                      child: ListTile(
+                        leading: Icon(Icons.content_copy),
+                        title: Text("Copy"),
+                      ),
+                    ),
+                  ],
+                ),
               ] else ...[
                 if (!isSearching)
                   IconButton(
