@@ -8,6 +8,7 @@ class Status {
   String textStyle;
   Timestamp timestamp;
   List<String> viewedBy;
+  List<Map<String, String>> statusReply;
 
   Status({
     required this.uid,
@@ -17,6 +18,7 @@ class Status {
     required this.textStyle,
     required this.timestamp,
     required this.viewedBy,
+    required this.statusReply,
   });
 
 
@@ -30,6 +32,9 @@ class Status {
       textStyle: map['textStyle'] ?? '20',
       timestamp: map['timestamp'],
       viewedBy: List<String>.from(map['viewedBy'] ?? []),
+      statusReply: List<Map<String, String>>.from(map['statusReply']?.map((reply) => Map<String, String>.from(reply)) ?? []),
+
+
     );
   }
   Map<String, dynamic> toMap() {
@@ -41,6 +46,7 @@ class Status {
       'textStyle':textStyle,
       'timestamp': timestamp,
       'viewedBy': viewedBy,
+      'statusReply': statusReply,
     };
   }
 }
