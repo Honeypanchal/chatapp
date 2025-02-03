@@ -29,6 +29,7 @@ Future<CustomClass?> signUpUser(
       await _cloudFirestore.doc(user.user!.uid).set({
         "uid": user.user!.uid,
         "firstName": firstName,
+        "status": "unavailable",//changes
 
         "email": email,
         "password": password,
@@ -110,6 +111,8 @@ Future<CustomClass?> signInWithGoogle() async {
 "uid":user.uid,
 
         "firstName": user.displayName!,
+        "status": "unavailable",//changes
+
 
         "email": user.email!,
         "profilePic": "",

@@ -248,7 +248,7 @@
 
 
 import 'dart:io';
-
+import 'package:chatapp/services/auth_services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -374,7 +374,6 @@ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   }
 
-  @override
   void setStatus(String status) async{
     await _firestore.collection('Users').doc(widget.currentUser.uid).update({
       "status": status,
@@ -416,30 +415,39 @@ final FirebaseFirestore _firestore = FirebaseFirestore.instance;
         //   ),
         // ),
         title: StreamBuilder<DocumentSnapshot>(
-         stream: _firestore.collection('Users').doc().snapshots(),
+         stream: _firestore.collection('Users').doc(widget.user['uid']).snapshots(),
           builder: (context,snapshot){
             if(snapshot.data != null){
-              return Container(
-                child: Column(
-                  children: [
-                    Text(
-                    widget.user['firstName'],
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Raleway',
-                      fontWeight: FontWeight.w500,
-                    ),
+              return Column(
+                children: [
+                  Text(
+                  widget.user['firstName'],
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Raleway',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10,
                   ),
+                ),
                   Text(
                     widget.user['status'],
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'Raleway',
                       fontWeight: FontWeight.w500,
+                      // fontSize: 3,
                     ),
                   ),
-                  ],
-                ),
+                // Text(
+                //   widget.user['status'],
+                //   style: TextStyle(
+                //     color: Colors.white,
+                //     fontFamily: 'Raleway',
+                //     fontWeight: FontWeight.w500,
+                //     fontSize: 3,
+                //   ),
+                // ),
+                ],
               );
             }
             else{
