@@ -360,7 +360,8 @@ class _ChatPageState extends State<ChatPage> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => Groupchatpage(newGroup: groupObj,currentUser: widget.currentUser.uid,),
+                              builder: (context)=>Groupchatpage(groupId: groupObj.groupId!, currentUser: widget.currentUser.uid)
+                              // builder: (context) => Groupchatpage(newGroup: groupObj,currentUser: widget.currentUser.uid,),
                             ),
                           );
                         },

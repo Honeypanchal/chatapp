@@ -69,7 +69,16 @@ Future<void> editGroupInfo(String groupId, String desc) async {
     final data = await groupsDb.doc(groupId).update({"groupDescription": desc});
     print("Edited succesfully");
   } catch (e) {
-    throw e;
+    rethrow;
+  }
+}
+Future<void> editGroupName(String groupId,String name) async{
+  try {
+    print('$groupId');
+    final data = await groupsDb.doc(groupId).update({"groupName": name});
+    print("Edited succesfully");
+  } catch (e) {
+    rethrow;
   }
 }
 
