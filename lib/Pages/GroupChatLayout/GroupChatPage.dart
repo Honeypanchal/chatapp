@@ -237,23 +237,17 @@ Future<void> membersFirstName() async {
   }
   StreamSubscription? _groupSubscription;
   void listenToDatabaseUpdates() {
-
-    final groupRef =
-    FirebaseFirestore.instance.collection("groups").doc(group['groupId'].groupId);
+    final groupRef = FirebaseFirestore.instance.collection("groups").doc(widget.groupId); // Corrected groupId reference
 
     _groupSubscription = groupRef.snapshots().listen((snapshot) async {
-      print("Listening to changes");
+      print("Listening to changes...");
 
       if (snapshot.exists && mounted) {
         var updatedGroupData = snapshot.data() as Map<String, dynamic>;
 
-
-        await Future.delayed(Duration(seconds: 2));
-
         if (mounted) {
           setState(() {
             group = updatedGroupData;
-
             groupSettings = group['groupSettings'];
             sendMessages = group['sendMessages'];
             addOtherMembers = group['addOtherMembers'];
@@ -264,10 +258,20 @@ Future<void> membersFirstName() async {
     });
   }
   @override
+  void dispose() {
+    _groupSubscription?.cancel(); // Stop listening when widget is removed
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
+    if (isLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -546,7 +550,7 @@ Future<void> membersFirstName() async {
               padding: EdgeInsets.symmetric(horizontal: width*0.012,vertical: height*0.01),
               child: Row(
                 children: [
-                  if (!group['sendMessages'] && admins.contains(widget.currentUser)) ...[
+                  if (!group['sendMessages'] && !admins.contains(widget.currentUser)) ...[
                     ScaffoldMessenger(
 
                         child: Align(
