@@ -17,8 +17,8 @@ print("here to fetch firstnames");
 
   return userNames;
 }
-
-Future<void> addGroupAndAddActiveGroupInDatabase(String groupId, String path, bool isAdmin) async {
+Future<void> addGroupAndAddActiveGroupInDatabase(
+    String groupId, String path, bool isAdmin) async {
   try {
     DocumentReference userRef = usersDb.doc(path);
     DocumentSnapshot snapshot = await userRef.get();
@@ -28,19 +28,19 @@ Future<void> addGroupAndAddActiveGroupInDatabase(String groupId, String path, bo
       return;
     }
 
-
-    List<Map<String, dynamic>> groupList = List<Map<String, dynamic>>.from(snapshot.get("groups") ?? []);
-
+    List<dynamic> groupList = snapshot.get("groups") ?? [];
 
     bool groupExists = groupList.any((group) => group["groupId"] == groupId);
 
     if (!groupExists) {
+      print("Adding new group with admin status: $isAdmin");
 
-      print("Here to updateAdmin status");
-      print('admins status is $isAdmin');
-      groupList.add({"groupId": groupId, "admin": isAdmin});
+      await userRef.update({
+        "groups": FieldValue.arrayUnion([
+          {"groupId": groupId, "admin": isAdmin}
+        ])
+      });
 
-      await userRef.update({"groups": groupList});
       print("Group added successfully");
     } else {
       print("Group already exists");
@@ -89,4 +89,25 @@ try{
 
 Future<void> updateNotificationsForCurrentUser(String userId,bool adminStatus)async{
 
+}
+
+Future<void> addGroupIdToNewMembers(String groupId, List<String> users) async {
+  final usersDb = FirebaseFirestore.instance.collection('Users');
+
+  try {
+    for (var user in users) {
+      await usersDb.doc(user).update({
+        "groups": FieldValue.arrayUnion([
+          {
+            "groupId": groupId,
+            "admin": false,
+          }
+        ])
+      });
+    }
+  } catch (e) {
+    print("Error updating users: ${e.toString()}");
+  }finally{
+    print("New group added to the member");
+  }
 }

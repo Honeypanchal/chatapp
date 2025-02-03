@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
 import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
 import 'package:chatapp/models/Group.dart';
+import 'package:chatapp/pages/GroupChatLayout/AddNewMembersToGroup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,7 +39,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
   StreamSubscription? _groupSubscription;
 
   void listenToDatabaseUpdates() {
-    final groupRef = FirebaseFirestore.instance.collection("groups").doc(group['groupId']);
+    final groupRef =
+        FirebaseFirestore.instance.collection("groups").doc(group['groupId']);
 
     _groupSubscription = groupRef.snapshots().listen((snapshot) async {
       print("Listening to changes");
@@ -50,15 +52,14 @@ class _GroupDescriptionState extends State<GroupDescription> {
           isLoadingDatabse = true;
         });
 
-
         await Future.delayed(Duration(seconds: 2));
 
-
         if (mounted) {
-
           setState(() {
             group = updatedGroupData;
-            admins = (group['admins'] as List<dynamic>).map((e) => e.toString()).toList();
+            admins = (group['admins'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList();
             groupSettings = group['groupSettings'];
             sendMessages = group['sendMessages'];
             addOtherMembers = group['addOtherMembers'];
@@ -136,7 +137,6 @@ class _GroupDescriptionState extends State<GroupDescription> {
     super.initState();
 
     getGroup();
-
   }
 
   Future<String?> _showGroupDescriptionModal() async {
@@ -151,14 +151,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        double screenHeight = MediaQuery
-            .of(context)
-            .size
-            .height;
-        double screenWidth = MediaQuery
-            .of(context)
-            .size
-            .width;
+        double screenHeight = MediaQuery.of(context).size.height;
+        double screenWidth = MediaQuery.of(context).size.width;
 
         return Container(
           padding: EdgeInsets.all(screenWidth * 0.05),
@@ -175,7 +169,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                 controller: descriptionController,
                 decoration: InputDecoration(
                   hintText:
-                  group['groupDescription'] ?? "Add group description",
+                      group['groupDescription'] ?? "Add group description",
                   border: UnderlineInputBorder(),
                 ),
               ),
@@ -183,7 +177,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
               Text(
                 "The group description is visible to members of this group and people invited to this group.",
                 style:
-                TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+                    TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
               Row(
@@ -201,7 +195,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         Navigator.pop(context, null); // Return null if canceled
                       },
                       child:
-                      Text("Cancel", style: TextStyle(color: Colors.red)),
+                          Text("Cancel", style: TextStyle(color: Colors.red)),
                     ),
                   ),
                   SizedBox(width: screenWidth * 0.02),
@@ -237,450 +231,462 @@ class _GroupDescriptionState extends State<GroupDescription> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final height = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     if (isLoading) {
-      return Center(child: CircularProgressIndicator(),);
+      return Center(
+        child: CircularProgressIndicator(),
+      );
     }
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.more_vert, color: Colors.black),
-              onPressed: () {},
-            ),
-          ],
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-          Center(
-          child: CircleAvatar(
-          radius: width * 0.13,
-            backgroundColor: Colors.black,
-            child:
-            Icon(Icons.group, color: Colors.white, size: width * 0.09),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_vert, color: Colors.black),
+            onPressed: () {},
           ),
-        ),
-        SizedBox(height: height * 0.012),
-        Text(group['groupName'], style: TextStyle(fontSize: width * 0.055)),
-        Text('Group · ${group['participants'].length} members',
-            style: TextStyle(color: Colors.grey, fontSize: width * 0.042)),
-        SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
           children: [
-            _buildButton(Icons.call, 'Audio'),
-            _buildButton(Icons.videocam, 'Video'),
+            Center(
+              child: CircleAvatar(
+                radius: width * 0.13,
+                backgroundColor: Colors.black,
+                child:
+                    Icon(Icons.group, color: Colors.white, size: width * 0.09),
+              ),
+            ),
+            SizedBox(height: height * 0.012),
+            Text(group['groupName'], style: TextStyle(fontSize: width * 0.055)),
+            Text('Group · ${group['participants'].length} members',
+                style: TextStyle(color: Colors.grey, fontSize: width * 0.042)),
+            SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildButton(Icons.call, 'Audio'),
+                _buildButton(Icons.videocam, 'Video'),
 
-            //Adding a new member to the group ;
-            GestureDetector(
-                onTap: () {}, child: _buildButton(Icons.person_add, 'Add')),
-            _buildButton(Icons.search, 'Search'),
-          ],
-        ),
-        SizedBox(height: height * 0.012),
-        Divider(
-            height: height * 0.012,
-            thickness: height * 0.007,
-            color: Colors.grey.shade100),
-        SizedBox(height: height * 0.012),
-        Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: width * 0.047, vertical: height * 0.017),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
+                //Adding a new member to the group ;
+                GestureDetector(
+                    onTap: () {}, child: _buildButton(Icons.person_add, 'Add')),
+                _buildButton(Icons.search, 'Search'),
+              ],
+            ),
+            SizedBox(height: height * 0.012),
+            Divider(
+                height: height * 0.012,
+                thickness: height * 0.007,
+                color: Colors.grey.shade100),
+            SizedBox(height: height * 0.012),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: width * 0.047, vertical: height * 0.017),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      String? desc = await _showGroupDescriptionModal();
+                      if (desc != null) {
+                        try {
+                          await editGroupInfo(group['groupId'], desc);
+                          // setState(() {
+                          //   group['groupDescription'] = desc;
+                          // });
+                          setState(() {
+                            groupDescription = desc;
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content:
+                                Text("Group description edited succesfully"),
+                            backgroundColor: Colors.blue.shade200,
+                          ));
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
+                    },
+                    child: Text(
+                      groupDescription,
+                      style: TextStyle(
+                          color: Colors.blue[500], fontSize: width * 0.037),
+                    ),
+                  ),
+                  SizedBox(height: height * 0.005),
+                  Text(
+                    'Created by ${firstName}, ${(group['createdAt'])}',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+                height: height * 0.012,
+                thickness: height * 0.007,
+                color: Colors.grey.shade100),
+            ListTile(
+              leading: Icon(
+                Icons.notifications_none,
+                size: width * 0.06,
+              ),
+              title: Text(
+                'Notifications',
+                style: TextStyle(fontSize: width * 0.045),
+              ),
+              trailing: Icon(
+                Icons.chevron_right,
+                size: width * 0.07,
+              ),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.image_outlined,
+                size: width * 0.06,
+              ),
+              title: Text('Media visibility',
+                  style: TextStyle(fontSize: width * 0.045)),
+              trailing: Icon(
+                Icons.chevron_right,
+                size: width * 0.07,
+              ),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.star_border,
+                size: width * 0.06,
+              ),
+              title: Text('Starred messages',
+                  style: TextStyle(fontSize: width * 0.045)),
+              trailing: Text(''),
+            ),
+            SizedBox(height: height * 0.012),
+            Divider(
+                height: height * 0.012,
+                thickness: height * 0.007,
+                color: Colors.grey.shade100),
+            SizedBox(height: height * 0.012),
+            ListTile(
+              leading: Icon(
+                Icons.lock_outline,
+                size: width * 0.06,
+              ),
+              title: Padding(
+                padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Encryption',
+                      style: TextStyle(fontSize: width * 0.045),
+                    ),
+                    Container(
+                        width: width * 0.6,
+                        child: Text(
+                            "Messages and calls are end-to-end encrypted.",
+                            style: TextStyle(
+                                fontSize: width * 0.035, color: Colors.grey)))
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.timer_outlined,
+                size: width * 0.06,
+              ),
+              title: Padding(
+                padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Disappearing messages',
+                        style: TextStyle(fontSize: width * 0.045)),
+                    Text("off",
+                        style: TextStyle(
+                            fontSize: width * 0.035, color: Colors.grey))
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.mail_lock_outlined,
+                size: width * 0.06,
+              ),
+              title: Padding(
+                padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Chat lock',
+                        style: TextStyle(fontSize: width * 0.045)),
+                    Text("Lock and hide this chat on this device",
+                        style: TextStyle(
+                            fontSize: width * 0.035, color: Colors.grey))
+                  ],
+                ),
+              ),
+              trailing: Transform.scale(
+                  scale: width * 0.002,
+                  child: Switch(
+                    value: false,
+                    onChanged: (val) {},
+                    activeColor: Colors.black,
+                  )),
+            ),
+            if (isCurrentUserAdmin(widget.currentUser)) ...[
+              ListTile(
                 onTap: () async {
-                  String? desc = await _showGroupDescriptionModal();
-                  if (desc != null) {
-                    try {
-                      await editGroupInfo(group['groupId'], desc);
-                      // setState(() {
-                      //   group['groupDescription'] = desc;
-                      // });
-                      setState(() {
-                        groupDescription = desc;
-                      });
+                  final result =
+                      await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => UpdateGroupPermissions(
+                      groupSettings: group['groupSettings'],
+                      sendMessages: group['sendMessages'],
+                      addOtherMembers: group['addOtherMembers'],
+                      admins: admins,
+                      members: participants,
+                      currentUser: widget.currentUser,
+                    ),
+                  ));
+                  List<String> newAdmins = result['admins'];
 
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content:
-                        Text("Group description edited succesfully"),
-                        backgroundColor: Colors.blue.shade200,
-                      ));
-                    } catch (e) {
-                      print(e.toString());
+                  setState(() {
+                    admins = newAdmins;
+                    sendMessages = result['sendMessages'];
+                    addOtherMembers = result['addOtherMembers'];
+                    groupSettings = result['groupSettings'];
+                  });
+
+                  try {
+                    print("Here to update group settings");
+                    print(
+                        '${result['groupSettings']}, ${result['sendMessages']},${result['addOtherMembers']}');
+                    updateGroupSettings(
+                      group['groupId'],
+                      result['groupSettings'],
+                      result['sendMessages'],
+                      result['addOtherMembers'],
+                      admins,
+                    );
+
+                    for (String members in group['participants']) {
+                      if (admins.contains(members)) {
+                        print('$members is an admin');
+                        updateAdminStatusForCurrentUser(
+                            members, group['groupId'], true);
+                      } else {
+                        print('$members is  not an admin');
+                        updateAdminStatusForCurrentUser(
+                            members, group['groupId'], false);
+                      }
                     }
+                  } catch (e) {
+                    print(e.toString());
                   }
                 },
-                child: Text(
-                  groupDescription,
-                  style: TextStyle(
-                      color: Colors.blue[500], fontSize: width * 0.037),
+                leading: Icon(
+                  Icons.settings,
+                  size: width * 0.06,
                 ),
-              ),
-              SizedBox(height: height * 0.005),
-              Text(
-                'Created by ${firstName}, ${(group['createdAt'])}',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
+                title: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                  child: Text('Group permissions',
+                      style: TextStyle(fontSize: width * 0.045)),
+                ),
+              )
             ],
-          ),
-        ),
-        Divider(
-            height: height * 0.012,
-            thickness: height * 0.007,
-            color: Colors.grey.shade100),
-        ListTile(
-          leading: Icon(
-            Icons.notifications_none,
-            size: width * 0.06,
-          ),
-          title: Text(
-            'Notifications',
-            style: TextStyle(fontSize: width * 0.045),
-          ),
-          trailing: Icon(
-            Icons.chevron_right,
-            size: width * 0.07,
-          ),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.image_outlined,
-            size: width * 0.06,
-          ),
-          title: Text('Media visibility',
-              style: TextStyle(fontSize: width * 0.045)),
-          trailing: Icon(
-            Icons.chevron_right,
-            size: width * 0.07,
-          ),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.star_border,
-            size: width * 0.06,
-          ),
-          title: Text('Starred messages',
-              style: TextStyle(fontSize: width * 0.045)),
-          trailing: Text(''),
-        ),
-        SizedBox(height: height * 0.012),
-        Divider(
-            height: height * 0.012,
-            thickness: height * 0.007,
-            color: Colors.grey.shade100),
-        SizedBox(height: height * 0.012),
-        ListTile(
-          leading: Icon(
-            Icons.lock_outline,
-            size: width * 0.06,
-          ),
-          title: Padding(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.012),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Encryption',
-                  style: TextStyle(fontSize: width * 0.045),
-                ),
-                Container(
-                    width: width * 0.6,
-                    child: Text(
-                        "Messages and calls are end-to-end encrypted.",
-                        style: TextStyle(
-                            fontSize: width * 0.035, color: Colors.grey)))
-              ],
+            Divider(
+                height: height * 0.012,
+                thickness: height * 0.007,
+                color: Colors.grey.shade100),
+            SizedBox(height: height * 0.012),
+            Container(
+              margin: EdgeInsets.symmetric(
+                  horizontal: width * 0.035, vertical: height * 0.012),
+              padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+              child: Column(
+                children: [
+                  Row(
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${group['participants'].length} members ",
+                        style: TextStyle(fontSize: width * 0.042),
+                      ),
+                      Spacer(),
+                      Padding(
+                        padding: EdgeInsets.only(right: width * 0.052),
+                        child: Icon(
+                          Icons.search,
+                          size: width * 0.062,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: height * 0.012,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        ListTile(
+                          //Adding new members to the group after checking if the user is an admin and the permissions
+                          onTap: () {
+                            print('$addOtherMembers');
+                            if (addOtherMembers ||
+                                admins.contains(widget.currentUser)) {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => AddNewMembersToGroup(
+                                      exisitingMembers:
+                                          List.from(group['participants']),
+                                      groupId: widget.groupId)));
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(
+                                    "You are not an admin of this group.",
+                                    style: TextStyle(color: Colors.white,fontFamily: 'Raleway')),
+                                backgroundColor: Colors.red.shade200,
+                              ));
+                            }
+                          },
+                          contentPadding: EdgeInsets.zero,
+                          leading: CircleAvatar(
+                              backgroundColor: Colors.black,
+                              child: Icon(
+                                Icons.group_add_outlined,
+                                color: Colors.white,
+                                size: width * 0.052,
+                              )),
+                          title: Text(
+                            "Add members",
+                            style: TextStyle(fontSize: width * 0.045),
+                          ),
+                        ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: group['participants'].length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.black,
+                                child: Text(
+                                  membersFirstNameList[index][0].toUpperCase(),
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                              title: Text(membersFirstNameList[index]),
+                              trailing: isCurrentUserAdmin(
+                                      group['participants'][index])
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.blue.shade200,
+                                          border: Border.all(
+                                              color: Colors.blue.shade200),
+                                          borderRadius: BorderRadius.circular(
+                                              width * 0.01)),
+                                      width: width * 0.12,
+                                      height: height * 0.017,
+                                      child: Center(
+                                        child: Text(
+                                          "Admin",
+                                          style: TextStyle(
+                                              fontSize: width * 0.027,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    )
+                                  : null,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.timer_outlined,
-            size: width * 0.06,
-          ),
-          title: Padding(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.012),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Disappearing messages',
-                    style: TextStyle(fontSize: width * 0.045)),
-                Text("off",
-                    style: TextStyle(
-                        fontSize: width * 0.035, color: Colors.grey))
-              ],
+            Divider(
+                height: height * 0.012,
+                thickness: height * 0.007,
+                color: Colors.grey.shade100),
+            SizedBox(height: height * 0.012),
+            ListTile(
+              leading: Icon(
+                Icons.favorite_outline,
+                size: width * 0.06,
+              ),
+              title: Text(
+                'Add to Favourites',
+                style: TextStyle(fontSize: width * 0.045),
+              ),
             ),
-          ),
-        ),
-        ListTile(
-          leading: Icon(
-            Icons.mail_lock_outlined,
-            size: width * 0.06,
-          ),
-          title: Padding(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.012),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Chat lock',
-                    style: TextStyle(fontSize: width * 0.045)),
-                Text("Lock and hide this chat on this device",
-                    style: TextStyle(
-                        fontSize: width * 0.035, color: Colors.grey))
-              ],
+            ListTile(
+              leading: Icon(
+                Icons.people_outline,
+                size: width * 0.06,
+              ),
+              title: Text('Add to list',
+                  style: TextStyle(fontSize: width * 0.045)),
             ),
-          ),
-          trailing: Transform.scale(
-              scale: width * 0.002,
-              child: Switch(
-                value: false,
-                onChanged: (val) {},
-                activeColor: Colors.black,
-              )),
+            ListTile(
+              leading: Icon(
+                Icons.exit_to_app,
+                size: width * 0.06,
+                color: Colors.red,
+              ),
+              title: Text('Exit group',
+                  style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.thumb_down_alt_outlined,
+                size: width * 0.06,
+                color: Colors.red,
+              ),
+              title: Text('Report group',
+                  style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
+            ),
+          ],
         ),
-        if (isCurrentUserAdmin(widget.currentUser)) ...[
-    ListTile(
-    onTap: () async {
-    final result = await Navigator.of(context).push(
-    MaterialPageRoute(
-    builder: (context) =>
-    UpdateGroupPermissions(
-    groupSettings: group['groupSettings'],
-    sendMessages: group['sendMessages'],
-    addOtherMembers: group['addOtherMembers'],
-    admins: admins,
-    members: participants,
-    currentUser: widget.currentUser,),));
-    List<String> newAdmins = result['admins'];
-
-
-    setState(() {
-    admins = newAdmins;
-    sendMessages = result['sendMessages'];
-    addOtherMembers = result['addOtherMembers'];
-    groupSettings = result['groupSettings'];
-    });
-
-    try {
-      print("Here to update group settings");
-
-      updateGroupSettings(
-        group['groupId'],
-        result['groupSettings'],
-        result['sendMessages'],
-        result['addOtherMembers'],
-        admins,
-      );
-
-     for(String members in group['participants']){
-
-       if(admins.contains(members)){
-         print('$members is an admin');
-         updateAdminStatusForCurrentUser(members, group['groupId'], true);
-       }else
-         {   print('$members is  not an admin');
-           updateAdminStatusForCurrentUser(members, group['groupId'], false);
-         }
-     }
-    }catch(e){
-      print(e.toString());
-    }
-    },
-    leading: Icon(
-    Icons.settings,
-    size: width * 0.06,
-    ),
-    title: Padding(
-    padding: EdgeInsets.symmetric(horizontal: width * 0.012),
-    child: Text('Group permissions',
-    style: TextStyle(fontSize: width * 0.045)),
-    ),
-    )
-    ],
-    Divider(
-    height: height * 0.012,
-    thickness: height * 0.007,
-    color: Colors.grey.shade100),
-    SizedBox(height: height * 0.012),
-    Container(
-    margin: EdgeInsets.symmetric(
-    horizontal: width * 0.035, vertical: height * 0.012),
-    padding: EdgeInsets.symmetric(horizontal: width * 0.012),
-    child: Column(
-    children: [
-    Row(
-    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    "${group['participants'].length} members ",
-    style: TextStyle(fontSize: width * 0.042),
-    ),
-    Spacer(),
-    Padding(
-    padding: EdgeInsets.only(right: width * 0.052),
-    child: Icon(
-    Icons.search,
-    size: width * 0.062,
-    ),
-    )
-    ],
-    ),
-    SizedBox(
-    height: height * 0.012,
-    ),
-    SizedBox(
-    width: double.infinity,
-    child: Column(
-    children: [
-    ListTile(
-    contentPadding: EdgeInsets.zero,
-    leading: CircleAvatar(
-    backgroundColor: Colors.black,
-    child: Icon(
-    Icons.group_add_outlined,
-    color: Colors.white,
-    size: width * 0.052,
-    )),
-    title: Text(
-    "Add members",
-    style: TextStyle(fontSize: width * 0.045),
-    ),
-    ),
-    ListView.builder(
-    shrinkWrap: true,
-    physics: NeverScrollableScrollPhysics(),
-    itemCount: group['participants'].length,
-    itemBuilder: (context, index) {
-    return ListTile(
-    contentPadding: EdgeInsets.zero,
-    leading: CircleAvatar(
-    backgroundColor: Colors.black,
-    child: Text(
-    membersFirstNameList[index][0].toUpperCase(),
-    style: TextStyle(color: Colors.white),
-    ),
-    ),
-    title: Text(membersFirstNameList[index]),
-    trailing: isCurrentUserAdmin(
-    group['participants'][index])
-    ? Container(
-    decoration: BoxDecoration(
-    color: Colors.blue.shade200,
-    border: Border.all(
-    color: Colors.blue.shade200),
-    borderRadius: BorderRadius.circular(
-    width * 0.01)),
-    width: width * 0.12,
-    height: height * 0.017,
-    child: Center(
-    child: Text(
-    "Admin",
-    style: TextStyle(
-    fontSize: width * 0.027,
-    color: Colors.white),
-    ),
-    ),
-    )
-        : null,
+      ),
     );
-    },
-    ),
-    ],
-    ),
-    ),
-    ],
-    ),
-    ),
-    Divider(
-    height: height * 0.012,
-    thickness: height * 0.007,
-    color: Colors.grey.shade100),
-    SizedBox(height: height * 0.012),
-    ListTile(
-    leading: Icon(
-    Icons.favorite_outline,
-    size: width * 0.06,
-    ),
-    title: Text(
-    'Add to Favourites',
-    style: TextStyle(fontSize: width * 0.045),
-    ),
-    ),
-    ListTile(
-    leading: Icon(
-    Icons.people_outline,
-    size: width * 0.06,
-    ),
-    title: Text('Add to list',
-    style: TextStyle(fontSize: width * 0.045)),
-    ),
-    ListTile(
-    leading: Icon(
-    Icons.exit_to_app,
-    size: width * 0.06,
-    color: Colors.red,
-    ),
-    title: Text('Exit group',
-    style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
-    ),
-    ListTile(
-    leading: Icon(
-    Icons.thumb_down_alt_outlined,
-    size: width * 0.06,
-    color: Colors.red,
-    ),
-    title: Text('Report group',
-    style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
-    ),
-    ],
-    ),
-    ),
-    );
-    }
-
-    Widget _buildButton(IconData icon, String label) {
-    final height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    return Column(
-    children: [
-    Container(
-    padding: EdgeInsets.symmetric(
-    horizontal: width * 0.042, vertical: height * 0.017),
-    decoration: BoxDecoration(
-    border: Border.all(color: Colors.grey.shade300),
-    borderRadius: BorderRadius.circular(width * 0.032),
-    ),
-    child: Icon(icon, color: Colors.black),
-    ),
-    SizedBox(height: height * 0.01),
-    Text(label),
-    ],
-    );
-    }
   }
+
+  Widget _buildButton(IconData icon, String label) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.042, vertical: height * 0.017),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(width * 0.032),
+          ),
+          child: Icon(icon, color: Colors.black),
+        ),
+        SizedBox(height: height * 0.01),
+        Text(label),
+      ],
+    );
+  }
+}

@@ -86,3 +86,14 @@ Future<void> updateGroupSettings(String groupId, bool groupSettings,
     print(e.toString());
   }
 }
+Future<void> addNewMembersToGroup(String groupId, List<String> newMembers)async{
+  try{
+    final  foundGroup=groupsDb.doc(groupId);
+   await  foundGroup.update({"participants":FieldValue.arrayUnion(newMembers)});
+
+  }catch(e){
+    print(e.toString());
+
+  }finally{
+   print("New member added succesfully!");
+  }}

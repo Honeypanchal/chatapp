@@ -118,22 +118,7 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (isMakingGroupChat)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: height * 0.012, horizontal: width * 0.012),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: groupChatUsers.map((x) {
-                      return CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.blue[600],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
+
               Align(
                 alignment: Alignment.center,
                 child: Padding(
@@ -141,7 +126,7 @@ class _ChatPageState extends State<ChatPage> {
                       left: width * 0.01,
                       right: width * 0.01,
                       top: height * 0.018,
-                      bottom: height * 0.01),
+                    ),
                   child: Container(
                     height: height * 0.052,
                     width: width * 0.9,
@@ -167,6 +152,31 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ),
               SizedBox(height: height * 0.025),
+              if (isMakingGroupChat && groupChatUsers.isNotEmpty)...[
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: height * 0.002, horizontal: width * 0.012),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: groupChatUsers.map((x) {
+                      return CircleAvatar(
+                        backgroundColor: Colors.black,
+                        child: Icon(
+                          Icons.person,
+                          color: Colors.blue[600],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                Divider(
+                  height: height*0.012,
+                  thickness: width*0.00015,
+                  color: Colors.grey,
+                )
+              ]
+              ,
+
+
 
               // Users StreamBuilder
               StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
@@ -226,6 +236,9 @@ class _ChatPageState extends State<ChatPage> {
                             ),
                           ));
                         },
+                        tileColor:  groupChatUsers.contains(_chatUsers[index]['uid'])
+                            ? Colors.grey.shade300
+                            : Colors.transparent,
                         leading: Container(
                           padding: EdgeInsets.all(width * 0.002),
                           decoration: BoxDecoration(
@@ -238,10 +251,34 @@ class _ChatPageState extends State<ChatPage> {
                               width: width * 0.002,
                             ),
                           ),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Text(
-                                "${_chatUsers[index]['firstName'][0].toUpperCase()}"),
+                          child:Stack(
+                            clipBehavior: Clip.none, // Allows the tick to be placed outside the CircleAvatar's bounds
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: width * 0.05, // Adjust the radius as needed
+                                child: Text(
+                                  _chatUsers[index]['firstName'][0].toUpperCase(),
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              if (groupChatUsers.contains(_chatUsers[index]['uid']))
+                                Positioned(
+                                  right: -2,  // Move slightly outside the CircleAvatar
+                                  bottom: -2, // Move slightly outside the CircleAvatar
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white, // Background for tick to blend with avatar border
+                                    ),
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      size: width * 0.035,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         title: Text(
