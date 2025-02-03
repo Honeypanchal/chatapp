@@ -28,11 +28,39 @@ class _ChatLayoutState extends State<ChatLayout> {
       "sentTo": widget.user['uid'],
       "message": message,
       "timestamp": timestamp,
+      "seen": false,
     });
 
   }
-
   Future<void> fetchMessagesByCurrentUser() async {
+    print('Fetching messages...');
+
+    widget.databaseRef.collection("messages").snapshots().listen((QuerySnapshot event) {
+      setState(() {
+        messages.clear();
+        messages.addAll(event.docs);
+        messages.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
+      });
+
+      /// ✅ **Fix: Ensure 'seen' field updates when receiver opens chat**
+      for (var doc in event.docs) {
+        Map<String, dynamic> messageData = doc.data() as Map<String, dynamic>;
+
+        if (messageData['sentTo'] == widget.currentUser.uid && messageData['seen'] == false) {
+          print('Updating seen status for message: ${doc.id}');
+          widget.databaseRef.collection("messages").doc(doc.id).update({
+            "seen": true,
+          }).then((_) {
+            print('Message marked as seen: ${doc.id}');
+          }).catchError((error) {
+            print('Error updating seen status: $error');
+          });
+        }
+      }
+    });
+  }
+
+  /*Future<void> fetchMessagesByCurrentUser() async {
     print('here');
     final newDB =  widget.databaseRef.collection("messages").snapshots();
     if(newDB.length==0){
@@ -46,61 +74,41 @@ class _ChatLayoutState extends State<ChatLayout> {
 
         setState(() {  messages.clear();
         messages.addAll(userMessages.docs);
+        print(messages.length);
         messages.sort((a,b){
           return a['timestamp'].compareTo(b['timestamp']);
         });
+
+        for (var doc in event.docs) {
+          if (doc['sentTo'] == widget.currentUser.uid &&
+              !(doc.data() as Map<String, dynamic>).containsKey('seen')) {
+            widget.databaseRef.collection("messages").doc(doc.id).update({
+              "seen": true, // 🔹 Mark message as seen when opened
+            });
+          }
+        }
         });
       });
     });
+  }*/
+
+  Future<void> updateOldMessages() async {
+    QuerySnapshot snapshot = await widget.databaseRef.collection("messages").get();
+    for (var doc in snapshot.docs) {
+      if (!(doc.data() as Map<String, dynamic>).containsKey('seen')) {
+        await widget.databaseRef.collection("messages").doc(doc.id).update({
+          "seen": false, // 🔹 Add 'seen' field to old messages
+        });
+      }
+    }
   }
-
-  /*void fetchMessagesByCurrentUser() {
-    widget.databaseRef.collection("messages")
-        .where(Filter.or(
-        Filter.and(Filter("sentBy", isEqualTo: widget.currentUser.uid),
-            Filter("sentTo", isEqualTo: widget.user['uid'])),
-        Filter.and(Filter("sentBy", isEqualTo: widget.user['uid']),
-            Filter("sentTo", isEqualTo: widget.currentUser.uid))
-    ))  // ✅ Fetches messages from both sender and receiver
-        .orderBy("timestamp", descending: false)  // ✅ Ensures correct order
-        .snapshots()
-        .listen((QuerySnapshot event) {
-      setState(() {
-        messages = event.docs;  // ✅ Updates messages list
-      });
-    });
-  }*/
- /* void fetchMessagesByCurrentUser() {
-    widget.databaseRef.collection("messages")
-        .where("sentBy", isEqualTo: widget.currentUser.uid)
-        .where("sentTo", isEqualTo: widget.user['uid'])
-        .orderBy("timestamp")
-        .snapshots()
-        .listen((QuerySnapshot event) {
-      setState(() {
-        messages = event.docs;
-      });
-    });
-
-    widget.databaseRef.collection("messages")
-        .where("sentBy", isEqualTo: widget.user['uid'])
-        .where("sentTo", isEqualTo: widget.currentUser.uid)
-        .orderBy("timestamp")
-        .snapshots()
-        .listen((QuerySnapshot event) {
-      setState(() {
-        messages.addAll(event.docs);
-        messages.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
-      });
-    });
-  }*/
-
 
 
   @override
   void initState() {
     super.initState();
     fetchMessagesByCurrentUser();
+    updateOldMessages();
   }
 
   @override
@@ -162,6 +170,57 @@ class _ChatLayoutState extends State<ChatLayout> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (messages.isNotEmpty)
+                Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: height * 0.12),
+                      child: ListView.builder(
+                        itemBuilder: (context, index) {
+                          bool x = messages[index]['sentBy'] == widget.currentUser.uid;
+                          bool seenStatus = (messages[index].data() as Map<String, dynamic>).containsKey('seen')
+                              ? messages[index]['seen']
+                              : false;
+
+                          return Column(
+                            crossAxisAlignment:
+                            x ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                            children: [
+                              ChatBubble(
+                                clipper: ChatBubbleClipper1(
+                                    type: x ? BubbleType.sendBubble : BubbleType.receiverBubble),
+                                alignment: x ? Alignment.topRight : Alignment.topLeft,
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: width * 0.012, vertical: height * 0.012),
+                                backGroundColor: x
+                                    ? Color(0xFF2C313F)
+                                    : Color(0xFF995BF8).withOpacity(0.3),
+                                child: Container(
+                                  constraints: BoxConstraints(maxWidth: width * 0.7),
+                                  child: Text(
+                                    messages[index]['message'],
+                                    style: TextStyle(
+                                        fontFamily: 'Raleway', color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 4), // Small gap
+
+                              /// ✅ **Checkmark for Sent & Seen Messages**
+                              if (x) // Only show for sent messages
+                                Padding(
+                                  padding: EdgeInsets.only(right: width * 0.02),
+                                  child: Icon(
+                                    seenStatus ? Icons.done_all : Icons.check,
+                                    size: 16,
+                                    color: seenStatus ? Colors.green : Colors.grey,
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
+                        itemCount: messages.length,
+                      ),
+                    )),
                 /*Expanded(
                     flex: 3,
                     child: Padding(
@@ -195,35 +254,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                         itemCount: messages.length,
                       ),
                     )),*/
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: height * 0.12),
-                    child: messages.isNotEmpty
-                        ? ListView.builder(
-                      itemBuilder: (context, index) {
-                        bool isSentByCurrentUser = messages[index]['sentBy'] == widget.currentUser.uid;
-                        return ChatBubble(
-                          clipper: ChatBubbleClipper1(
-                            type: isSentByCurrentUser ? BubbleType.sendBubble : BubbleType.receiverBubble,
-                          ),
-                          alignment: isSentByCurrentUser ? Alignment.topRight : Alignment.topLeft,
-                          margin: EdgeInsets.symmetric(horizontal: width * 0.012, vertical: height * 0.012),
-                          backGroundColor: isSentByCurrentUser ? Color(0xFF2C313F) : Color(0xFF995BF8).withOpacity(0.3),
-                          child: Container(
-                            constraints: BoxConstraints(maxWidth: width * 0.7),
-                            child: Text(
-                              messages[index]['message'],
-                              style: TextStyle(fontFamily: 'Raleway', color: Colors.white),
-                            ),
-                          ),
-                        );
-                      },
-                      itemCount: messages.length,
-                    )
-                        : Center(child: Text("No messages yet!")),  // ✅ Shows message if empty
-                  ),
-                ),
-
               Expanded(
                   child: Align(
                       alignment: Alignment.bottomCenter,
