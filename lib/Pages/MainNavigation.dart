@@ -49,10 +49,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         child: BottomNavigationBar(
           backgroundColor: Colors.black,
           items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'chat',
-            ),
+
 
             BottomNavigationBarItem(
               icon: Icon(Icons.home),

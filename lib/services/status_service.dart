@@ -9,6 +9,7 @@ class StatusService {
   Future<void> uploadStatus(String text, String backgroundColor,String textStyle) async {
     String uid = _auth.currentUser!.uid;
 
+
     DocumentSnapshot userDoc = await _firestore.collection('Users').doc(uid).get();
     if (!userDoc.exists) {
       print("Error: User document not found!");
@@ -25,6 +26,8 @@ class StatusService {
       textStyle: textStyle, // Store selected text style
       timestamp: Timestamp.now(),
       viewedBy: [],
+      statusReply: [],
+
     );
 
     await _firestore.collection('Status').add(status.toMap());
@@ -40,8 +43,30 @@ class StatusService {
       return snapshot.docs.map((doc) => Status.fromMap(doc.data())).toList();
     });
   }
+  Future<void> sendStatusReply(String statusId, String receiverId, String replyText) async {
+    String senderId = _auth.currentUser!.uid;
+    DocumentSnapshot senderDoc = await _firestore.collection('Users').doc(senderId).get();
+    if (!senderDoc.exists) {
+      print("Error: Sender document not found!");
+      return;
+    }
 
-// Mark Status as Viewed
+    String senderName = senderDoc['firstName'] ?? "Unknown"; // Get sender's name
+    DocumentReference statusRef = _firestore.collection('Status').doc(statusId);
+    await statusRef.update({
+      'statusReply': FieldValue.arrayUnion([
+        {'replyBy': senderName, 'replyText': replyText} // Store name instead of ID
+      ])
+    });
+
+    print("Reply added successfully: $senderName - $replyText");
+  }
+
+
+  String getChatId(String user1, String user2) {
+    return user1.hashCode <= user2.hashCode ? '$user1\_$user2' : '$user2\_$user1';
+  }
+
   Future<void> markStatusAsViewed(String statusOwnerId) async {
     String viewerId = _auth.currentUser!.uid;
     DocumentSnapshot viewerDoc = await _firestore.collection('Users').doc(viewerId).get();
@@ -49,7 +74,8 @@ class StatusService {
 
     DocumentReference statusRef = _firestore.collection('Status').doc(statusOwnerId);
     await statusRef.update({
-      'viewedBy': FieldValue.arrayUnion([viewerName])
+      'viewedBy': FieldValue.arrayUnion([viewerName]),
+
     });
   }
 }
