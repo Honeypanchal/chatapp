@@ -377,7 +377,6 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   ],color: Colors.grey.shade200,onSelected: (value){
                 if(value==0){
 
-
                     print('$addOtherMembers');
                     if (addOtherMembers ||
                         admins.contains(widget.currentUser)) {
@@ -399,14 +398,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                     }
 
                 }else if(value==1){
-
-                  if(!isCurrentUserAdmin(widget.currentUser)){
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("You are not an admin",style: TextStyle(color: Colors.white,fontFamily: 'Raleway')),backgroundColor: Colors.red.shade200,));
-                  }else
-                    {
-                      changeGroupName();
-                    }
-
+changeGroupName();
                 }
           },)
         ],
@@ -471,35 +463,26 @@ class _GroupDescriptionState extends State<GroupDescription> {
                 children: [
                   GestureDetector(
                     onTap: () async {
-    if(!isCurrentUserAdmin(widget.currentUser)) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
-          "You are not an admin",
-          style: TextStyle(color: Colors.white, fontFamily: 'Raleway')),
-        backgroundColor: Colors.red.shade200,));
-    }else
-      {
-        String? desc = await _showGroupDescriptionModal();
-        if (desc != null) {
-          try {
-            await editGroupInfo(group['groupId'], desc);
-            // setState(() {
-            //   group['groupDescription'] = desc;
-            // });
-            setState(() {
-              groupDescription = desc;
-            });
+                      String? desc = await _showGroupDescriptionModal();
+                      if (desc != null) {
+                        try {
+                          await editGroupInfo(group['groupId'], desc);
+                          // setState(() {
+                          //   group['groupDescription'] = desc;
+                          // });
+                          setState(() {
+                            groupDescription = desc;
+                          });
 
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content:
-              Text("Group description edited succesfully"),
-              backgroundColor: Colors.blue.shade200,
-            ));
-          } catch (e) {
-            print(e.toString());
-          }
-        }
-      }
-
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content:
+                                Text("Group description edited succesfully"),
+                            backgroundColor: Colors.blue.shade200,
+                          ));
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      }
                     },
                     child: Text(
                       groupDescription,
