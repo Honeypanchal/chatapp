@@ -18,7 +18,6 @@ class Groupchatpage extends StatefulWidget {
   @override
   State<Groupchatpage> createState() => _GroupchatpageState();
 }
-
 class _GroupchatpageState extends State<Groupchatpage> {
   final TextEditingController _messageController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -132,8 +131,9 @@ class _GroupchatpageState extends State<Groupchatpage> {
   }
 
   // Function to handle the action of copying messages
-  void copyMessage(String message) {
-    Clipboard.setData(ClipboardData(text: message));
+  void copyMessage(String messageId) async {
+    String messageText = await getMessageTextById(messageId);
+    Clipboard.setData(ClipboardData(text: messageText));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Message copied to clipboard'),
     ));
@@ -174,7 +174,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                 ? TextField(
               autofocus: true,
               decoration: InputDecoration(
-                  hintText: "Search messages"),
+                  hintText: "Search messages",
+              hintStyle:TextStyle(color:Colors.white)),
               onChanged: (query) => setState(() => searchQuery = query),
             )
                 : Text(widget.newGroup.groupName,
@@ -197,22 +198,19 @@ class _GroupchatpageState extends State<Groupchatpage> {
                 // Display 3 dots when messages are selected
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert, color: Colors.white),
-                  onSelected: (value) {
+                  onSelected: (value) async {
+                    String messageId = selectedMessages.first; // Using the first selected message as an example
                     if (value == 'reply') {
                       // Perform reply action on selected message
-                      String messageId = selectedMessages.first; // Using the first selected message as an example
-                      var messageText = 'Replying to message';
+                      String messageText = await getMessageTextById(messageId);
                       replyToMessage(messageText, messageId);
                     } else if (value == 'edit') {
                       // Perform edit action on selected message
-                      String messageId = selectedMessages.first;
-                      var messageText = 'Edit message';
+                      String messageText = await getMessageTextById(messageId);
                       editMessage(messageText, messageId);
                     } else if (value == 'copy') {
                       // Perform copy action on selected message
-                      String messageId = selectedMessages.first;
-                      var messageText = 'Copy message text';
-                      copyMessage(messageText);
+                      copyMessage(messageId);
                     }
                   },
                   itemBuilder: (context) => [
@@ -447,5 +445,5 @@ class _GroupchatpageState extends State<Groupchatpage> {
         .get();
 
     return messageDoc['message'] ?? ''; // Return the actual message content
-     }
+    }
 }
