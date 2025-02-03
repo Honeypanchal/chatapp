@@ -1,9 +1,9 @@
 import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/models/Group.dart';
-import 'package:chatapp/services/users.dart';
+import 'package:chatapp/services/users_services.dart';
 import 'package:flutter/material.dart';
-import 'package:chatapp/services/groupChat.dart';
+import 'package:chatapp/services/groupChat_services.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 
 class NewGroupDefinition extends StatefulWidget {
@@ -19,8 +19,8 @@ class NewGroupDefinition extends StatefulWidget {
 }
 
 class _NewGroupDefinitionState extends State<NewGroupDefinition> {
+  List<String> membersFirstNameList = [];
 
-  List<String> membersFirstNameList=[];
   Future<void> memebersFirstName() async {
     List<String> fetchedNames = await getUserNames(widget.members);
     setState(() {
@@ -28,19 +28,33 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
     });
   }
 
+  bool groupSettings = true;
 
-  bool groupSettings=true;
+  bool sendMessages = true;
 
-  bool sendMessages=true;
+  bool addOtherMembers = true;
+  String currentUser = '';
+  List<String> admins = [];
 
-  bool addOtherMembers=true;
   TextEditingController _groupName = TextEditingController();
 
-  @override
-  void initState(){
-    super.initState();
-    memebersFirstName();
+  Future<void> fetchCurrentUser() async {
+    String user = await getCurrentUser(); // Wait for the value
+    setState(() {
+      currentUser = user; // Update state
+    });
   }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCurrentUser();
+    memebersFirstName();
+    setState(() {
+      admins.add(widget.createdBy.uid);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -50,7 +64,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
       appBar: AppBar(
         title: Text(
           'New  Group',
-          style: TextStyle(fontFamily: 'Raleway',color: Colors.white),
+          style: TextStyle(fontFamily: 'Raleway', color: Colors.white),
         ),
         leading: IconButton(
             onPressed: () {
@@ -150,13 +164,16 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                             ),
                           ),
                           Spacer(),
-                        IconButton(onPressed: (){
-                          print("Not implemented disappearing messages yet!");
-                        }, icon:   Icon(
-                          Icons.timer,
-                          color: Colors.grey,
-                          size: width * 0.06,
-                        ))
+                          IconButton(
+                              onPressed: () {
+                                print(
+                                    "Not implemented disappearing messages yet!");
+                              },
+                              icon: Icon(
+                                Icons.timer,
+                                color: Colors.grey,
+                                size: width * 0.06,
+                              ))
                         ],
                       ),
                       Text(
@@ -180,20 +197,22 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           ),
                           Spacer(),
                           IconButton(
-                              onPressed: () async{
-                               final result= await  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => Grouppermissions(
-                                      groupSettings: groupSettings,
-                                      sendMessages: sendMessages,
-                                      addOtherMembers: addOtherMembers,
-
-                                    )));
-                              if(result!=null){
-                                groupSettings=result['groupSettings'];
-                                sendMessages=result['sendMessages'];
-                                addOtherMembers=result['addOtherMembers'];
-                                print('$groupSettings $sendMessages $addOtherMembers');
-                              }
+                              onPressed: () async {
+                                final result = await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => GroupPermissions(
+                                            groupSettings: groupSettings,
+                                            sendMessages: sendMessages,
+                                            addOtherMembers: addOtherMembers,
+                                            admins: admins,
+                                            members: widget.members,
+                                            currentUser:
+                                                widget.createdBy.uid)));
+                                if (result != null) {
+                                  groupSettings = result['groupSettings'];
+                                  sendMessages = result['sendMessages'];
+                                  addOtherMembers = result['addOtherMembers'];
+                                }
                               },
                               icon: Icon(
                                 Icons.settings,
@@ -243,7 +262,6 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                         children: [
                           CircleAvatar(
                             radius: width * 0.1,
-
                             child: Icon(Icons.person),
                           ),
                           SizedBox(height: height * 0.01),
@@ -276,37 +294,43 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
             ));
           } else {
             try {
-
               Group? newGroup = await createNewGroup(
-                _groupName.text.trim(),
-                "assets/images/images.jpg",
-                "groupDescription",
-                widget.createdBy.uid,
-                widget.members,
-                groupSettings,
-                sendMessages,
-                addOtherMembers
-
-
-              );
+                  _groupName.text.trim(),
+                  "assets/images/images.jpg",
+                  "Group Description",
+                  widget.createdBy.uid,
+                  widget.members,
+                  [widget.createdBy.uid],
+                  groupSettings,
+                  sendMessages,
+                  addOtherMembers);
 
               if (newGroup != null) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Groupchatpage(newGroup: newGroup))).
-              catchError((error){
+                Navigator.of(context)
+                    .pushReplacement(MaterialPageRoute(
+                        builder: (context) => Groupchatpage(
+                            newGroup: newGroup, currentUser: currentUser)))
+                    .catchError((error) {
                   print(error.toString());
                 });
                 //Adding group id to user and participants
-                widget.createdBy.addGroupAndAddActiveGroup(newGroup.groupId!);
-                print("Members length ${widget.members.length}");
-
+                widget.createdBy
+                    .addGroupAndAddActiveGroup(newGroup.groupId!, true);
+print(widget.members.length);
                 for (var singleMember in widget.members) {
                   print(singleMember);
-                  addGroupAndAddActiveGroupInDatabase(newGroup.groupId!, singleMember);
+                  if (singleMember == widget.createdBy.uid) {
+                    print('Here adding trur to group admin for person who created the group');
+                    addGroupAndAddActiveGroupInDatabase(
+                        newGroup.groupId!, singleMember, true);
+                  }
+                  addGroupAndAddActiveGroupInDatabase(
+                      newGroup.groupId!, singleMember, false);
+                  //   addGroupAndAddActiveGroupInDatabase(groupId: newGroup.groupId!, path: singleMember,isAdmin:false);
                 }
 
                 print("Group created successfully: ${newGroup.groupId}");
-                widget.members.clear();
+                // widget.members.clear();
                 _groupName.clear();
               } else {
                 print("Group creation failed.");
@@ -317,7 +341,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
             }
           }
         },
-        backgroundColor: Colors.blue[600],
+        backgroundColor: Colors.black,
         child: Icon(
           Icons.arrow_forward,
           color: Colors.white,

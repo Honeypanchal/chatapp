@@ -1,15 +1,16 @@
 import 'package:chatapp/models/CustomClass.dart';
+import 'package:chatapp/services/users_services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatapp/models/Group.dart';
 
 CollectionReference groupsDb = FirebaseFirestore.instance.collection("groups");
 
-Future<Group?> createNewGroup(
-    String groupName,
+Future<Group?> createNewGroup(String groupName,
     String groupIcon,
     String groupDescription,
     String createdBy,
     List<String> participants,
+    List<String> admins,
     bool groupSettings,
     bool sendMessages,
     bool addOtherMembers) async {
@@ -29,6 +30,7 @@ Future<Group?> createNewGroup(
       groupDescription: groupDescription,
       createdBy: createdBy,
       participants: participants,
+      admins: admins,
       createdAt: Timestamp.now(),
       groupSettings: groupSettings,
       sendMessages: sendMessages,
@@ -36,6 +38,7 @@ Future<Group?> createNewGroup(
     );
     final newGroupRef = await groupsDb.add(newGroup.toMap());
     String newGroupId = newGroupRef.id;
+    await groupsDb.doc(newGroupId).update({"groupId": newGroupId});
     newGroup.addId(newGroupId);
     print(" Group created successfully with ID: $newGroupId ");
     return newGroup;
@@ -45,5 +48,41 @@ Future<Group?> createNewGroup(
   } on Exception catch (e) {
     print(" Error: $e ");
     return null;
+  }
+}
+
+Future<dynamic> fetchGroupByGroupId(String groupId) async {
+  try {
+    print("HEREKHNFSEHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+    final group = await groupsDb.doc(groupId).get();
+
+    print(groupId);
+    return group;
+  } catch (e) {
+    throw e;
+  }
+}
+
+Future<void> editGroupInfo(String groupId, String desc) async {
+  try {
+    print('$groupId');
+    final data = await groupsDb.doc(groupId).update({"groupDescription": desc});
+    print("Edited succesfully");
+  } catch (e) {
+    throw e;
+  }
+}
+
+Future<void> updateGroupSettings(String groupId, bool groupSettings,
+    bool sendMessages, bool addOtherMembers,List<String> admins) async{
+  try {
+    final groupDoc = await groupsDb.doc(groupId).update({
+      "groupSettings":groupSettings,
+      "sendMessages":sendMessages,
+      "addOtherMembers":addOtherMembers,
+      "admins":admins,
+    });
+  } catch (e) {
+    print(e.toString());
   }
 }

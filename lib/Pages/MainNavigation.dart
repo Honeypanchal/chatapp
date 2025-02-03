@@ -1,6 +1,6 @@
 import 'package:chatapp/Pages/statuspage.dart';
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/services/groupChat.dart';
+import 'package:chatapp/services/groupChat_services.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
 // import 'package:chat_application/Pages/HomePage.dart';
@@ -47,13 +47,17 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           border: Border.all(color: Colors.white)
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.blue[600],
+          backgroundColor: Colors.black,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'chat',
             ),
 
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.camera),
               label: 'Status',
@@ -64,7 +68,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             ),
           ],
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.indigo[900],
+          selectedItemColor: Colors.blue,
           unselectedItemColor: Colors.white,
           onTap: _onItemTapped,
         ),
