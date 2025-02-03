@@ -6,13 +6,10 @@ class StatusService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Upload Text Status
-  Future<void> uploadStatus(String text) async {
+  Future<void> uploadStatus(String text, String backgroundColor,String textStyle) async {
     String uid = _auth.currentUser!.uid;
 
-    // Fetch user data from Firestore
     DocumentSnapshot userDoc = await _firestore.collection('Users').doc(uid).get();
-
     if (!userDoc.exists) {
       print("Error: User document not found!");
       return;
@@ -24,28 +21,27 @@ class StatusService {
       uid: uid,
       username: username,
       text: text,
+      backgroundColor: backgroundColor,
+      textStyle: textStyle, // Store selected text style
       timestamp: Timestamp.now(),
       viewedBy: [],
     );
 
-    // Store status under the user's UID (overwrite old status)
-    await _firestore.collection('Status').doc(uid).set(status.toMap());
-
-    print("Text Status added successfully!");
+    await _firestore.collection('Status').add(status.toMap());
+    print("Status uploaded successfully with color: $backgroundColor and style: $textStyle");
   }
 
-  // Fetch all statuses
   Stream<List<Status>> getStatuses() {
-    return _firestore
-        .collection('Status')
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((snapshot) {
+    return _firestore.
+    collection('Status').
+        where('timestamp',isGreaterThan: Timestamp.now().toDate().subtract(Duration(hours: 24)))
+    .orderBy('timestamp',
+        descending: true).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => Status.fromMap(doc.data())).toList();
     });
   }
 
-  // Mark Status as Viewed
+// Mark Status as Viewed
   Future<void> markStatusAsViewed(String statusOwnerId) async {
     String viewerId = _auth.currentUser!.uid;
     DocumentSnapshot viewerDoc = await _firestore.collection('Users').doc(viewerId).get();
