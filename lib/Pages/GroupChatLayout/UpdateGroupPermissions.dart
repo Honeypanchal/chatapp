@@ -390,25 +390,37 @@ class _GroupMembersState extends State<GroupMembers> {
                     }
                   },
                   contentPadding: EdgeInsets.zero,
-                  leading: Container(
-                    padding: EdgeInsets.all(width * 0.002),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color:  isCurrentUserAdmin(widget.groupMembers[index])
-                            ? Colors.blue.shade600
-                            : Colors.black,
-                        width: width * 0.002,
-                      ),),
-                    child: CircleAvatar(
-                      radius: width*0.055,
-                      backgroundColor: Colors.black,
-                      child: Text(
-                        membersFirstNameList[index][0].toUpperCase(),
-                        style: TextStyle(color: Colors.white),
+                  leading:
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.black,
+                        radius: width * 0.05,
+                        child: Text(
+                          membersFirstNameList[index][0].toUpperCase(),
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
-                    ),
-                  ),
+                      if ( isCurrentUserAdmin(widget.groupMembers[index]))
+                        Positioned(
+                          right: -2,
+                          bottom: -2,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                            child: Icon(
+                              Icons.check_circle,
+                              size: width * 0.035,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                    ],
+                  )
+                  ,
                   title: Text(membersFirstNameList[index]),
                   trailing: isCurrentUserAdmin(widget.groupMembers[index])
                       ? Container(
