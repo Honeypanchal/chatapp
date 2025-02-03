@@ -28,7 +28,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       // HomePage(currentUser: widget.currentUser),
       ChatPage(currentUser: widget.currentUser, ),
       StatusPage(),
-      // ProfilePage(currentUser: widget.currentUser),
+      //ProfilePage(currentUser: widget.currentUser),
     ];
   }
 

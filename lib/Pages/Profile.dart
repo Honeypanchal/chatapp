@@ -39,3 +39,39 @@
 //     );
 //   }
 // }
+//
+//
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+
+class Profile extends StatefulWidget {
+  const Profile({super.key});
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Edit Profile',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w700,fontFamily: 'poppins'),
+      ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          Container(
+            decoration: BoxDecoration(color: Colors.white54),
+
+          )
+        ],
+      )
+
+    );
+  }
+}

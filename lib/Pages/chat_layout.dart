@@ -10,8 +10,8 @@ class ChatLayout extends StatefulWidget {
 
   const ChatLayout(
       {required this.currentUser,
-      required this.user,
-      required this.databaseRef});
+        required this.user,
+        required this.databaseRef});
 
   @override
   State<ChatLayout> createState() => _ChatLayoutState();
@@ -151,7 +151,7 @@ class _ChatLayoutState extends State<ChatLayout> {
         messages.sort((a, b) => a['timestamp'].compareTo(b['timestamp']));
       });
 
-      //**Mark unread messages as seen when the current user reads them**
+      //*Mark unread messages as seen when the current user reads them*
       event.docs.forEach((doc) {
         if ((doc['sentTo'] == widget.user['uid'] ||
             doc['sentBy'] == widget.currentUser.uid)
@@ -234,7 +234,7 @@ class _ChatLayoutState extends State<ChatLayout> {
               height: width * 0.045,
               width: width * 0.035,
               decoration:
-                  BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              BoxDecoration(color: Colors.white, shape: BoxShape.circle),
               child: Center(
                 child: Padding(
                   padding: EdgeInsets.only(left: width * 0.019),
@@ -284,7 +284,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                         bool isSentByCurrentUser = messages[index]['sentBy'] == widget.currentUser.uid;
                         bool seen = messages[index]['seen'];
 
-                      /*itemBuilder: (context, index) {
+                        /*itemBuilder: (context, index) {
                         bool x =
                             messages[index]['sentBy'] == widget.currentUser.uid;
 
@@ -297,8 +297,8 @@ class _ChatLayoutState extends State<ChatLayout> {
                           clipper: ChatBubbleClipper1(
                             type:isSentByCurrentUser ? BubbleType.sendBubble : BubbleType.receiverBubble,
                           ),
-                              // original
-                              /*type: x
+                          // original
+                          /*type: x
                                   ? BubbleType.sendBubble
                                   : BubbleType.receiverBubble),*/
                           alignment: isSentByCurrentUser ? Alignment.topRight : Alignment.topLeft,
