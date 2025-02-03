@@ -1,8 +1,6 @@
-// import 'package:chatapp/models/Group.dart';
-// import 'package:flutter/material.dart';
+
 import 'dart:async';
 
-import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -98,7 +96,8 @@ Future<void> membersFirstName() async {
     if (_messageController.text.trim().isNotEmpty) {
       String userId = _auth.currentUser!.uid;
       List<String> userNameList = await getUserNames([userId]);
-      String username = userNameList.isNotEmpty ? userNameList.first : "Unknown";
+      String username =
+          userNameList.isNotEmpty ? userNameList.first : "Unknown";
 
       // Add message to Firestore
       await _firestore
@@ -187,8 +186,9 @@ Future<void> membersFirstName() async {
   // Function to handle the action of deleting messages
   void deleteMessages() {
     selectedMessages.forEach((messageId) async {
-      await _firestore.collection('groups')
-          .doc(widget.groupId)
+      await _firestore
+          .collection('groups')
+          .doc(group['groupId'])
           .collection('messages')
           .doc(messageId)
           .delete();
@@ -237,23 +237,17 @@ Future<void> membersFirstName() async {
   }
   StreamSubscription? _groupSubscription;
   void listenToDatabaseUpdates() {
-
-    final groupRef =
-    FirebaseFirestore.instance.collection("groups").doc(group['groupId'].groupId);
+    final groupRef = FirebaseFirestore.instance.collection("groups").doc(widget.groupId); // Corrected groupId reference
 
     _groupSubscription = groupRef.snapshots().listen((snapshot) async {
-      print("Listening to changes");
+      print("Listening to changes...");
 
       if (snapshot.exists && mounted) {
         var updatedGroupData = snapshot.data() as Map<String, dynamic>;
 
-
-        await Future.delayed(Duration(seconds: 2));
-
         if (mounted) {
           setState(() {
             group = updatedGroupData;
-
             groupSettings = group['groupSettings'];
             sendMessages = group['sendMessages'];
             addOtherMembers = group['addOtherMembers'];
@@ -264,10 +258,20 @@ Future<void> membersFirstName() async {
     });
   }
   @override
+  void dispose() {
+    _groupSubscription?.cancel(); // Stop listening when widget is removed
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
+    if (isLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -280,6 +284,14 @@ Future<void> membersFirstName() async {
                     currentUser: widget.currentUser)));
           },
           child: AppBar(
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                )),
             title: selectedMessages.isNotEmpty
                 ? Text("${selectedMessages.length} selected",
                     style: TextStyle(color: Colors.white))
@@ -287,8 +299,9 @@ Future<void> membersFirstName() async {
                     ? TextField(
                         autofocus: true,
                         decoration:
-                            InputDecoration(hintText: "Search messages",
-                            hintStyle:TextStyle(color:Colors.white)),
+                            InputDecoration(hintText: "Search messages"
+                            ,
+                                hintStyle:TextStyle(color:Colors.white)),
                         onChanged: (query) =>
                             setState(() => searchQuery = query),
                       )
@@ -537,7 +550,7 @@ Future<void> membersFirstName() async {
               padding: EdgeInsets.symmetric(horizontal: width*0.012,vertical: height*0.01),
               child: Row(
                 children: [
-                  if (!group['sendMessages'] && admins.contains(widget.currentUser)) ...[
+                  if (!group['sendMessages'] && !admins.contains(widget.currentUser)) ...[
                     ScaffoldMessenger(
 
                         child: Align(
@@ -589,6 +602,5 @@ Future<void> membersFirstName() async {
         .get();
 
     return messageDoc['message'] ?? ''; // Return the actual message content
-    }
   }
-
+}
