@@ -35,6 +35,12 @@ dependencies:
   cloud_firestore:
   firebase_database:
   fluttertoast: ^8.2.4
+  image_picker:
+  intl:
+  file_picker:
+  firebase_storage:
+
+
   google_sign_in:
   flutter_chat_bubble:
   image_picker:
@@ -77,6 +83,20 @@ flutter:
         - asset: assets/fonts/Raleway-Bold.ttf
         - asset: assets/fonts/Raleway-Medium.ttf
           weight: 700
+
+
+    - family: Rubic
+
+      fonts:
+        - asset: assets/fonts/Rubik-ExtraBoldItalic.ttf
+        - asset: assets/fonts/Rubik-Italic-VariableFont_wght.ttf
+
+    - family: CedarvilleCursive
+
+      fonts:
+        - asset: assets/fonts/CedarvilleCursive-Regular.ttf
+
+
     - family: Poppins
 
       fonts:

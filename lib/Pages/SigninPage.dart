@@ -374,7 +374,11 @@ class _SigninPageState extends State<SigninPage> {
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString(),style: TextStyle(fontWeight: FontWeight.w300,fontFamily: 'poppins'),),
+            content: Text(
+              e.toString(),
+              style:
+                  TextStyle(fontWeight: FontWeight.w300, fontFamily: 'poppins'),
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -388,209 +392,171 @@ class _SigninPageState extends State<SigninPage> {
     final width = mediaQuery.size.width;
     final height = mediaQuery.size.height;
 
-    return
-      Scaffold(
+    return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: height * 0.5,
-                  width: width,
-                  // decoration: BoxDecoration(
-                  //   gradient: LinearGradient(
-                  //     colors: [
-                  //       Color(0XFF5098FA),
-                  //       Color(0XFF526CF7),
-                  //       Color(0XFF533BF1),
-                  //       Color(0XFF5327EE),
-                  //       Color(0XFF5317EB),
-                  //     ],
-                  //     begin: Alignment.topCenter,
-                  //     end: Alignment.bottomCenter,
-                  //   ),
-                  // ),
-                  child: SafeArea(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          // SizedBox(height: height * 0.065),
-                          // ClipOval(
-                          //   child: SizedBox.fromSize(
-                          //     size: Size.fromRadius(50),
-                          //     child: Image.asset(
-                          //       'assets/images/login1.jpg',
-                          //       fit: BoxFit.cover,
-                          //     ),
-                          //   ),
-                          // ),
-                          Image.asset(
-                            'assets/images/login3.jpg',
-                            fit: BoxFit.cover,
-                            height: 500,
-                            width: MediaQuery.of(context).size.width,
-                          ),
-                        ],
+            Image.asset(
+              'assets/images/main4.png',
+              fit: BoxFit.cover,
+            ),
+            Text("Let's Sign In",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: width * 0.09,)),
+            /*Text(
+              'LOGIN',
+              style: TextStyle(
+                fontSize: width * 0.05,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            ),*/
+            SizedBox(
+              height: height * 0.013,
+            ),
+            Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    top: 8.0, bottom: 10.0, left: 20.0, right: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Email Address',
+                        style: TextStyle(
+                            fontSize: width * 0.036,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Poppins'),
+                        textAlign: TextAlign.left,
                       ),
                     ),
-                  ),
-                ),
-                Container(
-                  width: width * 0.85,
-                  margin: EdgeInsets.only(
-                    left: width * 0.1,
-                    right: width * 0.1,
-                    top: height * 0.33,
-                    bottom: height * 0.03,
-                  ),
-                  padding: EdgeInsets.all(width * 0.06),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(width * 0.06),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        spreadRadius: 1,
+                    SizedBox(
+                      height: height * 0.008,
+                    ),
+                    /*Text(
+                      'EMAIL',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: width * 0.03,
+                        color: Colors.blueAccent,
+                        fontFamily: 'poppins'
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'LOGIN',
+                    ),*/
+                    TextFormField(
+                      style: TextStyle(
+                          color: Colors.black, fontFamily: 'Raleway'),
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.email_outlined),
+                        hintText: 'Email',
+                        hintStyle: TextStyle(color: Colors.grey),
+                        // label: Text('Email'),
+                        border: OutlineInputBorder(),
+                      ),
+                      /*decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                            fontFamily: 'Raleway',
+                            color: Colors.black),
+                      ),*/
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Email cannot be empty';
+                        }
+                        if (!_isValidEmail(value)) {
+                          return 'Enter a valid email';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: height * 0.035),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Password',
                         style: TextStyle(
-                          fontSize: width * 0.05,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
+                            fontSize: width * 0.036,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'poppins'),
+                        textAlign: TextAlign.left,
                       ),
-                      SizedBox(height: height*0.013,),
-
-                      Form(
-                        key: _formKey,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'EMAIL',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: width * 0.04,
-                                  // color: Colors.blueAccent,
-                                    color: Colors.orangeAccent,
-                                    fontFamily: 'poppins'
-                                ),
-                              ),
-                              TextFormField(
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Raleway'),
-                                controller: _emailController,
-                                decoration: InputDecoration(
-                                  labelStyle: TextStyle(
-                                      fontFamily: 'Raleway',
-                                      color: Colors.black),
-                                ),
-                                keyboardType: TextInputType.emailAddress,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Email cannot be empty';
-                                  }
-                                  if (!_isValidEmail(value)) {
-                                    return 'Enter a valid email';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              SizedBox(height: height * 0.035),
-                              Text(
-                                'PASSWORD',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: width * 0.03,
-                                  // color: Colors.blueAccent,
-                                  color: Colors.orangeAccent,
-                                  fontFamily: 'poppins',
-                                ),
-                              ),
-
-                          TextFormField(
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Raleway'),
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(
-                                  fontFamily: 'Raleway',
-                                  color: Colors.black),
-                              suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      showPass = !showPass;
-                                    });
-                                  },
-                                  icon: showPass
-                                      ? Icon(Icons.visibility_outlined,
-                                      color: Colors.grey)
-                                      : Icon(
+                    ),
+                    SizedBox(
+                      height: height * 0.008,
+                    ),
+                    /*Text(
+                      'PASSWORD',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: width * 0.03,
+                        color: Colors.blueAccent,
+                        fontFamily: 'poppins',
+                      ),
+                    ),*/
+                    TextFormField(
+                      style: TextStyle(
+                          color: Colors.black, fontFamily: 'Raleway'),
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        fillColor: Colors.white38,
+                        prefixIcon: Icon(Icons.vpn_key_outlined),
+                        border: OutlineInputBorder(),
+                        hintText: "Password",
+                        hintStyle: TextStyle(color: Colors.grey),
+                        // helperText: "Password must contain special character",
+                        helperStyle: TextStyle(color: Colors.green),
+                        labelStyle: TextStyle(
+                            fontFamily: 'Raleway', color: Colors.black),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                showPass = !showPass;
+                              });
+                            },
+                            icon: showPass
+                                ? Icon(Icons.visibility_outlined,
+                                    color: Colors.grey)
+                                : Icon(
                                     Icons.visibility_off_outlined,
                                     color: Colors.black,
                                   )),
-                            ),
-                            obscureText: !showPass,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Password cannot be empty';
-                              }
-                              return null;
-                            },
-                        ),
-                            ],
-                          ),
-                        ),
                       ),
-                     SizedBox(height: height*0.035,),
-                      SizedBox(
-                        height: height*0.070,
-                        width: width*0.7,
-
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _signin();
-                          },
-                          child: Text('Login'),
-                          style: ElevatedButton.styleFrom(
-                            // backgroundColor: Color(0XFF185FED),
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                      obscureText: !showPass,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Password cannot be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            Text(
-              'FORGOT PASSWORD?',
-              style: TextStyle(
-                fontSize: width * 0.030,
-                fontWeight: FontWeight.w600,
               ),
             ),
-            SizedBox(height: height * 0.013),
-            Text(
-              'OR',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: width * 0.030,
-                color: Colors.grey,
+            SizedBox(
+              height: height * 0.035,
+            ),
+            SizedBox(
+              height: height * 0.070,
+              width: width * 0.9,
+              child: ElevatedButton(
+                onPressed: () {
+                  _signin();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                child: Text('Sign In',style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: width * 0.055,
+                  color: Colors.white,
+                ),),
               ),
             ),
             SizedBox(height: height * 0.013),
@@ -600,16 +566,48 @@ class _SigninPageState extends State<SigninPage> {
                   MaterialPageRoute(builder: (context) => SignupPage()),
                 );
               },
-              child: Text(
-                "DON'T HAVE AN ACCOUNT?",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: width * 0.030,
-                  // color: Colors.red,
-                  color: Colors.orangeAccent,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? ",
+                    style: TextStyle(
+                      // fontWeight: FontWeight.w600,
+                      fontSize: width * 0.035,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    "Sign Up",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: width * 0.037,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
               ),
             ),
+            SizedBox(
+              height: height * 0.010,
+            ),
+            Text(
+              'FORGOT PASSWORD?',
+              style: TextStyle(
+                fontSize: width * 0.032,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            // SizedBox(height: height * 0.013),
+            /*Text(
+              'OR',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: width * 0.030,
+                color: Colors.grey,
+              ),
+            ),*/
+
           ],
         ),
       ),

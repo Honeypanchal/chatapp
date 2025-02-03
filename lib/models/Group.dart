@@ -6,8 +6,9 @@ class Group {
   final String groupName;
   final String groupIcon;
   final String groupDescription;
-  final Map<String,dynamic> createdBy;
-  final List<Map<String,dynamic>> participants;
+  final String createdBy;
+  final List<String?> admins;
+  final List<String?> participants;
   final Timestamp createdAt;
   final bool groupSettings;
   final bool sendMessages;
@@ -18,6 +19,7 @@ class Group {
     required this.groupIcon,
     required this.groupDescription,
     required this.createdBy,
+    required this.admins,
     required this.participants,
     required this.createdAt,
     this.groupSettings=true,
@@ -35,6 +37,8 @@ required this.groupId,
       'groupIcon': groupIcon,
       'groupDescription': groupDescription,
       'createdBy': createdBy,
+      'admins':admins
+      ,
       'participants': participants,
       'createdAt': createdAt,
       'groupSettings':groupSettings,
@@ -55,7 +59,8 @@ void addId(String id )
       groupIcon: doc['groupIcon'],
       groupDescription: doc['groupDescription'],
       createdBy:  doc['createdBy'],
-      participants: List<Map<String,dynamic>>.from(doc['participants']),
+      participants: List<String>.from(doc['participants']),
+      admins: List<String>.from(doc['admins']),
       createdAt: doc['createdAt'],
       groupSettings: doc['groupSettings'],
       sendMessages: doc['sendMessages'],

@@ -21,9 +21,11 @@ Future<CustomClass?> signUpUser(
       CustomClass newUser = CustomClass(
         uid: user.user!.uid,
           firstName: firstName,
-
           email: email,
-          password: password);
+          password: password,
+        activeChats:null,
+        groups: null,
+      );
       await _cloudFirestore.doc(user.user!.uid).set({
         "uid": user.user!.uid,
         "firstName": firstName,
@@ -63,6 +65,8 @@ Future<CustomClass?> signInUser(String email, String password) async {
 
           email: foundUser['email'],
           password: foundUser['password'],
+          activeChats: null,
+          groups:null
         );
         // photoURL: foundUser['photoURL']);
 
@@ -109,9 +113,9 @@ Future<CustomClass?> signInWithGoogle() async {
 
         "email": user.email!,
         "profilePic": "",
-        "groups": [],
-        "activeChats": [],
-        "notifications": [],
+        "groups": null,
+        "activeChats":null,
+        "notifications":null,
         "createdAt": DateTime.timestamp().millisecondsSinceEpoch,
         "isActive": true
       });
@@ -121,6 +125,8 @@ uid: user.uid,
           firstName: user.displayName!,
 
           email: user.email!,
+        activeChats: [],
+        groups: [],
       );
       return newUser;
     }
