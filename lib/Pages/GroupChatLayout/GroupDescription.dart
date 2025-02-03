@@ -1,21 +1,23 @@
 import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
 import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
 import 'package:chatapp/models/Group.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:chatapp/services/users.dart';
-import 'package:chatapp/services/groupChat.dart';
+import 'package:chatapp/services/users_services.dart';
+import 'package:chatapp/services/groupChat_services.dart';
 
-class GroupChatDetails extends StatefulWidget {
+class GroupDescription extends StatefulWidget {
   final String groupId;
+  final String currentUser;
 
-  const GroupChatDetails({super.key, required this.groupId});
+  const GroupDescription({super.key, required this.groupId, required this.currentUser});
 
   @override
-  State<GroupChatDetails> createState() => _GroupChatDetailsState();
+  State<GroupDescription> createState() => _GroupDescriptionState();
 }
 
-class _GroupChatDetailsState extends State<GroupChatDetails> {
+class _GroupDescriptionState extends State<GroupDescription> {
   String firstName = '';
   String groupDescription = '';
   dynamic group;
@@ -26,38 +28,45 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
   List<String> membersFirstNameList = [];
   List<String> participants = [];
   List<String> admins = [];
-
+  bool isLoading = true;
   Future<void> getGroup() async {
-    final anothergroup = await fetchGroupByGroupId(widget.groupId);
-    setState(() {
-      group = anothergroup;
-      print(group['groupId']);
-    });
-    if (group != null) {
+    try {
+      final anothergroup = await fetchGroupByGroupId(widget.groupId);
       setState(() {
-        groupDescription = group['groupDescription'];
-      });
-      setState(() {
-        admins = (group['admins'] as List<dynamic>)
-            .map((e) => e.toString())
-            .toList();
-      });
-      setState(() {
-        groupSettings=group['groupSettings'];
-        sendMessages=group['sendMessages'];
-        addOtherMembers=group['addOtherMembers'];
+        group = anothergroup;
+        print(group['groupId']);
       });
 
-      await getDataAndUpdateUI();
-      await memebersFirstName();
+      if (group != null) {
+        setState(() {
+          groupDescription = group['groupDescription'];
+          admins = (group['admins'] as List<dynamic>)
+              .map((e) => e.toString())
+              .toList();
+          groupSettings = group['groupSettings'];
+          sendMessages = group['sendMessages'];
+          addOtherMembers = group['addOtherMembers'];
+        });
+
+        await getDataAndUpdateUI();
+        await membersFirstName();
+      }
+    } catch (e) {
+
+      print('Error fetching group details: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   bool isCurrentUserAdmin(String userId) {
+    print('Here for the admin purposes : $userId');
     return admins.contains(userId);
   }
 
-  Future<void> memebersFirstName() async {
+  Future<void> membersFirstName() async {
     print(group['participants']);
 
     setState(() {
@@ -197,7 +206,9 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
         .of(context)
         .size
         .height;
-
+if(isLoading){
+  return Center(child: CircularProgressIndicator(),);
+}
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -408,32 +419,58 @@ class _GroupChatDetailsState extends State<GroupChatDetails> {
                     activeColor: Colors.black,
                   )),
             ),
-            if (isCurrentUserAdmin(group['createdBy'])) ...[
+            if (isCurrentUserAdmin(widget.currentUser)) ...[
               ListTile(
                 onTap: () async {
                   final result = await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) =>
-                            Updategrouppermissions(
+                            UpdateGroupPermissions(
                               groupSettings: group['groupSettings'],
                               sendMessages: group['sendMessages'],
                               addOtherMembers: group['addOtherMembers'],
                               admins: admins,
                               members: participants,
-                              currentUser: group['createdBy'],),));
+                              currentUser: widget.currentUser,),));
                   if (result != null) {
-                    setState(() {
-                      admins = result['admins'];
-                    });
+    List<String> newAdmins = result['admins'];
+    List<String> removedAdmins = admins.where((admin) => !newAdmins.contains(admin)).toList();
+    if (!listEquals(admins, newAdmins)) {
+      setState(() {
+        admins = newAdmins;
+      });
+    }
                     setState(() {
                       sendMessages=result['sendMessages'];
                       addOtherMembers=result['addOtherMembers'];
                       groupSettings=result['groupSettings'];
                     });
                    try{
+                     print("Here to update group settings");
                      updateGroupSettings(
                          group['groupId'], result['groupSettings'], result['sendMessages'],
                          result['addOtherMembers'], admins);
+
+
+for(String addedAdmin in newAdmins){
+  print('HER TO Add');
+  updateAdminStatusForCurrentUser(addedAdmin, group['groupId'], true);
+  updateNotificationsForCurrentUser(addedAdmin, true);
+
+}
+                     // if (admins.contains(widget.currentUser)) {
+                     //   updateAdminStatusForCurrentUser(widget.currentUser, group['groupId'], true);
+                     //   updateNotificationsForCurrentUser(widget.currentUser, true);
+                     // } else {
+                     //   updateAdminStatusForCurrentUser(widget.currentUser, group['groupId'], false);
+                     //   updateNotificationsForCurrentUser(widget.currentUser, false);
+                     // }
+
+                     for (String removedAdmin in removedAdmins) {
+               print("Here to remove");        updateAdminStatusForCurrentUser(removedAdmin, group['groupId'], false);
+                       updateNotificationsForCurrentUser(removedAdmin, false);
+                     }
+
                    }catch(e){
                      print((e.toString()));
                    }

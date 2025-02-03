@@ -1,4 +1,4 @@
-import 'package:chatapp/Pages/GroupChatLayout/new_group_definition.dart';
+import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/chat_layout.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -323,7 +323,7 @@ class _ChatPageState extends State<ChatPage> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => Groupchatpage(newGroup: groupObj),
+                              builder: (context) => Groupchatpage(newGroup: groupObj,currentUser: widget.currentUser.uid,),
                             ),
                           );
                         },

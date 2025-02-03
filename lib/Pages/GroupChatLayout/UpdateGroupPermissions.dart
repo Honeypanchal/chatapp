@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../services/users.dart';
+import '../../services/users_services.dart';
 
-class Updategrouppermissions extends StatefulWidget {
+class UpdateGroupPermissions extends StatefulWidget {
   bool groupSettings;
 
   bool sendMessages;
@@ -12,7 +12,7 @@ class Updategrouppermissions extends StatefulWidget {
   final String currentUser;
   List<String> members;
 
-  Updategrouppermissions({
+  UpdateGroupPermissions({
     super.key,
     required this.groupSettings,
     required this.sendMessages,
@@ -23,10 +23,10 @@ class Updategrouppermissions extends StatefulWidget {
   });
 
   @override
-  State<Updategrouppermissions> createState() => _UpdategrouppermissionsState();
+  State<UpdateGroupPermissions> createState() => _UpdateGroupPermissionsState();
 }
 
-class _UpdategrouppermissionsState extends State<Updategrouppermissions> {
+class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -265,15 +265,20 @@ class _UpdategrouppermissionsState extends State<Updategrouppermissions> {
                       ),
                     )),
                 ListTile(
-                  onTap: () {
-                    setState(() async {
-                      widget.admins= await  Navigator.of(context).push(MaterialPageRoute(
+                  onTap: () async{
+
+                      var result=  widget.admins= await  Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => GroupMembers(
                               groupMembers: widget.members,
                               admins: widget.admins,
                               currentUser:widget.currentUser
                           )));
-                    });
+                      if (result != null) {
+                        setState(() {
+                          widget.admins = result;
+                          print('${widget.admins.length} is the length of admins');
+                        });
+                      }
 
                   },
                   leading: Icon(
@@ -344,7 +349,7 @@ class _GroupMembersState extends State<GroupMembers> {
         backgroundColor: Colors.black,
         leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pop({'admins':widget.admins});
+              Navigator.of(context).pop(widget.admins);
             },
             icon: Icon(
               Icons.arrow_back,
