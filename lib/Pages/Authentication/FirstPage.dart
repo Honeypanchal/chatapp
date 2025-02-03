@@ -1,5 +1,5 @@
-import 'package:chatapp/Pages/SigninPage.dart';
-import 'package:chatapp/Pages/Signup.dart';
+import 'package:chatapp/Pages/Authentication/SigninPage.dart';
+import 'package:chatapp/Pages/Authentication/Signup.dart';
 import 'package:flutter/material.dart';
 
 class Firstpage extends StatefulWidget {

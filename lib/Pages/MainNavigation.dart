@@ -25,7 +25,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     super.initState();
 
     _pages = [
-      // HomePage(currentUser: widget.currentUser),
+
       ChatPage(currentUser: widget.currentUser, ),
       StatusPage(),
       // ProfilePage(currentUser: widget.currentUser),
@@ -59,10 +59,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
               icon: Icon(Icons.camera),
               label: 'Status',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.person),
+            //   label: 'Profile',
+            // ),
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.blue,

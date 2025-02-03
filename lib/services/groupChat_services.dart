@@ -106,3 +106,35 @@ Future<void> addNewMembersToGroup(String groupId, List<String> newMembers)async{
   }finally{
    print("New member added succesfully!");
   }}
+Future<void> removeUserFromGroupParticipants(String groupId, String userId) async {
+  final groupDoc = await groupsDb.doc(groupId).get();
+
+  if (!groupDoc.exists) return;
+
+  try {
+    final groupData = groupDoc.data() as Map<String, dynamic>;
+    List<String> participants = List.from(groupData['participants']);
+    List<String> admins = List.from(groupData['admins']);
+
+    if (participants.contains(userId)) {
+      participants.remove(userId);
+    }
+    if (admins.contains(userId)) {
+      admins.remove(userId);
+    }
+print("${admins.length} is length og admoins list ");
+    if (admins.isEmpty && participants.isNotEmpty) {
+      print("here tp change admin to first person");
+      admins.add(participants.first);
+    }
+
+    await groupsDb.doc(groupId).update({
+      'participants': participants,
+      'admins': admins,
+    });
+
+    print("User $userId removed successfully from the group.");
+  } catch (e) {
+    rethrow;
+  }
+}

@@ -50,6 +50,7 @@ List<String> admins=[];
           addOtherMembers = group['addOtherMembers'];
         });
         listenToDatabaseUpdates();
+         await membersFirstName();
 
       }
     } catch (e) {
@@ -550,22 +551,67 @@ Future<void> membersFirstName() async {
               padding: EdgeInsets.symmetric(horizontal: width*0.012,vertical: height*0.01),
               child: Row(
                 children: [
-                  if (!group['sendMessages'] && !admins.contains(widget.currentUser)) ...[
-                    ScaffoldMessenger(
+                  if(!participants.contains(widget.currentUser))...[
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        margin: EdgeInsets.symmetric( horizontal: width*0.072,vertical: height*0.012),
+                        padding: EdgeInsets.all(width*0.012),
+                        width: width*0.8,
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade100, // WhatsApp-like green shade
 
-                        child: Align(
-                          alignment: Alignment.bottomRight,child: Container(
-                          width: width*0.9,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 5,
                             ),
-                            child: Text(
-                                                "Only Admins can send messages ",
-                                                style:
-                              TextStyle(fontFamily: 'Raleway', color: Colors.black),
-                                              ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            "You are no longer a participant of this group",
+                            style: TextStyle(
+                              fontFamily: 'Raleway',
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
                           ),
-                        ))
+                        ),
+                      ),
+                    )
+                  ]else...[
+                  if (!group['sendMessages'] && !admins.contains(widget.currentUser)) ...[
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: width*0.035, vertical: height*0.012),
+                        padding: EdgeInsets.all(width*0.012),
+                      width: width*0.9,
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade100, // WhatsApp-like green shade
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Only Admins can send messages",
+                            style: TextStyle(
+                              fontFamily: 'Raleway',
+                              fontSize: 14,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ]else...[
 
                     Expanded(
@@ -584,6 +630,7 @@ Future<void> membersFirstName() async {
                   ]
 
                 ],
+    ]
               ),
             ),
           ],

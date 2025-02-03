@@ -111,3 +111,20 @@ Future<void> addGroupIdToNewMembers(String groupId, List<String> users) async {
     print("New group added to the member");
   }
 }
+Future<void> removeGroupFromCurrentUser(String userId, String groupId) async {
+  try {
+    DocumentReference userRef = usersDb.doc(userId);
+
+    DocumentSnapshot userSnapshot = await userRef.get();
+
+    List groups = userSnapshot.get('groups');
+
+    groups.removeWhere((group) => group['groupId'] == groupId);
+
+    await userRef.update({'groups': groups});
+
+    print("Group removed from user successfully.");
+  } catch (e) {
+    print("Error removing group from user: $e");
+  }
+}
