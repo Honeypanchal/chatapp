@@ -1,5 +1,7 @@
 // import 'package:chatapp/models/Group.dart';
 // import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 
@@ -186,7 +188,7 @@ Future<void> membersFirstName() async {
   void deleteMessages() {
     selectedMessages.forEach((messageId) async {
       await _firestore.collection('groups')
-          .doc(widget.newGroup.groupId)
+          .doc(widget.groupId)
           .collection('messages')
           .doc(messageId)
           .delete();
@@ -285,7 +287,8 @@ Future<void> membersFirstName() async {
                     ? TextField(
                         autofocus: true,
                         decoration:
-                            InputDecoration(hintText: "Search messages"),
+                            InputDecoration(hintText: "Search messages",
+                            hintStyle:TextStyle(color:Colors.white)),
                         onChanged: (query) =>
                             setState(() => searchQuery = query),
                       )
@@ -588,4 +591,4 @@ Future<void> membersFirstName() async {
     return messageDoc['message'] ?? ''; // Return the actual message content
     }
   }
-}
+
