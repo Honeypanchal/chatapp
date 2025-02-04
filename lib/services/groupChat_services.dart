@@ -25,7 +25,7 @@ Future<Group?> createNewGroup(String groupName,
 
     Group newGroup = Group(
       groupId: '',
-      groupName: groupName,
+      groupName: groupName.toLowerCase(),
       groupIcon: groupIcon,
       groupDescription: groupDescription,
       createdBy: createdBy,
