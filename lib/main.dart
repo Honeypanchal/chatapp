@@ -1,3 +1,4 @@
+import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroup.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -37,6 +38,11 @@ class MyApp extends StatelessWidget {
           return MaterialPageRoute(builder: (context) =>
               NewGroupDefinition(
                   members: args['members'], createdBy: args['currentUser']));
+        }else if (settings.name == '/groupDisplay') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(builder: (context) =>
+              GroupDisplayPage(
+                  currentUser: args['currentUser']));
         }
       },
 
