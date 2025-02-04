@@ -38,6 +38,11 @@ class _GroupDescriptionState extends State<GroupDescription> {
   bool isLoading = true;
   bool isLoadingDatabse = true;
 
+  TextEditingController _searchText = TextEditingController();
+  bool _isSearching = false;
+
+
+
   StreamSubscription? _groupSubscription;
 
   void listenToDatabaseUpdates() {
@@ -51,6 +56,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
         var updatedGroupData = snapshot.data() as Map<String, dynamic>;
 
         setState(() {
+          isLoading=true;
           isLoadingDatabse = true;
         });
 
@@ -69,8 +75,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
             sendMessages = group['sendMessages'];
             addOtherMembers = group['addOtherMembers'];
             isLoading = false;
+            isLoadingDatabse=false;
           });
-
 
           await membersFirstName();
         }
@@ -95,9 +101,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
           groupSettings = group['groupSettings'];
           sendMessages = group['sendMessages'];
           addOtherMembers = group['addOtherMembers'];
-            participants = (group['participants'] as List<dynamic>)
-                .map((e) => e.toString())
-                .toList();
+          participants = (group['participants'] as List<dynamic>)
+              .map((e) => e.toString())
+              .toList();
         });
 
         listenToDatabaseUpdates();
@@ -136,8 +142,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
   }
 
   Future<void> getDataAndUpdateUI() async {
-    String enteredFirstName = await getFirstNameById(
-        group['createdBy']);
+    String enteredFirstName = await getFirstNameById(group['createdBy']);
 
     setState(() {
       firstName = enteredFirstName;
@@ -828,7 +833,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                             style: TextStyle(fontSize: width * 0.045),
                           ),
                         ),
-                        if (isLoading)
+                        if (isLoading || isLoadingDatabse)
                           CircularProgressIndicator()
                         else ...[
                           ListView.builder(
@@ -837,20 +842,84 @@ class _GroupDescriptionState extends State<GroupDescription> {
                             itemCount: group['participants'].length,
                             itemBuilder: (context, index) {
                               return ListTile(
-                                onLongPress: (){
-                                if( isCurrentUserAdmin(widget.currentUser)) {
+                                onLongPress: () {
+                                  if(widget.currentUser==group['participants'][index]) {
 
-                                  PopupMenuButton( offset: Offset(0, height * 0.052),
-                                    elevation: 2,itemBuilder: (context)=>[
-                                      PopupMenuItem(child: Text("Delete participant"),value: 0,)
-// removeParticipantFromGroup(groupId,)
-                                  ],onSelected:(val){
-                                    if(val==0){
-                                      //delete user
-                                    }
+                                  }else
+                                    {
+                                      if (isCurrentUserAdmin(widget.currentUser)) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                backgroundColor: Colors.white,
+                                                title: Text(
+                                                    "Remove ${membersFirstNameList[index]} from this group?",
+                                                    style: TextStyle(
+                                                        fontFamily: 'Raleway',
+                                                        color: Colors.black)),
+                                                actions: [
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                    children: [
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(context)
+                                                                .pop();
+                                                          },
+                                                          child: Text(
+                                                            "Cancel",
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                'Raleway',
+                                                                color: Colors
+                                                                    .blue.shade200),
+                                                          )),
+                                                      TextButton(
+                                                          onPressed: () async{
+                                                            try {
+                                                              print("The particpant you are removing is ${group['participants'][index]} their name is ${membersFirstNameList[index]}");
+
+                                                              await   removeGroupFromThisUser(group['participants'][index],widget.groupId);
+                                                              removeUserFromThisGroup(widget.groupId,group['participants'][index])
+                                                                  .then((_) {
+                                                                Navigator.of(
+                                                                    context)
+                                                                    .pop();
+                                                              });
+                                                            } catch (e) {
+                                                              print(e.toString());
+                                                            }
+                                                          },
+                                                          child: Text(
+                                                            "Remove",
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                'Raleway',
+                                                                color: Colors.red),
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                            "You cant remove participants",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'Raleway'),
+                                          ),
+                                          backgroundColor: Colors.red.shade200,
+                                        ));
                                       }
-                                  );
-                                }
+                                    }
+
                                 },
                                 contentPadding: EdgeInsets.zero,
                                 leading: CircleAvatar(

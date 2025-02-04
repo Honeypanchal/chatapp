@@ -147,3 +147,23 @@ Future<void> removeUserFromGroupParticipants(String groupId, String userId) asyn
     rethrow;
   }
 }
+
+
+Future<void> removeUserFromThisGroup(String groupId, String userId)async{
+  try{
+    print("here in group chat  services");
+    final groupDbRef=  groupsDb.doc(groupId);
+    final groupDb= await groupDbRef.get();
+    List<String> participants = List.from(groupDb['participants']);
+    List<String> admins=List.from(groupDb['admins']);
+    if(admins.contains(userId)){
+      print("user also removed from admin");
+      admins.removeWhere((user)=>user==userId);
+    }
+    participants.removeWhere((user)=>user==userId);
+    groupDbRef.update({"participants":participants,"admins":admins});
+    print("User ${userId} removed from group succesfully!");
+  }catch(e){
+    print(e.toString());
+  }
+}

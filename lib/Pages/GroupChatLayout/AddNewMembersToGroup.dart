@@ -19,7 +19,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
   List<String> newMembers = [];
   final _database = FirebaseFirestore.instance.collection('Users');
   TextEditingController _searchText = TextEditingController();
-  bool _isSearching = false; // To track search bar visibility
+  bool _isSearching = false;
 
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() {
     return _database.snapshots().map((snapshot) {

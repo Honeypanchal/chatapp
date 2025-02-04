@@ -1,10 +1,15 @@
 import 'package:chatapp/Pages/statuspage.dart';
 import 'package:chatapp/models/CustomClass.dart';
+
 import 'package:chatapp/services/groupChat_services.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/ChatPage.dart';
-// import 'package:chat_application/Pages/HomePage.dart';
-// import 'package:chat_application/Pages/Profile.dart';
+
+import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
+import 'package:chatapp/Pages/Profile/Profile.dart';
+
+import '../GroupChatLayout/GroupDisplayPage.dart';
+
 
 // file is updated1
 class MainNavigationPage extends StatefulWidget {
@@ -25,10 +30,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     super.initState();
 
     _pages = [
+ChatPage(currentUser: widget.currentUser),
+      GroupDisplayPage(),
 
-      ChatPage(currentUser: widget.currentUser, ),
       StatusPage(),
-      // ProfilePage(currentUser: widget.currentUser),
+Profile()
     ];
   }
 
@@ -52,12 +58,20 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
 
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: Icon(Icons.chat_sharp),
+              label: 'Chats',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.groups_outlined),
+              label: 'Groups',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.camera),
               label: 'Status',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
             ),
             // BottomNavigationBarItem(
             //   icon: Icon(Icons.person),

@@ -91,39 +91,182 @@ Future<void> membersFirstName() async {
   String? repliedMessageText;
   String? editedMessageText; // Store text for editing
   String? replyingToMessageId; // Store the message ID for replying
+  String? selectedReplyMessageId;
+   String? selectedReplyMessageText;
 
-  // Function to send message
-  void sendMessage() async {
-    if (_messageController.text.trim().isNotEmpty) {
-      String userId = _auth.currentUser!.uid;
-      List<String> userNameList = await getUserNames([userId]);
-      String username =
-          userNameList.isNotEmpty ? userNameList.first : "Unknown";
+void sendMessage({bool isPoll = false, List<String>? pollOptions, String? question}) async {
+  String userId = _auth.currentUser!.uid;
 
-      // Add message to Firestore
-      await _firestore
-          .collection('groups')
-          .doc(group['groupId'])
-          .collection('messages')
-          .add({
-        'senderUid': userId,
-        'sender': username,
-        'message': _messageController.text.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
-        'pinned': false,
-        'favorite': false,
-        'replyTo': replyingToMessageId,
-      });
+  // Fetch sender's username
+  List<String> userNameList = await getUserNames([userId]);
+  String username = userNameList.isNotEmpty ? userNameList.first : "Unknown";
 
-      _messageController.clear();
-      setState(() {
-        replyingToMessage = null;
-        repliedMessageText = null;
-        replyingToMessageId = null;
-        editedMessageText = null; // Clear edited message text after sending
-      });
-    }
+  // Check if replying to a message
+  String? replyToMessageId = selectedReplyMessageId;
+  String? replyToMessageText = selectedReplyMessageText;
+
+  if (isPoll) {
+    await _firestore.collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .add({
+      'senderUid': userId,
+      'sender': username, // Store username instead of UID
+      'message': question, // Poll question
+      'timestamp': FieldValue.serverTimestamp(),
+      'isPoll': true,
+      'pinned': false,
+      'favorite': false,
+      'pollOptions': {for (var option in pollOptions!) option: []}, // Ensure options start empty
+      'replyToMessageId': replyToMessageId, // Store replied message ID
+      'replyToMessageText': replyToMessageText, // Store replied message text
+    });
+
+    setState(() {
+      selectedReplyMessageId = null;
+      selectedReplyMessageText = null;
+    });
+  } else if (_messageController.text.trim().isNotEmpty) {
+    await _firestore.collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .add({
+      'senderUid': userId,
+      'sender': username, // Store username instead of UID
+      'message': _messageController.text.trim(),
+      'timestamp': FieldValue.serverTimestamp(),
+      'pinned': false,
+      'favorite': false,
+      'isPoll': false,
+      'replyToMessageId': replyToMessageId, // Store replied message ID
+      'replyToMessageText': replyToMessageText, // Store replied message text
+    });
+
+    _messageController.clear();
+
+    setState(() {
+      selectedReplyMessageId = null;
+      selectedReplyMessageText = null;
+    });
   }
+}
+
+
+
+  void showCreatePollDialog(BuildContext context) {
+  TextEditingController questionController = TextEditingController();
+  List<TextEditingController> optionControllers = [
+    TextEditingController(),
+    TextEditingController()
+  ]; // Start with 2 options
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        backgroundColor: Colors.black,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          "Create a Poll",
+          style: TextStyle(color: Colors.white),
+        ),
+        content: StatefulBuilder(
+          builder: (context, setState) {
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: questionController,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "Ask a question...",
+                      hintStyle: TextStyle(color: Colors.grey),
+                      border: UnderlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                    children: List.generate(optionControllers.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: TextField(
+                          controller: optionControllers[index],
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: "Option ${index + 1}",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: UnderlineInputBorder(),
+                            suffixIcon: index >= 2
+                                ? IconButton(
+                              icon: Icon(Icons.remove_circle, color: Colors.red),
+                              onPressed: () {
+                                setState(() {
+                                  optionControllers.removeAt(index);
+                                });
+                              },
+                            )
+                                : null,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () {
+                        if (optionControllers.length < 10) {
+                          setState(() {
+                            optionControllers.add(TextEditingController());
+                          });
+                        }
+                      },
+                      child: Text(
+                        "+ Add Option",
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel", style: TextStyle(color: Colors.red)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+            onPressed: () {
+              List<String> pollOptions = optionControllers
+                  .where((controller) => controller.text.trim().isNotEmpty)
+                  .map((controller) => controller.text.trim())
+                  .toList();
+
+              if (questionController.text.trim().isNotEmpty && pollOptions.length >= 2) {
+                sendMessage(
+                  isPoll: true,
+                  pollOptions: pollOptions,
+                  question: questionController.text.trim(),
+                );
+
+                // Close the dialog
+                Navigator.pop(context);
+              }
+            },
+            child: Text("Create Poll"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
 
   // Function to handle the reply
   void replyToMessage(String message, String messageId) {
@@ -143,6 +286,174 @@ Future<void> membersFirstName() async {
       selectedMessages.clear(); // Clear any selected messages
     });
   }
+
+  void showMessageInfoDialog(BuildContext context, String messageId) async {
+    // Fetch the message data
+    DocumentSnapshot messageSnapshot = await _firestore
+        .collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .doc(messageId)
+        .get();
+
+    String senderId = messageSnapshot['senderUid']; // Get the sender's ID
+
+    // Get the list of users who read the message
+    List<String> readByUsers = await getReadReceipts(messageId); // Users who read
+    List<String> unreadByUsers = await getUnreadUsers(readByUsers); // Users who haven't read
+
+    // Exclude the sender from unreadByUsers
+    unreadByUsers.remove(senderId); // Remove sender from unread users list
+
+    // Show the modal dialog with message info
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.black, // Black background
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black, // Set background to black
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Close button (X) to dismiss dialog
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: Icon(Icons.close, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                  },
+                ),
+              ),
+              // Header
+              Text(
+                "Message Info",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 10),
+              Divider(color: Colors.grey),
+              // Read by users
+              Text(
+                "Read by:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              SizedBox(height: 5),
+              for (var user in readByUsers)
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      user.isNotEmpty ? user[0].toUpperCase() : '',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  title: Text(
+                    user,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  trailing: Icon(Icons.done_all, color: Colors.blue),
+                ),
+              Divider(color: Colors.grey),
+              // Not read by users
+              Text(
+                "Not read by:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              SizedBox(height: 5),
+              for (var user in unreadByUsers)
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      user.isNotEmpty ? user[0].toUpperCase() : '',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  title: Text(
+                    user,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  trailing: Icon(Icons.remove_red_eye_outlined, color: Colors.grey),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void markMessageAsRead(String messageId) async {
+    String userId = _auth.currentUser!.uid;
+
+    // Get the reference to the message document
+    DocumentReference messageRef = _firestore
+        .collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .doc(messageId);
+
+    // Get the current message data
+    DocumentSnapshot messageSnapshot = await messageRef.get();
+
+    // Check if the user has already read the message
+    List<dynamic> readByUsers = messageSnapshot['readBy'] ?? [];
+
+    if (!readByUsers.contains(userId)) {
+      // If the user hasn't read it, update the readBy field
+      await messageRef.update({
+        'readBy': FieldValue.arrayUnion([userId]),
+      });
+    }
+  }
+
+
+void votePoll(String pollId, String option) async {
+  DocumentReference pollRef = _firestore
+      .collection('groups')
+      .doc(group['groupId'])
+      .collection('messages')
+      .doc(pollId);
+
+  await _firestore.runTransaction((transaction) async {
+    DocumentSnapshot pollDoc = await transaction.get(pollRef);
+    if (!pollDoc.exists) return;
+
+    Map<String, dynamic> pollOptions = Map<String, dynamic>.from(pollDoc['pollOptions']);
+    String userId = _auth.currentUser!.uid;
+
+    // Remove vote from other options
+    pollOptions.forEach((key, value) {
+      List<String> voters = List<String>.from(value ?? []);
+      if (voters.contains(userId)) {
+        voters.remove(userId);
+        pollOptions[key] = voters;
+      }
+    });
+
+    // Add vote to the selected option
+    List<String> selectedVoters = List<String>.from(pollOptions[option] ?? []);
+    if (!selectedVoters.contains(userId)) {
+      selectedVoters.add(userId);
+      pollOptions[option] = selectedVoters;
+    }
+
+    transaction.update(pollRef, {'pollOptions': pollOptions});
+  });
+}
+
+
 
   // Function to start the search
   void startSearch() => setState(() => isSearching = true);
@@ -211,18 +522,21 @@ Future<void> membersFirstName() async {
     });
   }
 
-  // Function to handle long press (to select message)
-  void handleMessageLongPress(String messageId) {
-    setState(() {
-      if (selectedMessages.contains(messageId)) {
-        selectedMessages
-            .remove(messageId); // Deselect message if it's already selected
-      } else {
-        selectedMessages
-            .add(messageId); // Select message if it's not already selected
-      }
-    });
-  }
+
+void handleMessageLongPress(String messageId) {
+  setState(() {
+    if (selectedMessages.contains(messageId)) {
+      selectedMessages.remove(messageId); // Deselect message if already selected
+    } else {
+      selectedMessages.add(messageId); // Select message if not selected
+    }
+  });
+}
+
+
+
+
+
 //Listening to real time changes
   bool isLoading=true;
  late bool  groupSettings ;
@@ -295,19 +609,18 @@ Future<void> membersFirstName() async {
                 )),
             title: selectedMessages.isNotEmpty
                 ? Text("${selectedMessages.length} selected",
-                    style: TextStyle(color: Colors.white))
+                style: TextStyle(color: Colors.white))
                 : isSearching
-                    ? TextField(
-                        autofocus: true,
-                        decoration:
-                            InputDecoration(hintText: "Search messages"
-                            ,
-                                hintStyle:TextStyle(color:Colors.white)),
-                        onChanged: (query) =>
-                            setState(() => searchQuery = query),
-                      )
-                    : Text(group['groupName'],
-                        style: TextStyle(color: Colors.white)),
+                ? TextField(
+              autofocus: true,
+              decoration:
+              InputDecoration(hintText: "Search messages",
+                  hintStyle:TextStyle(color:Colors.white)),
+              onChanged: (query) =>
+                  setState(() => searchQuery = query),
+            )
+                : Text(group['groupName'],
+                style: TextStyle(color: Colors.white)),
             backgroundColor: Colors.black,
             actions: [
               if (selectedMessages.isNotEmpty) ...[
@@ -339,6 +652,8 @@ Future<void> membersFirstName() async {
                     } else if (value == 'copy') {
                       // Perform copy action on selected message
                       copyMessage(messageId);
+                    }else if (value == 'info') {
+                      showMessageInfoDialog(context, messageId); // Show info dialog
                     }
                   },
                   itemBuilder: (context) => [
@@ -363,6 +678,13 @@ Future<void> membersFirstName() async {
                         title: Text("Copy"),
                       ),
                     ),
+                    PopupMenuItem(
+                      value: 'info',
+                      child: ListTile(
+                        leading: Icon(Icons.info),
+                        title: Text("Info"),
+                      ),
+                    ),
                   ],
                 ),
               ] else ...[
@@ -379,172 +701,117 @@ Future<void> membersFirstName() async {
           ),
         ),
       ),
-      body: Container(
-        width: width,
-        height: height,
-        child: Column(
-          children: [
-            if (repliedMessageText != null)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  color: Colors.grey[200],
-                  child: Row(
-                    children: [
-                      Icon(Icons.reply, color: Colors.blue),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.blue[50],
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Replying to:',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                repliedMessageText!,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
+      body: Column(
+        children: [
+          Expanded(
+            child:StreamBuilder(
+              stream: _firestore
+                  .collection('groups')
+                  .doc(group['groupId'])
+                  .collection('messages')
+                  .orderBy('timestamp', descending: true)
+                  .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                var messages = snapshot.data!.docs;
+
+                return ListView.builder(
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    // Separate pinned and non-pinned messages
+                    List pinnedMessages = messages.where((msg) => msg['pinned'] ?? false).toList();
+                    List unpinnedMessages = messages.where((msg) => !(msg['pinned'] ?? false)).toList();
+
+                    // Combine pinned messages first, followed by unpinned messages
+                    List allMessages = [...pinnedMessages, ...unpinnedMessages];
+
+                    // Get the message for the current index
+                    var message = allMessages[index];
+                    bool isMe = message['senderUid'] == _auth.currentUser!.uid;
+                    bool isPoll = message['isPoll'] ?? false; // Check if message is a poll
+                    bool isSelected = selectedMessages.contains(message.id);
+                    bool isPinned = message['pinned'] ?? false; // Check if message is pinned
+                    bool isFavorite = message['favorite'] ?? false; // Check if message is favorite
+                    bool isSearched = searchQuery.isNotEmpty &&
+                        RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b',
+                            caseSensitive: false)
+                            .hasMatch(message['message']);
+                    bool isSelected1 = selectedMessages
+                        .contains(message.id); // Check if message is selected
+
+
+                    // Handle long press for selecting the message
+                    return GestureDetector(
+                      onLongPress: () {
+                        handleMessageLongPress(message.id);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.grey[300] : Colors.transparent, // Light grey if selected
+                          borderRadius: BorderRadius.circular(10),
+                          border: isPinned ? Border.all(color: Colors.yellow, width: 2) : null, // Border for pinned messages
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            Expanded(
-              child: StreamBuilder(
-                stream: _firestore
-                    .collection('groups')
-                    .doc(group['groupId'])
-                    .collection('messages')
-                    .orderBy('timestamp', descending: true)
-                    .snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData)
-                    return const Center(child: CircularProgressIndicator());
-                  var messages = snapshot.data!.docs;
-
-                  return ListView.builder(
-                    reverse: true,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      var message = messages[index];
-                      bool isMe = message['senderUid'] == _auth.currentUser!.uid;
-                      bool isPinned = message['pinned'] ?? false;
-                      bool isFavorite = message['favorite'] ?? false;
-                      bool isSearched = searchQuery.isNotEmpty &&
-                          RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b',
-                                  caseSensitive: false)
-                              .hasMatch(message['message']);
-                      bool isSelected = selectedMessages
-                          .contains(message.id); // Check if message is selected
-
-                      return GestureDetector(
-                        onLongPress: () {
-                          handleMessageLongPress(message.id);
-                        },
-                        child: Container(
-                          color:
-                              isSelected ? Colors.grey[200] : Colors.transparent,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 10),
-                          alignment:
-                              isMe ? Alignment.centerRight : Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: isMe
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
-                            children: [
-                              if (message['replyTo'] != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 5),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue[50],
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.reply, color: Colors.blue),
-                                        SizedBox(width: 5),
-                                        Expanded(
-                                          child: Text(
-                                            message['message'],
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                        child: Column(
+                          crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                          children: [
+                            // Display pinned indicator for pinned messages at the top
+                            if (isPinned)
                               Container(
+                                color: Colors.grey[300], // Grey background for pinned messages
+                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.push_pin, color: Colors.yellow, size: 18),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      message['message'],
+                                      style: TextStyle(color: isMe ? Colors.white : Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            // Non-pinned message content
+                            if (!isPinned)
+                              isPoll
+                                  ? buildPollWidget(message) // Display poll if it's a poll message
+                                  : Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   color: isMe ? Colors.black : Colors.grey[300],
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    if (isPinned)
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(Icons.push_pin,
-                                              size: 14, color: Colors.yellow),
-                                          SizedBox(width: 5),
-                                          Text("Pinned",
-                                              style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.yellow)),
-                                        ],
-                                      ),
                                     Text(
                                       message['message'],
-                                      style: TextStyle(
-                                        color: isMe ? Colors.white : Colors.black,
-                                        backgroundColor: isSearched
-                                            ? Colors.yellow.withOpacity(0.5)
-                                            : null,
-                                      ),
+                                      style: TextStyle(color: isMe ? Colors.white : Colors.black),
                                     ),
+                                    // Favorite icon for favorited messages
                                     if (isFavorite)
-                                      Icon(Icons.star,
-                                          size: 14, color: Colors.orange),
+                                      Icon(
+                                        Icons.star,
+                                        color: Colors.yellow,
+                                        size: 18,
+                                      ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
+                          ],
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
+                      ),
+                    );
+                  },
+                );
+
+
+              },
             ),
 
+          ),
 
             //NEHA YAHA SE MENE PERMISSIONS WALA KAAM KIYA HAI!!
             Padding(
@@ -613,7 +880,10 @@ Future<void> membersFirstName() async {
                       ),
                     ),
                   ]else...[
-
+                    IconButton(
+                      icon: Icon(Icons.poll, color: Colors.black),
+                      onPressed: () => showCreatePollDialog(context),
+                    ),
                     Expanded(
                       child: TextField(
                         controller: _messageController,
@@ -635,8 +905,130 @@ Future<void> membersFirstName() async {
             ),
           ],
         ),
-      ),
     );
+  }
+
+  Widget buildPollWidget(QueryDocumentSnapshot message) {
+    Map<String, dynamic> pollOptions = Map<String, dynamic>.from(message['pollOptions'] ?? {});
+    bool showVotes = false; // Toggle for showing votes
+    Map<String, String> voterNames = {}; // Store voter UID -> Name mapping
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        Future<void> fetchVoterNames(List<dynamic> voterUids) async {
+          List<String> fetchedNames = await getUserNames(voterUids.cast<String>());
+          if (fetchedNames.isNotEmpty) {
+            setState(() {
+              for (int i = 0; i < voterUids.length; i++) {
+                voterNames[voterUids[i]] = fetchedNames[i];
+              }
+            });
+          }
+        }
+
+        return Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                message['message'], // Poll question
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Column(
+                children: pollOptions.entries.map((entry) {
+                  String option = entry.key;
+                  List<dynamic> voters = entry.value ?? [];
+                  int voteCount = voters.length;
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () => votePoll(message.id, option),
+                        child: Container(
+                          margin: EdgeInsets.symmetric(vertical: 5),
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.black),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(option, style: TextStyle(fontSize: 14)),
+                              Text("$voteCount votes", style: TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (showVotes && voters.isNotEmpty) // Fetch & show voter names dynamically
+                        FutureBuilder(
+                          future: fetchVoterNames(voters),
+                          builder: (context, snapshot) {
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 10, top: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: voters.map((uid) {
+                                  String voterName = voterNames[uid] ?? "Fetching...";
+                                  return Text("- $voterName", style: TextStyle(fontSize: 14, color: Colors.grey[700]));
+                                }).toList(),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: ()
+                {
+                  setState(() {
+                    showVotes = !showVotes; // Toggle votes display
+                  });
+                }, style: ElevatedButton.styleFrom(
+                  backgroundColor: showVotes ? Colors.black : Colors.black, // Button background color
+                  foregroundColor: Colors.white), // Text color
+                child: Text(showVotes ? "Hide Votes" : "Show Votes"),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  Future<List<String>> getReadReceipts(String messageId) async {
+    DocumentSnapshot messageSnapshot = await _firestore
+        .collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .doc(messageId)
+        .get();
+
+    if (messageSnapshot.exists) {
+      Map<String, dynamic>? data = messageSnapshot.data() as Map<String, dynamic>?;
+      List<dynamic> readBy = data?['readBy'] ?? [];
+
+      // Fetch usernames from UIDs
+      return getUserNames(List<String>.from(readBy));
+    }
+    return [];
+  }
+  Future<List<String>> getUnreadUsers(List<String> readByUsers) async {
+    List<String> allMembers = List<String>.from(group['participants']);
+    List<String> unreadUsers = allMembers.where((uid) => !readByUsers.contains(uid)).toList();
+
+    // Fetch usernames from UIDs
+    return getUserNames(unreadUsers);
   }
 
   // Function to retrieve message text by message ID
@@ -648,6 +1040,6 @@ Future<void> membersFirstName() async {
         .doc(messageId)
         .get();
 
-    return messageDoc['message'] ?? ''; // Return the actual message content
+    return messageDoc['message'] ?? ''; // Return the actual message content
   }
 }
