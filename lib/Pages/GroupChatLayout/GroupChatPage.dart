@@ -1,6 +1,6 @@
 // import 'package:chatapp/models/Group.dart';
 // import 'package:flutter/material.dart';
-import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/Pages/Chat_layout/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 import 'package:chatapp/models/Group.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

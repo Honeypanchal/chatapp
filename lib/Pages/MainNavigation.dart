@@ -2,7 +2,7 @@ import 'package:chatapp/Pages/statuspage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/services/groupChat_services.dart';
 import 'package:flutter/material.dart';
-import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/Pages/Chat_layout/ChatPage.dart';
 // import 'package:chat_application/Pages/HomePage.dart';
 // import 'package:chat_application/Pages/Profile.dart';
 
