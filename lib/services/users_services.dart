@@ -119,12 +119,40 @@ Future<void> removeGroupFromCurrentUser(String userId, String groupId) async {
 
     List groups = userSnapshot.get('groups');
 
+    print('${groups.length} is the lengthof user groups');
     groups.removeWhere((group) => group['groupId'] == groupId);
-
+    print('${groups.length} is the lengthof user groups after removing');
     await userRef.update({'groups': groups});
 
     print("Group removed from user successfully.");
   } catch (e) {
     print("Error removing group from user: $e");
+  }
+}
+
+Future<void> makeUserAdminOfThisGroup(String groupId, String userId) async {
+  final userDoc = await usersDb.doc(userId).get();
+
+  if (!userDoc.exists) return;
+
+  try {
+    List<Map<String, dynamic>> groupsOfUser = List<Map<String, dynamic>>.from(userDoc.get("groups"));
+
+    bool isUpdated = false;
+    for (var group in groupsOfUser) {
+      if (group['groupId'] == groupId) {
+        group['admin'] = true;
+        isUpdated = true;
+        break;
+      }
+    }
+
+    if (isUpdated) {
+      await usersDb.doc(userId).update({"groups": groupsOfUser});
+      print("User $userId is now an admin of group $groupId.");
+    }
+  } catch (e) {
+    print("Error making user admin: $e");
+    rethrow;
   }
 }

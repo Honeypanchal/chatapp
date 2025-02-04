@@ -1,16 +1,34 @@
-# chatapp
+# 📱 ChatApp
 
-A new Flutter project.
+A modern group chat application built with **Flutter** and **Firebase**.
 
-## Getting Started
+## 🚀 Features
 
-This project is a starting point for a Flutter application.
+### 🔹 Group Chat Functionality
+- Users can **create groups** and invite members.
+- **Admins** have full control over the group settings.
+- **Permissions Management**:
+    - Admins can **restrict** who can send messages.
+    - Admins can **control** who can add new members.
+    - Admins can **edit** group information.
+- Members can send messages and participate in real-time discussions.
+- Admins can promote/depromote other members as admins
 
-A few resources to get you started if this is your first Flutter project:
+### 🔹 Authentication & Security
+- **Firebase Authentication** for user login & registration.
+- Secure **email/password** login.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 🔹 Real-Time Messaging
+- Uses **Cloud Firestore** for **real-time** message syncing.
+- Messages are stored securely in Firestore.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Tech Stack
+- **Flutter** (Dart) - Frontend UI
+- **Firebase** - Backend services
+    - **Authentication** for user login
+    - **Cloud Firestore** for real-time database
+
+
+
+
+

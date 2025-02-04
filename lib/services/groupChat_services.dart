@@ -122,11 +122,20 @@ Future<void> removeUserFromGroupParticipants(String groupId, String userId) asyn
     if (admins.contains(userId)) {
       admins.remove(userId);
     }
-print("${admins.length} is length og admoins list ");
-    if (admins.isEmpty && participants.isNotEmpty) {
-      print("here tp change admin to first person");
-      admins.add(participants.first);
+
+    print("${admins.length} is length of admins list");
+    if (participants.isEmpty) {
+      print("No participants left, deleting group...");
+      await groupsDb.doc(groupId).delete();
+      return;
     }
+    if (admins.isEmpty && participants.isNotEmpty) {
+      print("Assigning first participant as the new admin");
+      admins.add(participants.first);
+      makeUserAdminOfThisGroup(groupId,participants.first);
+    }
+
+
 
     await groupsDb.doc(groupId).update({
       'participants': participants,

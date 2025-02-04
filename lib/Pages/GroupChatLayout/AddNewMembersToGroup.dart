@@ -115,6 +115,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         ],
       ),
       body: SingleChildScrollView(
+
         child: Column(
         
           children: [
@@ -154,6 +155,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                   if (users.isEmpty) return Center(child: Text("No users found"));
         
                   return ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: users.length,
                     itemBuilder: (context, index) {

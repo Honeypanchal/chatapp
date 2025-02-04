@@ -317,7 +317,7 @@ class GroupMembers extends StatefulWidget {
 
 class _GroupMembersState extends State<GroupMembers> {
   List<String> membersFirstNameList = [];
-
+bool isLoading=true;
   bool isCurrentUserAdmin(String userId) {
     return widget.admins.contains(userId);
   }
@@ -333,6 +333,7 @@ class _GroupMembersState extends State<GroupMembers> {
 
     setState(() {
       membersFirstNameList = fetchedNames;
+      isLoading=false;
     });
   }
   @override
@@ -344,7 +345,8 @@ class _GroupMembersState extends State<GroupMembers> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
-    return Scaffold(
+    return
+      Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
@@ -358,91 +360,98 @@ class _GroupMembersState extends State<GroupMembers> {
         title: Text("Edit Admin",style: TextStyle(color: Colors.white,fontFamily: 'Raleway'),),
       ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width*0.052,vertical: height*0.032),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text("Admins :"),
+      body:
 
-              ],
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: membersFirstNameList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  onTap: (){
-                    if(!widget.admins.contains(widget.groupMembers[index])){
-                      setState(() {
-                        widget.admins.add(widget.groupMembers[index]);
-                      });
+      SingleChildScrollView(
 
-                    }else
-                    {
-                      setState(() {
-                        if(widget.currentUser==widget.groupMembers[index]){}
-                        else{  widget.admins.remove(widget.groupMembers[index]);}
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: width*0.052,vertical: height*0.032),
+          child: Column(
+            children: [
 
-                      });
-                    }
-                  },
-                  contentPadding: EdgeInsets.zero,
-                  leading:
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.black,
-                        radius: width * 0.05,
-                        child: Text(
-                          membersFirstNameList[index][0].toUpperCase(),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      if ( isCurrentUserAdmin(widget.groupMembers[index]))
-                        Positioned(
-                          right: -2,
-                          bottom: -2,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                            ),
-                            child: Icon(
-                              Icons.check_circle,
-                              size: width * 0.035,
-                              color: Colors.blue,
-                            ),
+              Row(
+                children: [
+                  Text("Admins :"),
+        
+                ],
+              ),
+              if(isLoading) CircularProgressIndicator(),
+              ListView.builder(
+                shrinkWrap: true,
+physics: NeverScrollableScrollPhysics(),
+                itemCount: membersFirstNameList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    onTap: (){
+                      if(!widget.admins.contains(widget.groupMembers[index])){
+                        setState(() {
+                          widget.admins.add(widget.groupMembers[index]);
+                        });
+
+                      }else
+                      {
+                        setState(() {
+                          if(widget.currentUser==widget.groupMembers[index]){}
+                          else{  widget.admins.remove(widget.groupMembers[index]);}
+
+                        });
+                      }
+                    },
+                    contentPadding: EdgeInsets.zero,
+                    leading:
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.black,
+                          radius: width * 0.05,
+                          child: Text(
+                            membersFirstNameList[index][0].toUpperCase(),
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                    ],
-                  )
-                  ,
-                  title: Text(membersFirstNameList[index]),
-                  trailing: isCurrentUserAdmin(widget.groupMembers[index])
-                      ? Container(
-                    decoration: BoxDecoration(
-                        color: Colors.blue.shade200,
-                        border: Border.all(color: Colors.blue.shade200),
-                        borderRadius: BorderRadius.circular(width * 0.01)),
-                    width: width * 0.12,
-                    height: height * 0.017,
-                    child: Center(
-                      child: Text(
-                        "Admin",
-                        style: TextStyle(
-                            fontSize: width * 0.027, color: Colors.white),
+                        if ( isCurrentUserAdmin(widget.groupMembers[index]))
+                          Positioned(
+                            right: -2,
+                            bottom: -2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              child: Icon(
+                                Icons.check_circle,
+                                size: width * 0.035,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
+                    ,
+                    title: Text(membersFirstNameList[index]),
+                    trailing: isCurrentUserAdmin(widget.groupMembers[index])
+                        ? Container(
+                      decoration: BoxDecoration(
+                          color: Colors.blue.shade200,
+                          border: Border.all(color: Colors.blue.shade200),
+                          borderRadius: BorderRadius.circular(width * 0.01)),
+                      width: width * 0.12,
+                      height: height * 0.017,
+                      child: Center(
+                        child: Text(
+                          "Admin",
+                          style: TextStyle(
+                              fontSize: width * 0.027, color: Colors.white),
+                        ),
                       ),
-                    ),
-                  )
-                      : null,
-                );
-              },
-            ),
-          ],
+                    )
+                        : null,
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
