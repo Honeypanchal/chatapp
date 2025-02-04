@@ -1,12 +1,11 @@
 import 'dart:async';
 
-import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
-import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
+
 import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
-import 'package:chatapp/models/Group.dart';
+
 import 'package:chatapp/pages/GroupChatLayout/AddNewMembersToGroup.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -37,7 +36,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
   List<String> participants = [];
   List<String> admins = [];
   bool isLoading = true;
-  bool isLoadingDatabse = true; // To control the loading state
+  bool isLoadingDatabse = true;
 
   StreamSubscription? _groupSubscription;
 
@@ -71,6 +70,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
             addOtherMembers = group['addOtherMembers'];
             isLoading = false;
           });
+
+
+          await membersFirstName();
         }
       }
     });
@@ -93,7 +95,11 @@ class _GroupDescriptionState extends State<GroupDescription> {
           groupSettings = group['groupSettings'];
           sendMessages = group['sendMessages'];
           addOtherMembers = group['addOtherMembers'];
+            participants = (group['participants'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList();
         });
+
         listenToDatabaseUpdates();
         await getDataAndUpdateUI();
         await membersFirstName();
@@ -115,12 +121,12 @@ class _GroupDescriptionState extends State<GroupDescription> {
   Future<void> membersFirstName() async {
     print('here populating participants');
 
-    setState(() {
-      participants = (group['participants'] as List<dynamic>)
-          .map((e) => e.toString())
-          .toList();
-      print(participants[0]);
-    });
+    // setState(() {
+    //   participants = (group['participants'] as List<dynamic>)
+    //       .map((e) => e.toString())
+    //       .toList();
+    //   print(participants[0]);
+    // });
 
     List<String> fetchedNames = await getUserNames(participants);
 
@@ -131,7 +137,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
 
   Future<void> getDataAndUpdateUI() async {
     String enteredFirstName = await getFirstNameById(
-        group['createdBy']); // Await the Future to get the value
+        group['createdBy']);
 
     setState(() {
       firstName = enteredFirstName;
@@ -410,9 +416,11 @@ class _GroupDescriptionState extends State<GroupDescription> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => Groupchatpage(
-                  groupId: widget.groupId, currentUser: widget.currentUser))),
+          onPressed: () => Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                  builder: (context) => Groupchatpage(
+                      groupId: widget.groupId,
+                      currentUser: widget.currentUser))),
         ),
         actions: [
           PopupMenuButton(
@@ -820,45 +828,65 @@ class _GroupDescriptionState extends State<GroupDescription> {
                             style: TextStyle(fontSize: width * 0.045),
                           ),
                         ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: group['participants'].length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.black,
-                                child: Text(
-                                  membersFirstNameList[index][0].toUpperCase(),
-                                  style: TextStyle(color: Colors.white),
+                        if (isLoading)
+                          CircularProgressIndicator()
+                        else ...[
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: group['participants'].length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                onLongPress: (){
+                                if( isCurrentUserAdmin(widget.currentUser)) {
+
+                                  PopupMenuButton( offset: Offset(0, height * 0.052),
+                                    elevation: 2,itemBuilder: (context)=>[
+                                      PopupMenuItem(child: Text("Delete participant"),value: 0,)
+
+                                  ],onSelected:(val){
+                                    if(val==0){
+                                      //delete user
+                                    }
+                                      }
+                                  );
+                                }
+                                },
+                                contentPadding: EdgeInsets.zero,
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.black,
+                                  child: Text(
+                                    membersFirstNameList[index][0]
+                                        .toUpperCase(),
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
-                              ),
-                              title: Text(membersFirstNameList[index]),
-                              trailing: isCurrentUserAdmin(
-                                      group['participants'][index])
-                                  ? Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.blue.shade200,
-                                          border: Border.all(
-                                              color: Colors.blue.shade200),
-                                          borderRadius: BorderRadius.circular(
-                                              width * 0.01)),
-                                      width: width * 0.12,
-                                      height: height * 0.017,
-                                      child: Center(
-                                        child: Text(
-                                          "Admin",
-                                          style: TextStyle(
-                                              fontSize: width * 0.027,
-                                              color: Colors.white),
+                                title: Text(membersFirstNameList[index]),
+                                trailing: isCurrentUserAdmin(
+                                        group['participants'][index])
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.blue.shade200,
+                                            border: Border.all(
+                                                color: Colors.blue.shade200),
+                                            borderRadius: BorderRadius.circular(
+                                                width * 0.01)),
+                                        width: width * 0.12,
+                                        height: height * 0.017,
+                                        child: Center(
+                                          child: Text(
+                                            "Admin",
+                                            style: TextStyle(
+                                                fontSize: width * 0.027,
+                                                color: Colors.white),
+                                          ),
                                         ),
-                                      ),
-                                    )
-                                  : null,
-                            );
-                          },
-                        ),
+                                      )
+                                    : null,
+                              );
+                            },
+                          ),
+                        ]
                       ],
                     ),
                   ),

@@ -322,9 +322,12 @@ print(widget.members.length);
                     print('Here adding trur to group admin for person who created the group');
                     addGroupAndAddActiveGroupInDatabase(
                         newGroup.groupId!, singleMember, true);
-                  }
-                  addGroupAndAddActiveGroupInDatabase(
-                      newGroup.groupId!, singleMember, false);
+                  }else
+                    {
+                      addGroupAndAddActiveGroupInDatabase(
+                          newGroup.groupId!, singleMember, false);
+                    }
+
                   //   addGroupAndAddActiveGroupInDatabase(groupId: newGroup.groupId!, path: singleMember,isAdmin:false);
                 }
 
