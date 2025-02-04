@@ -69,7 +69,16 @@ Future<void> editGroupInfo(String groupId, String desc) async {
     final data = await groupsDb.doc(groupId).update({"groupDescription": desc});
     print("Edited succesfully");
   } catch (e) {
-    throw e;
+    rethrow;
+  }
+}
+Future<void> editGroupName(String groupId,String name) async{
+  try {
+    print('$groupId');
+    final data = await groupsDb.doc(groupId).update({"groupName": name});
+    print("Edited succesfully");
+  } catch (e) {
+    rethrow;
   }
 }
 
@@ -86,3 +95,14 @@ Future<void> updateGroupSettings(String groupId, bool groupSettings,
     print(e.toString());
   }
 }
+Future<void> addNewMembersToGroup(String groupId, List<String> newMembers)async{
+  try{
+    final  foundGroup=groupsDb.doc(groupId);
+   await  foundGroup.update({"participants":FieldValue.arrayUnion(newMembers)});
+
+  }catch(e){
+    print(e.toString());
+
+  }finally{
+   print("New member added succesfully!");
+  }}
