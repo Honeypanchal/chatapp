@@ -4,7 +4,7 @@ import 'package:chatapp/services/auth_services.dart';
 import 'package:chatapp/Pages/Authentication/FirstPage.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/Pages/Authentication/Signup.dart';
-import '../MainNavigation.dart';
+import '../helpers/MainNavigation.dart';
 
 class SigninPage extends StatefulWidget {
   @override

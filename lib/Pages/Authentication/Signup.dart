@@ -1,7 +1,7 @@
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/auth_services.dart';
-import '../MainNavigation.dart';
+import '../helpers/MainNavigation.dart';
 
 import 'SigninPage.dart';
 

@@ -843,7 +843,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                   PopupMenuButton( offset: Offset(0, height * 0.052),
                                     elevation: 2,itemBuilder: (context)=>[
                                       PopupMenuItem(child: Text("Delete participant"),value: 0,)
-
+// removeParticipantFromGroup(groupId,)
                                   ],onSelected:(val){
                                     if(val==0){
                                       //delete user
