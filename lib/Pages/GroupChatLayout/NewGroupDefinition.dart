@@ -68,7 +68,8 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
         ),
         leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pushNamed(context, "/newGroup",
+                  arguments: {'currentUser': widget.createdBy});
             },
             icon: Icon(
               Icons.arrow_back,
@@ -104,11 +105,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   Expanded(
                     flex: 4,
                     child: TextFormField(
+                      cursorColor: Colors.green.shade700,
                       controller: _groupName,
                       decoration: InputDecoration(
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Colors.blue,
+                                color: Colors.green.shade700,
                                 width: 2.0), // Color when focused
                           ),
                           enabledBorder: UnderlineInputBorder(
@@ -198,20 +200,26 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Spacer(),
                           IconButton(
                               onPressed: () async {
-                                final result = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) => GroupPermissions(
-                                            groupSettings: groupSettings,
-                                            sendMessages: sendMessages,
-                                            addOtherMembers: addOtherMembers,
-                                            admins: admins,
-                                            members: widget.members,
-                                            currentUser:
-                                                widget.createdBy.uid)));
+                                final result =
+                                    await Navigator.of(context).pushNamed(
+                                  '/groupPermissions',
+                                  arguments: {
+                                    'groupSettings': groupSettings,
+                                    'sendMessages': sendMessages,
+                                    'addOtherMembers': addOtherMembers,
+                                    'admins': admins,
+                                    'members': widget.members,
+                                    'currentUser': widget.createdBy.uid,
+                                  },
+                                );
+
                                 if (result != null) {
-                                  groupSettings = result['groupSettings'];
-                                  sendMessages = result['sendMessages'];
-                                  addOtherMembers = result['addOtherMembers'];
+                                  final data = result as Map<String, dynamic>;
+                                  setState(() {
+                                    groupSettings = data['groupSettings'];
+                                    sendMessages = data['sendMessages'];
+                                    addOtherMembers = data['addOtherMembers'];
+                                  });
                                 }
                               },
                               icon: Icon(
@@ -261,8 +269,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                       child: Column(
                         children: [
                           CircleAvatar(
+                            backgroundColor: Colors.black12,
                             radius: width * 0.1,
-                            child: Icon(Icons.person),
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.green.shade700,
+                            ),
                           ),
                           SizedBox(height: height * 0.01),
                           Text(
@@ -306,25 +318,32 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   addOtherMembers);
 
               if (newGroup != null) {
-                Navigator.of(context)
-                    .pushReplacement(MaterialPageRoute(
-                        builder: (context) => Groupchatpage(currentUser: currentUser,groupId:newGroup.groupId!)))
+                Navigator.of(context).pushNamed(
+                  '/groupchat',
+                  arguments: {
+                    'currentUser': currentUser,
+                    'groupId': newGroup.groupId,
+                  },
+                )
                     .catchError((error) {
                   print(error.toString());
                 });
                 //Adding group id to user and participants
                 widget.createdBy
                     .addGroupAndAddActiveGroup(newGroup.groupId!, true);
-print(widget.members.length);
+                print(widget.members.length);
                 for (var singleMember in widget.members) {
                   print(singleMember);
                   if (singleMember == widget.createdBy.uid) {
-                    print('Here adding trur to group admin for person who created the group');
+                    print(
+                        'Here adding trur to group admin for person who created the group');
                     addGroupAndAddActiveGroupInDatabase(
                         newGroup.groupId!, singleMember, true);
+                  } else {
+                    addGroupAndAddActiveGroupInDatabase(
+                        newGroup.groupId!, singleMember, false);
                   }
-                  addGroupAndAddActiveGroupInDatabase(
-                      newGroup.groupId!, singleMember, false);
+
                   //   addGroupAndAddActiveGroupInDatabase(groupId: newGroup.groupId!, path: singleMember,isAdmin:false);
                 }
 
@@ -343,7 +362,7 @@ print(widget.members.length);
         backgroundColor: Colors.black,
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.white,
+          color: Colors.green.shade700,
         ),
       ),
     );

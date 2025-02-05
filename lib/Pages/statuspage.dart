@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/Status.dart';
 import 'package:intl/intl.dart';
 
+import 'helpers/MainNavigation.dart';
+
 class StatusPage extends StatefulWidget {
   @override
   State<StatusPage> createState() => _StatusPageState();
@@ -23,6 +25,33 @@ class _StatusPageState extends State<StatusPage> {
       Navigator.pop(context);
     }
   }
+
+  // int _selectedIndex = 2;
+  //
+  // void _onItemTapped(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
+  //
+  //   switch (index) {
+  //     case 0:
+  //       Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.currentUser});
+  //       break;
+  //     case 1:
+  //       Navigator.pushNamed(
+  //         context,
+  //         '/groupDisplay',
+  //         arguments: {'currentUser': widget.currentUser},
+  //       );
+  //       break;
+  //     case 2:
+  //       Navigator.pushNamed(context, '/statusPage');
+  //       break;
+  //     case 3:
+  //       Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
+  //       break;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -564,6 +593,7 @@ class _EnterStatusState extends State<EnterStatus> {
             ],
           ),
         ),
+      // bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex,onTap:_onItemTapped),
         floatingActionButton: FloatingActionButton(
             onPressed: _uploadTextStatus,
             backgroundColor: Colors.black26,

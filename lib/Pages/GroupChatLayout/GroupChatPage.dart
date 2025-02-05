@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
@@ -9,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:chatapp/services/users_services.dart';
 import 'package:flutter/services.dart';
 
+import '../../models/CustomClass.dart';
+import '../../services/auth_services.dart';
 import '../../services/groupChat_services.dart';
 
 class Groupchatpage extends StatefulWidget {
@@ -450,14 +451,23 @@ class _GroupchatpageState extends State<Groupchatpage> {
 //Listening to real time changes
   bool isLoading = true;
   late bool groupSettings;
+  late CustomClass user;
 
   late bool sendMessages;
 
   late bool addOtherMembers;
-
+  void getCurrentUserDetails() async {
+    CustomClass? found = await getUserDetails(widget.currentUser);
+    if (found != null) {
+      setState(() {
+        user = found;
+      });
+    }
+  }
   @override
   void initState() {
     super.initState();
+    getCurrentUserDetails();
     getGroup();
   }
 
@@ -491,7 +501,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     _groupSubscription?.cancel(); // Stop listening when widget is removed
     super.dispose();
   }
-  
+
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
@@ -508,15 +518,19 @@ class _GroupchatpageState extends State<Groupchatpage> {
         preferredSize: Size(width, height * 0.072),
         child: GestureDetector(
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => GroupDescription(
-                    groupId: group['groupId'],
-                    currentUser: widget.currentUser)));
+            Navigator.of(context).pushNamed(
+              '/groupDescription',
+              arguments: {
+                'groupId': group['groupId'],
+                'currentUser': widget.currentUser,
+              },
+            );
           },
           child: AppBar(
             leading: IconButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed('/groupDisplay',
+                      arguments: {'currentUser': user});
                 },
                 icon: Icon(
                   Icons.arrow_back,
@@ -938,7 +952,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   color:Colors.grey,
                 ),
                 Center(
-                   child: GestureDetector(
+                    child: GestureDetector(
                       onTap: () {
                         setState(() {
                           showVotes = !showVotes;
@@ -972,7 +986,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
   }
 
 
-    Stream<List<String>> getReadReceipts(String messageId) {
+  Stream<List<String>> getReadReceipts(String messageId) {
     return _firestore
         .collection('groups')
         .doc(group['groupId'])
@@ -1186,6 +1200,3 @@ class _CreatePollPageState extends State<CreatePollPage> {
     );
   }
 }
-
-
-

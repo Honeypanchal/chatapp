@@ -1,3 +1,5 @@
+import 'package:chatapp/Pages/helpers/MainNavigation.dart';
+import 'package:chatapp/Pages/statuspage.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/chat_layout.dart';
@@ -17,10 +19,37 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  //For Navigation
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+
+        break;
+      case 1:
+        Navigator.pushNamed(
+          context,
+          '/groupDisplay',
+          arguments: {'currentUser': widget.currentUser},
+        );
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/statusPage');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
+        break;
+    }
+  }
+
   final _database = FirebaseFirestore.instance.collection('Users');
   dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
-  CollectionReference groupsDB = FirebaseFirestore.instance.collection(
-      "groups");
+  CollectionReference groupsDB = FirebaseFirestore.instance.collection("groups");
   TextEditingController _searchText = TextEditingController();
   dynamic _Chatdatabase = '';
   bool isMakingGroupChat = false;
@@ -68,14 +97,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final height = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -121,8 +144,7 @@ class _ChatPageState extends State<ChatPage> {
       ),
       body: SingleChildScrollView( // Scrollable parent widget for the entire body
         child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: width * 0.012, vertical: height * 0.012),
+          padding: EdgeInsets.symmetric(horizontal: width * 0.012, vertical: height * 0.012),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -162,8 +184,7 @@ class _ChatPageState extends State<ChatPage> {
               SizedBox(height: height * 0.025),
               if (isMakingGroupChat && groupChatUsers.isNotEmpty)...[
                 Padding(
-                  padding: EdgeInsets.symmetric(
-                      vertical: height * 0.002, horizontal: width * 0.012),
+                  padding: EdgeInsets.symmetric(vertical: height * 0.002, horizontal: width * 0.012),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: groupChatUsers.map((x) {
@@ -178,12 +199,13 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ),
                 Divider(
-                  height: height * 0.012,
-                  thickness: width * 0.00015,
+                  height: height*0.012,
+                  thickness: width*0.00015,
                   color: Colors.grey,
                 )
               ]
               ,
+
 
 
               // Users StreamBuilder
@@ -206,8 +228,7 @@ class _ChatPageState extends State<ChatPage> {
 
                   return ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    // Prevent scrolling inside ListView
+                    physics: NeverScrollableScrollPhysics(), // Prevent scrolling inside ListView
                     itemCount: _chatUsers.length,
                     itemBuilder: (context, index) {
                       if (_chatUsers[index]['uid'] == widget.currentUser.uid) {
@@ -232,24 +253,20 @@ class _ChatPageState extends State<ChatPage> {
                         onTap: () {
                           String docId = widget.currentUser.uid
                               .compareTo(_chatUsers[index]['uid']) < 0
-                              ? "${widget.currentUser
-                              .uid}_${_chatUsers[index]['uid']}"
-                              : "${_chatUsers[index]['uid']}${widget.currentUser
-                              .uid}";
+                              ? "${widget.currentUser.uid}_${_chatUsers[index]['uid']}"
+                              : "${_chatUsers[index]['uid']}${widget.currentUser.uid}";
 
                           _Chatdatabase = chatsDB.doc(docId);
 
                           Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) =>
-                                ChatLayout(
-                                  currentUser: widget.currentUser,
-                                  user: _chatUsers[index],
-                                  databaseRef: _Chatdatabase,
-                                ),
+                            builder: (context) => ChatLayout(
+                              currentUser: widget.currentUser,
+                              user: _chatUsers[index],
+                              databaseRef: _Chatdatabase,
+                            ),
                           ));
                         },
-                        tileColor: groupChatUsers.contains(
-                            _chatUsers[index]['uid'])
+                        tileColor:  groupChatUsers.contains(_chatUsers[index]['uid'])
                             ? Colors.grey.shade300
                             : Colors.transparent,
                         leading: Container(
@@ -264,32 +281,25 @@ class _ChatPageState extends State<ChatPage> {
                               width: width * 0.002,
                             ),
                           ),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            // Allows the tick to be placed outside the CircleAvatar's bounds
+                          child:Stack(
+                            clipBehavior: Clip.none, // Allows the tick to be placed outside the CircleAvatar's bounds
                             children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white,
-                                radius: width * 0.05,
-                                // Adjust the radius as needed
+                                radius: width * 0.05, // Adjust the radius as needed
                                 child: Text(
-                                  _chatUsers[index]['firstName'][0]
-                                      .toUpperCase(),
+                                  _chatUsers[index]['firstName'][0].toUpperCase(),
                                   style: TextStyle(color: Colors.black),
                                 ),
                               ),
-                              if (groupChatUsers.contains(
-                                  _chatUsers[index]['uid']))
+                              if (groupChatUsers.contains(_chatUsers[index]['uid']))
                                 Positioned(
-                                  right: -2,
-                                  // Move slightly outside the CircleAvatar
-                                  bottom: -2,
-                                  // Move slightly outside the CircleAvatar
+                                  right: -2,  // Move slightly outside the CircleAvatar
+                                  bottom: -2, // Move slightly outside the CircleAvatar
                                   child: Container(
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors
-                                          .white, // Background for tick to blend with avatar border
+                                      color: Colors.white, // Background for tick to blend with avatar border
                                     ),
                                     child: Icon(
                                       Icons.check_circle,
@@ -342,8 +352,7 @@ class _ChatPageState extends State<ChatPage> {
                   }).toList();
 
                   if (userGroups.isEmpty) {
-                    return Center(
-                        child: Text("You are not a member of any groups"));
+                    return Center(child: Text("You are not a member of any groups"));
                   }
 
                   return Column(
@@ -356,14 +365,12 @@ class _ChatPageState extends State<ChatPage> {
                         groupIcon: groupDoc['groupIcon'],
                         groupDescription: groupDoc['groupDescription'],
                         createdBy: groupDoc['createdBy'],
-                        participants: List<String>.from(
-                            groupDoc['participants']),
+                        participants: List<String>.from(groupDoc['participants']),
                         createdAt: groupDoc['createdAt'],
                         groupSettings: groupDoc['groupSettings'],
                         sendMessages: groupDoc['sendMessages'],
                         addOtherMembers: groupDoc['addOtherMembers'],
-                        groupId: groupDoc.id,
-                        // Assign Firestore ID
+                        groupId: groupDoc.id, // Assign Firestore ID
                         admins: ['woidoijwfw'],
 
                       );
@@ -383,9 +390,7 @@ class _ChatPageState extends State<ChatPage> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    Groupchatpage(groupId: groupObj.groupId!,
-                                        currentUser: widget.currentUser.uid)
+                                builder: (context)=>Groupchatpage(groupId: groupObj.groupId!, currentUser: widget.currentUser.uid)
                               // builder: (context) => Groupchatpage(newGroup: groupObj,currentUser: widget.currentUser.uid,),
                             ),
                           );
@@ -400,6 +405,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
+      bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex,onTap:_onItemTapped),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (isMakingGroupChat && groupChatUsers.isNotEmpty) {
@@ -407,10 +413,9 @@ class _ChatPageState extends State<ChatPage> {
             groupChatUsers.add(widget.currentUser.uid);
             Navigator.of(context)
                 .push(MaterialPageRoute(
-                builder: (context) =>
-                    NewGroupDefinition(
-                        createdBy: widget.currentUser,
-                        members: List.from(groupChatUsers)))).then((_) {
+                builder: (context) => NewGroupDefinition(
+                    createdBy: widget.currentUser,
+                    members: List.from(groupChatUsers)))).then((_) {
               isMakingGroupChat = !isMakingGroupChat;
               setState(() {
                 groupChatUsers.clear();
