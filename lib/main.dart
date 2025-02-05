@@ -2,8 +2,10 @@ import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
+import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
 import 'package:chatapp/Pages/Profile/Profile.dart';
 import 'package:chatapp/Pages/statuspage.dart';
+import 'package:chatapp/pages/GroupChatLayout/AddNewMembersToGroup.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroup.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:chatapp/Pages/Authentication/FirstPage.dart';
@@ -20,11 +22,11 @@ void main() async {
   await Firebase.initializeApp(
     options: kIsWeb
         ? const FirebaseOptions(
-      apiKey: "AIzaSyCkGQ8wNEx6kfHif77NG-DSHgD2HYug320",
-      appId: "1:796613698658:web:658acd1fecf115b281dd3b",
-      messagingSenderId: "796613698658",
-      projectId: "chatapp-6f684",
-    )
+            apiKey: "AIzaSyCkGQ8wNEx6kfHif77NG-DSHgD2HYug320",
+            appId: "1:796613698658:web:658acd1fecf115b281dd3b",
+            messagingSenderId: "796613698658",
+            projectId: "chatapp-6f684",
+          )
         : null,
   );
 
@@ -72,23 +74,23 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(primarySwatch: Colors.blue),
       home: _isLoading
           ? const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 20),
-              Text(
-                "Redirecting you to your chats...",
-                style: TextStyle(fontSize: 16),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 20),
+                    Text(
+                      "Redirecting you to your chats...",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      )
+            )
           : _user != null
-          ? ChatPage(currentUser: foundUser!)
-          : Firstpage(),
+              ? ChatPage(currentUser: foundUser!)
+              : Firstpage(),
       onGenerateRoute: (settings) {
         final args = settings.arguments as Map<String, dynamic>?;
         switch (settings.name) {
@@ -102,20 +104,18 @@ class _MyAppState extends State<MyApp> {
             );
           case '/newGroupDefinition':
             return MaterialPageRoute(
-              builder: (context) =>
-                  NewGroupDefinition(
-                    members: args!["members"],
-                    createdBy: args["currentUser"],
-                  ),
+              builder: (context) => NewGroupDefinition(
+                members: args!["members"],
+                createdBy: args["currentUser"],
+              ),
             );
           case '/statusPage':
             return MaterialPageRoute(builder: (context) => StatusPage());
           case '/groupDisplay':
             return MaterialPageRoute(
-              builder: (context) =>
-                  GroupDisplayPage(
-                    currentUser: args!["currentUser"],
-                  ),
+              builder: (context) => GroupDisplayPage(
+                currentUser: args!["currentUser"],
+              ),
             );
           case '/profile':
             return MaterialPageRoute(
@@ -125,27 +125,41 @@ class _MyAppState extends State<MyApp> {
           case '/groupPermissions':
             final args = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(
-              builder: (context) =>
-                  GroupPermissions(
-                    groupSettings: args['groupSettings'],
+              builder: (context) => GroupPermissions(
+                groupSettings: args['groupSettings'],
+                sendMessages: args['sendMessages'],
+                addOtherMembers: args['addOtherMembers'],
+                admins: args['admins'],
+                members: args['members'],
+                currentUser: args['currentUser'],
+              ),
+            );
+
+          case '/groupchat':
+            return MaterialPageRoute(
+                builder: (context) => Groupchatpage(
+                    groupId: args!['groupId'],
+                    currentUser: args['currentUser']));
+          case '/groupDescription':
+            return MaterialPageRoute(
+                builder: (context) => GroupDescription(
+                    groupId: args!['groupId'],
+                    currentUser: args['currentUser']));
+          case '/addNewMembers':
+            return MaterialPageRoute(
+                builder: (context) => AddNewMembersToGroup(
+                    existingMembers: args!['existingMembers'],
+                    groupId: args['groupId']));
+          case '/updateGroupPermissions':
+            return MaterialPageRoute(
+                builder: (context) => UpdateGroupPermissions(
+                    groupSettings: args!['groupSettings'],
                     sendMessages: args['sendMessages'],
                     addOtherMembers: args['addOtherMembers'],
                     admins: args['admins'],
                     members: args['members'],
                     currentUser: args['currentUser'],
-                  ),
-            );
-
-          case '/groupchat':
-            return MaterialPageRoute(
-                builder: (context) =>
-                    Groupchatpage(
-                        groupId: args!['groupId'],
-                        currentUser: args['currentUser']));
-          case '/groupDescription':
-            return MaterialPageRoute(builder: (context) =>
-                GroupDescription(
-                    groupId: args!['groupId'], currentUser: args['currentUser']));
+                createdBy:args['createdBy']));
           default:
             return null;
         }

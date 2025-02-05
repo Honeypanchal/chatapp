@@ -105,12 +105,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   Expanded(
                     flex: 4,
                     child: TextFormField(
-                      cursorColor: Colors.green.shade400,
+                      cursorColor: Colors.green.shade700,
                       controller: _groupName,
                       decoration: InputDecoration(
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Colors.green.shade400,
+                                color: Colors.green.shade700,
                                 width: 2.0), // Color when focused
                           ),
                           enabledBorder: UnderlineInputBorder(
@@ -273,7 +273,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                             radius: width * 0.1,
                             child: Icon(
                               Icons.person,
-                              color: Colors.green.shade400,
+                              color: Colors.green.shade700,
                             ),
                           ),
                           SizedBox(height: height * 0.01),
@@ -362,7 +362,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
         backgroundColor: Colors.black,
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.green.shade400,
+          color: Colors.green.shade700,
         ),
       ),
     );

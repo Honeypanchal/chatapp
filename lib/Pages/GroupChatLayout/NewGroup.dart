@@ -33,12 +33,12 @@ class _NewGroupState extends State<NewGroup> {
           onPressed: () => setState(() => _showSearch = false),
         ),
         title: TextField(
-cursorColor: Colors.green.shade400,
+cursorColor: Colors.green.shade700,
           controller: _searchText,
           style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
-            focusColor: Colors.green.shade400,
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color:Colors.green.shade400)),
+            focusColor: Colors.green.shade700,
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color:Colors.green.shade700)),
             hintText: 'Search users...',
             hintStyle: TextStyle(color: Colors.white70),
             border: InputBorder.none,
@@ -147,7 +147,7 @@ print("searching");
                               CircleAvatar(
                                 radius: width * 0.067,
                                 backgroundColor: Colors.black,
-                                child: Text(firstNames[index][0].toUpperCase(),style: TextStyle(color: Colors.green.shade400),)
+                                child: Text(firstNames[index][0].toUpperCase(),style: TextStyle(color: Colors.green.shade700),)
                               ),
                               Text(firstNames[index])
                             ],
@@ -196,7 +196,7 @@ print("searching");
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: groupChatUsers.any((x) => x == user['uid'])
-                                  ? Colors.green.shade400
+                                  ? Colors.green.shade700
                                   : Colors.black,
                               width: width * 0.002,
                             ),
@@ -224,7 +224,7 @@ print("searching");
                                     child: Icon(
                                       Icons.check_circle,
                                       size: width * 0.035,
-                                      color: Colors.green.shade400,
+                                      color: Colors.green.shade700,
                                     ),
                                   ),
                                 ),
@@ -289,7 +289,7 @@ print("searching");
         backgroundColor: Colors.black,
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.green.shade400,
+          color: Colors.green.shade700,
         ),
       ),
     );

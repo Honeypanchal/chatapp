@@ -173,7 +173,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         "Cancel",
                         style: TextStyle(
-                            fontFamily: 'Raleway', color: Colors.green.shade400),
+                            fontFamily: 'Raleway', color: Colors.green.shade700),
                       )),
                   TextButton(
                       onPressed: () {
@@ -244,18 +244,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
-                cursorColor: Colors.green.shade400,
+                cursorColor: Colors.green.shade700,
                 controller: descriptionController,
                 decoration: InputDecoration(
                   hintText: group['groupDescription'] ?? "Add group description",
                   border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade400),
+                    borderSide: BorderSide(color: Colors.green.shade700),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade400),
+                    borderSide: BorderSide(color: Colors.green.shade700),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade400),
+                    borderSide: BorderSide(color: Colors.green.shade700),
                   ),
                 ),
               ),
@@ -303,7 +303,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               Navigator.pop(context, enteredDescription);
                             }
                           },
-                          child: Text("Ok", style: TextStyle(color: Colors.green.shade400)),
+                          child: Text("Ok", style: TextStyle(color: Colors.green.shade700)),
                         ),
                       ),
                     ],
@@ -346,18 +346,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
-                cursorColor: Colors.green.shade400,
+                cursorColor: Colors.green.shade700,
                 controller: groupName,
                 decoration: InputDecoration(
                   hintText: group['groupName'] ?? "Change group name",
                   border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade400),
+                    borderSide: BorderSide(color: Colors.green.shade700),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade400),
+                    borderSide: BorderSide(color: Colors.green.shade700),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade400),
+                    borderSide: BorderSide(color: Colors.green.shade700),
                   ),
                 ),
               ),
@@ -407,7 +407,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                   enteredName); // Return the entered description
                             }
                           },
-                          child: Text("OK", style: TextStyle(color: Colors.green.shade400)),
+                          child: Text("OK", style: TextStyle(color: Colors.green.shade700)),
                         ),
                       ),
                     ],
@@ -449,7 +449,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
     final height = MediaQuery.of(context).size.height;
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.green.shade400,),
+        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.green.shade700,),
       );
     }
     return Scaffold(
@@ -489,10 +489,15 @@ class _GroupDescriptionState extends State<GroupDescription> {
               if (value == 0) {
                 print('$addOtherMembers');
                 if (addOtherMembers || admins.contains(widget.currentUser)) {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => AddNewMembersToGroup(
-                          exisitingMembers: List.from(group['participants']),
-                          groupId: widget.groupId)));
+                  Navigator.of(context).pushNamed(
+                    '/addNewMembers',
+                    arguments: {
+                      'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                      'groupId': widget.groupId,
+                    },
+                  );
+
+
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text("You are not an admin of this group.",
@@ -523,7 +528,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             Center(
               child: CircleAvatar(
                 radius: width * 0.13,
-                backgroundColor: Colors.black,
+                backgroundColor: Colors.green.shade700,
                 child:
                     Icon(Icons.group, color: Colors.white, size: width * 0.09),
               ),
@@ -536,8 +541,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildButton(Icons.call, 'Audio'),
-                _buildButton(Icons.videocam, 'Video'),
+                _buildButton(Icons.wifi_calling_3_outlined, 'Audio'),
+                _buildButton(Icons.video_call_outlined, 'Video'),
 
                 //Adding a new member to the group ;
                 GestureDetector(
@@ -545,11 +550,13 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       print('$addOtherMembers');
                       if (addOtherMembers ||
                           admins.contains(widget.currentUser)) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => AddNewMembersToGroup(
-                                exisitingMembers:
-                                    List.from(group['participants']),
-                                groupId: widget.groupId)));
+                        Navigator.of(context).pushNamed(
+                          '/addNewMembers',
+                          arguments: {
+                            'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                            'groupId': widget.groupId,
+                          },
+                        );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text("You are not an admin of this group.",
@@ -559,7 +566,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         ));
                       }
                     },
-                    child: _buildButton(Icons.person_add, 'Add')),
+                    child: _buildButton(Icons.person_add_alt, 'Add')),
                 _buildButton(Icons.search, 'Search'),
               ],
             ),
@@ -747,52 +754,56 @@ class _GroupDescriptionState extends State<GroupDescription> {
             if (isCurrentUserAdmin(widget.currentUser)) ...[
               ListTile(
                 onTap: () async {
-                  final result =
-                      await Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UpdateGroupPermissions(
-                      groupSettings: group['groupSettings'],
-                      sendMessages: group['sendMessages'],
-                      addOtherMembers: group['addOtherMembers'],
-                      admins: admins,
-                      members: participants,
-                      currentUser: widget.currentUser,
-                    ),
-                  ));
-                  List<String> newAdmins = result['admins'];
+                  final result = await Navigator.of(context).pushNamed(
+                    '/updateGroupPermissions',
+                    arguments: {
+                      'groupSettings': group['groupSettings'],
+                      'sendMessages': group['sendMessages'],
+                      'addOtherMembers': group['addOtherMembers'],
+                      'admins': admins,
+                      'members': participants,
+                      'currentUser': widget.currentUser,
+                      'createdBy': group['createdBy']
+                    },
+                  ) as Map<String, dynamic>?;
+                  if(result!=null){
+                    List<String> newAdmins = result['admins'];
 
-                  setState(() {
-                    admins = newAdmins;
-                    sendMessages = result['sendMessages'];
-                    addOtherMembers = result['addOtherMembers'];
-                    groupSettings = result['groupSettings'];
-                  });
+                    setState(() {
+                      admins = newAdmins;
+                      sendMessages = result['sendMessages'];
+                      addOtherMembers = result['addOtherMembers'];
+                      groupSettings = result['groupSettings'];
+                    });
 
-                  try {
-                    print("Here to update group settings");
-                    print(
-                        '${result['groupSettings']}, ${result['sendMessages']},${result['addOtherMembers']}');
-                    updateGroupSettings(
-                      group['groupId'],
-                      result['groupSettings'],
-                      result['sendMessages'],
-                      result['addOtherMembers'],
-                      admins,
-                    );
+                    try {
+                      print("Here to update group settings");
+                      print(
+                          '${result['groupSettings']}, ${result['sendMessages']},${result['addOtherMembers']}');
+                      updateGroupSettings(
+                        group['groupId'],
+                        result['groupSettings'],
+                        result['sendMessages'],
+                        result['addOtherMembers'],
+                        admins,
+                      );
 
-                    for (String members in group['participants']) {
-                      if (admins.contains(members)) {
-                        print('$members is an admin');
-                        updateAdminStatusForCurrentUser(
-                            members, group['groupId'], true);
-                      } else {
-                        print('$members is  not an admin');
-                        updateAdminStatusForCurrentUser(
-                            members, group['groupId'], false);
+                      for (String members in group['participants']) {
+                        if (admins.contains(members)) {
+                          print('$members is an admin');
+                          updateAdminStatusForCurrentUser(
+                              members, group['groupId'], true);
+                        } else {
+                          print('$members is  not an admin');
+                          updateAdminStatusForCurrentUser(
+                              members, group['groupId'], false);
+                        }
                       }
+                    } catch (e) {
+                      print(e.toString());
                     }
-                  } catch (e) {
-                    print(e.toString());
                   }
+
                 },
                 leading: Icon(
                   Icons.settings,
@@ -846,11 +857,13 @@ class _GroupDescriptionState extends State<GroupDescription> {
                             print('$addOtherMembers');
                             if (addOtherMembers ||
                                 admins.contains(widget.currentUser)) {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => AddNewMembersToGroup(
-                                      exisitingMembers:
-                                          List.from(group['participants']),
-                                      groupId: widget.groupId)));
+                              Navigator.of(context).pushNamed(
+                                '/addNewMembers',
+                                arguments: {
+                                  'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                                  'groupId': widget.groupId,
+                                },
+                              );
                             } else {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(SnackBar(
@@ -865,7 +878,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                              backgroundColor: Colors.black,
+                              backgroundColor: Colors.green.shade700,
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
@@ -877,7 +890,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           ),
                         ),
                         if (isLoading || isLoadingDatabse)
-                          CircularProgressIndicator(color: Colors.green.shade400,)
+                          CircularProgressIndicator(color: Colors.green.shade700,)
                         else ...[
                           ListView.builder(
                             shrinkWrap: true,
@@ -966,7 +979,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                 },
                                 contentPadding: EdgeInsets.zero,
                                 leading: CircleAvatar(
-                                  backgroundColor: Colors.black,
+                                  backgroundColor: Colors.green.shade700,
                                   child: Text(
                                     membersFirstNameList[index][0]
                                         .toUpperCase(),
@@ -978,9 +991,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                         group['participants'][index])
                                     ? Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.green.shade400,
+                                            color: Colors.green.shade700,
                                             border: Border.all(
-                                                color: Colors.green.shade400),
+                                                color: Colors.green.shade700),
                                             borderRadius: BorderRadius.circular(
                                                 width * 0.01)),
                                         width: width * 0.12,
@@ -1067,7 +1080,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(width * 0.032),
           ),
-          child: Icon(icon, color: Colors.black),
+          child: Icon(icon, color: Colors.green.shade700),
         ),
         SizedBox(height: height * 0.01),
         Text(label),

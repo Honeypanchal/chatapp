@@ -5,11 +5,11 @@ import '../../services/groupChat_services.dart';
 import '../../services/users_services.dart';
 
 class AddNewMembersToGroup extends StatefulWidget {
-  final List<String> exisitingMembers;
+  final List<String> existingMembers;
   final String groupId;
 
   const AddNewMembersToGroup(
-      {super.key, required this.exisitingMembers, required this.groupId});
+      {super.key, required this.existingMembers, required this.groupId});
 
   @override
   State<AddNewMembersToGroup> createState() => _AddNewMembersToGroupState();
@@ -17,6 +17,7 @@ class AddNewMembersToGroup extends StatefulWidget {
 
 class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
   List<String> newMembers = [];
+  List<String> newMembersName=[];
   final _database = FirebaseFirestore.instance.collection('Users');
   TextEditingController _searchText = TextEditingController();
   bool _isSearching = false;
@@ -25,7 +26,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
     return _database.snapshots().map((snapshot) {
       List<QueryDocumentSnapshot<Map<String, dynamic>>> filteredUsers = snapshot
           .docs
-          .where((doc) => !widget.exisitingMembers.contains(doc['uid']))
+          .where((doc) => !widget.existingMembers.contains(doc['uid']))
           .toList();
 
       if (_searchText.text.isNotEmpty) {
@@ -66,14 +67,23 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         backgroundColor: Colors.black,
         title: _isSearching
             ? TextField(
+          cursorColor: Colors.green.shade700,
                 controller: _searchText,
                 autofocus: true,
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: "Search users...",
                   hintStyle: TextStyle(color: Colors.white54),
-                  border: InputBorder.none,
+                  border:UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700)
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.green.shade700)
+                  ),enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700)
+                )
                 ),
+
               )
             : Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -119,23 +129,36 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         child: Column(
         
           children: [
-          if(newMembers.isNotEmpty)...[
+          if(newMembers.isNotEmpty && newMembersName.isNotEmpty)...[
             Padding(
               padding: EdgeInsets.symmetric(vertical: height * 0.012, horizontal: width * 0.012),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: newMembers.map((x) {
-                  return CircleAvatar(
-                    radius: width * 0.07,
-                    backgroundColor: Colors.black,
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.white,
-                    ),
-                  );
-                }).toList(),
+              child: SizedBox(
+                height: height*0.1, // Ensure enough height for ListView
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: newMembers.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: width * 0.02), // Adjust spacing
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: width * 0.07,
+                            backgroundColor: Colors.black,
+                            child: Text(
+                            newMembersName[index][0].toUpperCase(),
+                             style: TextStyle( color: Colors.green.shade700),
+                            ),
+                          ),
+                          Text(newMembersName[index])
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
+
             Divider(
               height: height*0.012,
               thickness: width*0.0005,
@@ -169,7 +192,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                               radius: width * 0.05,
                               child: Text(
                                user['firstName'][0].toUpperCase(),
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: Colors.green.shade700),
                               ),
                             ),
                             if (newMembers.contains(user['uid']))
@@ -184,7 +207,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                                   child: Icon(
                                     Icons.check_circle,
                                     size: width * 0.035,
-                                    color: Colors.blue,
+                                    color: Colors.green.shade700,
                                   ),
                                 ),
                               ),
@@ -197,6 +220,13 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                               newMembers.remove(user['uid']);
                             } else {
                               newMembers.add(user['uid']);
+                            }
+                          });
+                          setState(() {
+                            if (newMembersName.contains(user['firstName'])) {
+                              newMembersName.remove(user['firstName']);
+                            } else {
+                              newMembersName.add(user['firstName']);
                             }
                           });
                         },
@@ -214,12 +244,14 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
        for(var singleMember in newMembers){
-         widget.exisitingMembers.add(singleMember);
+         widget.existingMembers.add(singleMember);
        }
 
     try{
       addNewMembersToGroup(widget.groupId,newMembers);
       addGroupIdToNewMembers(widget.groupId,newMembers);
+      newMembersName.clear();
+      newMembers.clear();
       Navigator.of(context).pop();
 
     }catch(e){
@@ -230,7 +262,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         backgroundColor: Colors.black,
         child: Icon(
           Icons.check,
-          color: Colors.white,
+          color: Colors.green.shade700,
         ),
       ),
     );

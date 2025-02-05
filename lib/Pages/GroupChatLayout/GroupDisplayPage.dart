@@ -143,7 +143,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
                     child: CircularProgressIndicator(
-                      color: Colors.green.shade400, // WhatsApp-like green
+                      color: Colors.green.shade700, // WhatsApp-like green
                     ),
                   );
                 }
@@ -162,7 +162,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundColor: Colors.grey.shade100,
-                        child: Icon(Icons.group, color: Colors.green.shade400),
+                        child: Icon(Icons.group, color: Colors.green.shade700),
                       ),
                       title: Text(groupData["groupName"] ?? "Unnamed Group"),
                       subtitle:
@@ -196,7 +196,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
         tooltip: 'Create New Group',
         child: Icon(
           Icons.group_add,
-          color: Colors.green.shade400,
+          color: Colors.green.shade700,
           size: width < 600 ? width * 0.08 : width * 0.09,
         ),
       ),
