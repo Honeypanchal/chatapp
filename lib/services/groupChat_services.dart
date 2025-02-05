@@ -25,7 +25,7 @@ Future<Group?> createNewGroup(String groupName,
 
     Group newGroup = Group(
       groupId: '',
-      groupName: groupName,
+      groupName: groupName.toLowerCase(),
       groupIcon: groupIcon,
       groupDescription: groupDescription,
       createdBy: createdBy,
@@ -106,3 +106,64 @@ Future<void> addNewMembersToGroup(String groupId, List<String> newMembers)async{
   }finally{
    print("New member added succesfully!");
   }}
+Future<void> removeUserFromGroupParticipants(String groupId, String userId) async {
+  final groupDoc = await groupsDb.doc(groupId).get();
+
+  if (!groupDoc.exists) return;
+
+  try {
+    final groupData = groupDoc.data() as Map<String, dynamic>;
+    List<String> participants = List.from(groupData['participants']);
+    List<String> admins = List.from(groupData['admins']);
+
+    if (participants.contains(userId)) {
+      participants.remove(userId);
+    }
+    if (admins.contains(userId)) {
+      admins.remove(userId);
+    }
+
+    print("${admins.length} is length of admins list");
+    if (participants.isEmpty) {
+      print("No participants left, deleting group...");
+      await groupsDb.doc(groupId).delete();
+      return;
+    }
+    if (admins.isEmpty && participants.isNotEmpty) {
+      print("Assigning first participant as the new admin");
+      admins.add(participants.first);
+      makeUserAdminOfThisGroup(groupId,participants.first);
+    }
+
+
+
+    await groupsDb.doc(groupId).update({
+      'participants': participants,
+      'admins': admins,
+    });
+
+    print("User $userId removed successfully from the group.");
+  } catch (e) {
+    rethrow;
+  }
+}
+
+
+Future<void> removeUserFromThisGroup(String groupId, String userId)async{
+  try{
+    print("here in group chat  services");
+    final groupDbRef=  groupsDb.doc(groupId);
+    final groupDb= await groupDbRef.get();
+    List<String> participants = List.from(groupDb['participants']);
+    List<String> admins=List.from(groupDb['admins']);
+    if(admins.contains(userId)){
+      print("user also removed from admin");
+      admins.removeWhere((user)=>user==userId);
+    }
+    participants.removeWhere((user)=>user==userId);
+    groupDbRef.update({"participants":participants,"admins":admins});
+    print("User ${userId} removed from group succesfully!");
+  }catch(e){
+    print(e.toString());
+  }
+}

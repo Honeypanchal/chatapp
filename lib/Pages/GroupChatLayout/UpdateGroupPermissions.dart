@@ -11,16 +11,17 @@ class UpdateGroupPermissions extends StatefulWidget {
   List<String> admins;
   final String currentUser;
   List<String> members;
+  String createdBy;
 
-  UpdateGroupPermissions({
-    super.key,
-    required this.groupSettings,
-    required this.sendMessages,
-    required this.addOtherMembers,
-    required this.admins,
-    required this.members,
-    required this.currentUser
-  });
+  UpdateGroupPermissions(
+      {super.key,
+      required this.groupSettings,
+      required this.sendMessages,
+      required this.addOtherMembers,
+      required this.admins,
+      required this.members,
+      required this.currentUser,
+      required this.createdBy});
 
   @override
   State<UpdateGroupPermissions> createState() => _UpdateGroupPermissionsState();
@@ -49,7 +50,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                 'groupSettings': widget.groupSettings,
                 "sendMessages": widget.sendMessages,
                 "addOtherMembers": widget.addOtherMembers,
-                "admins":widget.admins
+                "admins": widget.admins
               });
             },
             icon: Icon(
@@ -116,8 +117,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.black,
-                            focusColor: Colors.black,
+                            activeColor: Colors.green.shade700,
+                            focusColor: Colors.green.shade700,
                             value: widget.groupSettings,
                             onChanged: (val) {
                               setState(() {
@@ -152,8 +153,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.black,
-                            focusColor: Colors.black,
+                            activeColor: Colors.green.shade700,
+                            focusColor: Colors.green.shade700,
                             value: widget.sendMessages,
                             onChanged: (val) {
                               setState(() {
@@ -188,13 +189,13 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.black,
-                            focusColor: Colors.black,
+                            activeColor: Colors.green.shade700,
+                            focusColor: Colors.green.shade700,
                             value: widget.addOtherMembers,
                             onChanged: (val) {
                               setState(() {
                                 widget.addOtherMembers =
-                                !widget.addOtherMembers;
+                                    !widget.addOtherMembers;
                               });
                             }),
                       ),
@@ -265,21 +266,20 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       ),
                     )),
                 ListTile(
-                  onTap: () async{
-
-                      var result=  widget.admins= await  Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => GroupMembers(
-                              groupMembers: widget.members,
-                              admins: widget.admins,
-                              currentUser:widget.currentUser
-                          )));
-                      if (result != null) {
-                        setState(() {
-                          widget.admins = result;
-                          print('${widget.admins.length} is the length of admins');
-                        });
-                      }
-
+                  onTap: () async {
+                    var result = widget.admins = await Navigator.of(context)
+                        .push(MaterialPageRoute(
+                            builder: (context) => GroupMembers(
+                                groupMembers: widget.members,
+                                admins: widget.admins,
+                                currentUser: widget.currentUser,createdBy: widget.createdBy,)));
+                    if (result != null) {
+                      setState(() {
+                        widget.admins = result;
+                        print(
+                            '${widget.admins.length} is the length of admins');
+                      });
+                    }
                   },
                   leading: Icon(
                     Icons.group_add_outlined,
@@ -307,9 +307,14 @@ class GroupMembers extends StatefulWidget {
   final List<String> groupMembers;
   final List<String> admins;
   final String currentUser;
+  final String createdBy;
 
   const GroupMembers(
-      {super.key, required this.groupMembers, required this.admins,required this.currentUser});
+      {super.key,
+      required this.groupMembers,
+      required this.admins,
+      required this.currentUser,
+      required this.createdBy});
 
   @override
   State<GroupMembers> createState() => _GroupMembersState();
@@ -317,6 +322,7 @@ class GroupMembers extends StatefulWidget {
 
 class _GroupMembersState extends State<GroupMembers> {
   List<String> membersFirstNameList = [];
+  bool isLoading = true;
 
   bool isCurrentUserAdmin(String userId) {
     return widget.admins.contains(userId);
@@ -333,13 +339,16 @@ class _GroupMembersState extends State<GroupMembers> {
 
     setState(() {
       membersFirstNameList = fetchedNames;
+      isLoading = false;
     });
   }
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
     memebersFirstName();
   }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -355,94 +364,118 @@ class _GroupMembersState extends State<GroupMembers> {
               Icons.arrow_back,
               color: Colors.white,
             )),
-        title: Text("Edit Admin",style: TextStyle(color: Colors.white,fontFamily: 'Raleway'),),
+        title: Text(
+          "Edit Admin",
+          style: TextStyle(color: Colors.white, fontFamily: 'Raleway'),
+        ),
       ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: width*0.052,vertical: height*0.032),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text("Admins :"),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.052, vertical: height * 0.032),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text("Admins :"),
+                ],
+              ),
+              if (isLoading)
+                CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                  color: Colors.green.shade700,
+                ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: membersFirstNameList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    onTap: () {
+                      if (!widget.admins.contains(widget.groupMembers[index])) {
+                        setState(() {
+                          widget.admins.add(widget.groupMembers[index]);
+                        });
+                      } else {
+                        setState(() {
+                          if (widget.currentUser ==
+                              widget.groupMembers[index]) {
+                          } else {
+                            if (widget.createdBy ==
+                                widget.groupMembers[index]) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(
+                                    "You cant remove them as the admin as theyve created the group"),
+                                backgroundColor: Colors.red.shade200,
+                              ));
+                              ;
+                            }else
+                              {   widget.admins.remove(widget.groupMembers[index]);}
 
-              ],
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: membersFirstNameList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  onTap: (){
-                    if(!widget.admins.contains(widget.groupMembers[index])){
-                      setState(() {
-                        widget.admins.add(widget.groupMembers[index]);
-                      });
 
-                    }else
-                    {
-                      setState(() {
-                        if(widget.currentUser==widget.groupMembers[index]){}
-                        else{  widget.admins.remove(widget.groupMembers[index]);}
 
-                      });
-                    }
-                  },
-                  contentPadding: EdgeInsets.zero,
-                  leading:
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.black,
-                        radius: width * 0.05,
-                        child: Text(
-                          membersFirstNameList[index][0].toUpperCase(),
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      if ( isCurrentUserAdmin(widget.groupMembers[index]))
-                        Positioned(
-                          right: -2,
-                          bottom: -2,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                            ),
-                            child: Icon(
-                              Icons.check_circle,
-                              size: width * 0.035,
-                              color: Colors.blue,
-                            ),
+                          }
+                        });
+                      }
+                    },
+                    contentPadding: EdgeInsets.zero,
+                    leading: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: Colors.black,
+                          radius: width * 0.05,
+                          child: Text(
+                            membersFirstNameList[index][0].toUpperCase(),
+                            style: TextStyle(color: Colors.green.shade700),
                           ),
                         ),
-                    ],
-                  )
-                  ,
-                  title: Text(membersFirstNameList[index]),
-                  trailing: isCurrentUserAdmin(widget.groupMembers[index])
-                      ? Container(
-                    decoration: BoxDecoration(
-                        color: Colors.blue.shade200,
-                        border: Border.all(color: Colors.blue.shade200),
-                        borderRadius: BorderRadius.circular(width * 0.01)),
-                    width: width * 0.12,
-                    height: height * 0.017,
-                    child: Center(
-                      child: Text(
-                        "Admin",
-                        style: TextStyle(
-                            fontSize: width * 0.027, color: Colors.white),
-                      ),
+                        if (isCurrentUserAdmin(widget.groupMembers[index]))
+                          Positioned(
+                            right: -2,
+                            bottom: -2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              child: Icon(
+                                Icons.check_circle,
+                                size: width * 0.035,
+                                color: Colors.green.shade700,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
-                  )
-                      : null,
-                );
-              },
-            ),
-          ],
+                    title: Text(membersFirstNameList[index]),
+                    trailing: isCurrentUserAdmin(widget.groupMembers[index])
+                        ? Container(
+                            decoration: BoxDecoration(
+                                color: Colors.green.shade700,
+                                border:
+                                    Border.all(color: Colors.green.shade700),
+                                borderRadius:
+                                    BorderRadius.circular(width * 0.01)),
+                            width: width * 0.12,
+                            height: height * 0.017,
+                            child: Center(
+                              child: Text(
+                                "Admin",
+                                style: TextStyle(
+                                    fontSize: width * 0.027,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          )
+                        : null,
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
