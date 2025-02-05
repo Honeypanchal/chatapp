@@ -1,4 +1,5 @@
 
+import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/services/auth_services.dart';
 import 'package:chatapp/Pages/Authentication/FirstPage.dart';
@@ -34,7 +35,7 @@ class _SigninPageState extends State<SigninPage> {
         if (user != null) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-                builder: (context) => MainNavigationPage(currentUser: user)),
+                builder: (context) => ChatPage(currentUser: user)),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

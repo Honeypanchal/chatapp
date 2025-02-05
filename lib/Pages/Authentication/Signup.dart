@@ -1,3 +1,4 @@
+import 'package:chatapp/Pages/ChatPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/auth_services.dart';
@@ -44,7 +45,7 @@ class _SignupPageState extends State<SignupPage> {
         if (user != null) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-                builder: (context) => MainNavigationPage(currentUser: user)),
+                builder: (context) => ChatPage(currentUser: user)),
           );
         }
       } catch (e) {
@@ -354,7 +355,7 @@ class _SignupPageState extends State<SignupPage> {
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
                               builder: (context) =>
-                                  MainNavigationPage(currentUser: user)),
+                                  ChatPage(currentUser: user)),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

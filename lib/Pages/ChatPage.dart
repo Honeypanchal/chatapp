@@ -1,3 +1,5 @@
+import 'package:chatapp/Pages/helpers/MainNavigation.dart';
+import 'package:chatapp/Pages/statuspage.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/chat_layout.dart';
@@ -17,6 +19,34 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  //For Navigation
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+
+        break;
+      case 1:
+        Navigator.pushNamed(
+          context,
+          '/groupDisplay',
+          arguments: {'currentUser': widget.currentUser},
+        );
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/statusPage');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
+        break;
+    }
+  }
+
   final _database = FirebaseFirestore.instance.collection('Users');
   dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
   CollectionReference groupsDB = FirebaseFirestore.instance.collection("groups");
@@ -375,6 +405,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ),
       ),
+      bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex,onTap:_onItemTapped),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (isMakingGroupChat && groupChatUsers.isNotEmpty) {
