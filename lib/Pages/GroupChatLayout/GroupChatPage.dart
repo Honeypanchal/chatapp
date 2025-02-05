@@ -62,23 +62,31 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
   List<String> participants = [];
   List<String> membersFirstNameList = [];
+  bool isFetching = false; // To track function execution
 
   Future<void> membersFirstName() async {
-    print(group['participants']);
+    if (isFetching) return; // If already fetching, do nothing
+    isFetching = true; // Set flag to prevent duplicate calls
 
-    setState(() {
-      participants = (group['participants'] as List<dynamic>)
-          .map((e) => e.toString())
-          .toList();
-      print(participants[0]);
-    });
+    print("Fetching participants...");
 
+    // Extract participants
+    participants = (group['participants'] as List<dynamic>)
+        .map((e) => e.toString())
+        .toList();
+
+    print(participants[0]);
+
+    // Fetch names
     List<String> fetchedNames = await getUserNames(participants);
 
     setState(() {
       membersFirstNameList = fetchedNames;
     });
+
+    isFetching = false; // Reset flag after completion
   }
+
 
   final TextEditingController _messageController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -469,6 +477,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     super.initState();
     getCurrentUserDetails();
     getGroup();
+    membersFirstName();
   }
 
   StreamSubscription? _groupSubscription;
@@ -633,7 +642,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder(
+            child:    StreamBuilder(
               stream: _firestore
                   .collection('groups')
                   .doc(group['groupId'])
@@ -646,7 +655,19 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
                 Map<String, List<QueryDocumentSnapshot>> groupedMessages = {};
                 for (var message in messages) {
-                  String messageDate = formatDateForGrouping(message['timestamp']);
+                  // Cast message data to Map<String, dynamic>
+                  Map<String, dynamic> messageData = message.data() as Map<String, dynamic>;
+
+                  // Check if 'timestamp' exists and is not null
+                  Timestamp? timestamp = messageData.containsKey('timestamp') && messageData['timestamp'] != null
+                      ? messageData['timestamp'] as Timestamp
+                      : null;
+
+                  // Use a fallback value to prevent errors
+                  String messageDate = timestamp != null
+                      ? formatDateForGrouping(timestamp)
+                      : "Unknown Date"; // Fallback value
+
                   groupedMessages.putIfAbsent(messageDate, () => []).add(message);
                 }
 
@@ -658,9 +679,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     if (a == 'Yesterday') return -1;
                     if (b == 'Yesterday') return 1;
                     return DateFormat('MMM dd').parse(a).compareTo(DateFormat('MMM dd').parse(b));
-                  });
-
-                return ListView(
+                  });            return ListView(
                   reverse: false, // Keeps the latest messages at the bottom
                   children: sortedDates.map((date) {
                     return Column(
@@ -718,17 +737,15 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                           // Make sure to use Flexible for long messages
                                           Align(
                                               alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                                          child:Flexible(
-                                            child: Text(
-                                              message['message'],
-                                              style: TextStyle(
-                                                color: isMe ? Colors.white : Colors.black,
-                                                backgroundColor: isSearched ? Colors.green : null,
-                                              ),
-                                              softWrap: true, // Allow text to wrap if too long
-                                              maxLines: null, // Allow unlimited lines for long messages
-                                              overflow: TextOverflow.visible, // Allow overflow to be visible
+                                          child:Text(
+                                            message['message'],
+                                            style: TextStyle(
+                                              color: isMe ? Colors.white : Colors.black,
+                                              backgroundColor: isSearched ? Colors.green : null,
                                             ),
+                                            softWrap: true, // Allow text to wrap if too long
+                                            maxLines: null, // Allow unlimited lines for long messages
+                                            overflow: TextOverflow.visible, // Allow overflow to be visible
                                           )
                                           ),
                                           if (isFavorite)
@@ -803,7 +820,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                 ),
                               ),
                             ),
-                            child: Icon(Icons.poll, color: Colors.green.shade400),
+                            child: Icon(Icons.poll, color: Colors.green.shade700),
                           ),
                           SizedBox(width: 10),
                           Expanded(
@@ -817,7 +834,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                           ),
                           GestureDetector(
                             onTap: sendMessage,
-                            child: Icon(Icons.send, color: Colors.green.shade400),
+                            child: Icon(Icons.send, color: Colors.green.shade700),
                           ),
                         ],
                       ),
@@ -1131,7 +1148,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                         contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         suffixIcon: index >= 2
                             ? IconButton(
-                          icon: Icon(Icons.remove_circle, color: Colors.red, size: 18),
+                          icon: Icon(Icons.remove_circle, color: Colors.green.shade700, size: 18),
                           onPressed: () {
                             setState(() {
                               optionControllers.removeAt(index);

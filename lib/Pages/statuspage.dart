@@ -1,10 +1,10 @@
+import 'dart:convert';
+
 import 'package:chatapp/services/status_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/Status.dart';
 import 'package:intl/intl.dart';
-
-import 'helpers/MainNavigation.dart';
 
 class StatusPage extends StatefulWidget {
   @override
@@ -26,38 +26,13 @@ class _StatusPageState extends State<StatusPage> {
     }
   }
 
-  // int _selectedIndex = 2;
-  //
-  // void _onItemTapped(int index) {
-  //   setState(() {
-  //     _selectedIndex = index;
-  //   });
-  //
-  //   switch (index) {
-  //     case 0:
-  //       Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.currentUser});
-  //       break;
-  //     case 1:
-  //       Navigator.pushNamed(
-  //         context,
-  //         '/groupDisplay',
-  //         arguments: {'currentUser': widget.currentUser},
-  //       );
-  //       break;
-  //     case 2:
-  //       Navigator.pushNamed(context, '/statusPage');
-  //       break;
-  //     case 3:
-  //       Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
-  //       break;
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height=MediaQuery.of(context).size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(
@@ -114,13 +89,43 @@ class _StatusPageState extends State<StatusPage> {
 
             return ListView(
               children: [
-                if (notSeenStatuses.isNotEmpty)
-                  _buildStatusCategory(
-                      "Recently Added", notSeenStatuses, false),
-                if (seenStatuses.isNotEmpty)
-                  _buildStatusCategory("Viewed Status", seenStatuses, true),
+                if (notSeenStatuses.isNotEmpty) ...[
+                  Padding(
+                    padding: EdgeInsets.only(top: height * 0.015, left: width * 0.06),
+                    child: Text(
+                      "Recently Added",
+                      style: TextStyle(
+                        fontSize: width * 0.045, // Reduce font size a little
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  _buildStatusCategory("", notSeenStatuses, false),
+                ] else
+                  SizedBox.shrink(), // Prevent empty space when there are no unseen statuses
+
+                if (seenStatuses.isNotEmpty) ...[
+                  Padding(
+                    padding: EdgeInsets.only(left: width * 0.06, top: height * 0.015),
+                    child: Text(
+                      "Viewed Status",
+                      style: TextStyle(
+                        fontSize: width * 0.045,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  _buildStatusCategory("", seenStatuses, true),
+                ] else
+                  SizedBox.shrink(), // Prevent empty space when there are no seen statuses
               ],
             );
+
+
+
+
           },
         ),
       ),
@@ -131,14 +136,14 @@ class _StatusPageState extends State<StatusPage> {
             MaterialPageRoute(builder: (context) => const EnterStatus()),
           );
         },
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.black87,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        child: Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: Colors.white,size: width*0.08,),
       ),
     );
   }
 
-  Widget _buildStatusCategory(
+  Widget  _buildStatusCategory(
       String title, Map<String, List<Status>> groupedStatuses, bool isSeen) {
     if (groupedStatuses.isEmpty) return SizedBox.shrink();
 
@@ -146,9 +151,9 @@ class _StatusPageState extends State<StatusPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(left: 8,right: 8),
           child: Text(title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         ),
         ListView.builder(
           shrinkWrap: true,
@@ -166,15 +171,19 @@ class _StatusPageState extends State<StatusPage> {
                     shape: BoxShape.circle,
                     border: Border.all(
                         color: isSeen ?
-                        Colors.grey : Colors.blue.shade400,
+                        Colors.grey : Color(0XFF45C178),
                         width: 2)),
                 child: CircleAvatar(
-                  backgroundColor: Colors.black,
-                  child: Text(userStatus[0].username[0].toUpperCase(),style: TextStyle(color: Colors.white),),
+                  backgroundColor: Color(0XFFF3F9ED),
+                  child: Text(userStatus[0].username[0].toUpperCase(),
+                    style: TextStyle(color: Color(0XFF8BC34A)),),
                 ),
               ),
-              title: Text(username),
-              subtitle: Text(isSeen?'${userStatus.length}status viewed':'${userStatus.length} status available',style: TextStyle(fontFamily: 'Raleway',fontWeight: FontWeight.w400,color: Colors.black38),),
+              title: Text(username,style: TextStyle(fontFamily: 'poppins',fontWeight: FontWeight.w500),),
+              subtitle: Text(isSeen?
+              '${userStatus.length} status viewed ':'${userStatus.length}'
+                  ' status available',style: TextStyle(
+                  fontFamily: 'poppins',fontWeight: FontWeight.w600,color: Colors.grey),),
               onTap: () {
                 Navigator.push(
                   context,
@@ -217,7 +226,8 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
       builder: (context) {
         return Container(
           width: MediaQuery.of(context).size.width,
-          height: 300,
+          height: MediaQuery.of(context).size.height*0.3,
+
           padding: EdgeInsets.all(10),
           child: Column(
             children: [
@@ -593,7 +603,6 @@ class _EnterStatusState extends State<EnterStatus> {
             ],
           ),
         ),
-      // bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex,onTap:_onItemTapped),
         floatingActionButton: FloatingActionButton(
             onPressed: _uploadTextStatus,
             backgroundColor: Colors.black26,
@@ -603,7 +612,7 @@ class _EnterStatusState extends State<EnterStatus> {
               color: Colors.white,
               size: width * 0.07,
             ),
-        ),
+            ),
         );
     }
 }

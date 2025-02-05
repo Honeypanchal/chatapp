@@ -61,15 +61,15 @@ class Status {
 
   Status copyWith({bool? isViewed}) {
     return Status(
-        uid: uid,
-        username: username,
-        text: text,
-        backgroundColor: backgroundColor,
-        textStyle: textStyle,
-        timestamp: timestamp,
-        viewedBy: viewedBy,
-        statusReplies: statusReplies,
-        isViewed: isViewed ?? this.isViewed,
-        );
-    }
+      uid: uid,
+      username: username,
+      text: text,
+      backgroundColor: backgroundColor,
+      textStyle: textStyle,
+      timestamp: timestamp,
+      viewedBy: viewedBy,
+      statusReplies: statusReplies,
+      isViewed: isViewed ?? this.isViewed,
+    );
+  }
 }
