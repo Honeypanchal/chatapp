@@ -1,11 +1,10 @@
-import 'package:chatapp/Pages/Chat_layout/ContectInfo.dart';
-import 'package:chatapp/Pages/Chat_layout/UserInfoPage.dart';
+import 'package:chatapp/Pages/Chatlayout/ContectInfo.dart';
+import 'package:chatapp/Pages/Chatlayout/UserInfoPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_chat_bubble/chat_bubble.dart';
-import 'package:chatapp/services/users_services.dart';
+
 
 class ChatLayout extends StatefulWidget {
   final CustomClass currentUser;
@@ -590,7 +589,7 @@ class _ChatLayoutState extends State<ChatLayout> {
 
 
 /*
-import 'package:chatapp/Pages/Chat_layout/ContectInfo.dart';
+import 'package:chatapp/Pages/Chatlayout/ContectInfo.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

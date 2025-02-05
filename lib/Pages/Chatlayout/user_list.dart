@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 
 class UserListPage extends StatefulWidget {
   final CustomClass currentUser;
@@ -136,7 +136,7 @@ class _UserListPageState extends State<UserListPage> {
 /*import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 
 class UserListPage extends StatefulWidget {
   final CustomClass currentUser;

@@ -1,8 +1,10 @@
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
-import 'package:chatapp/Pages/Chat_layout/user_list.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'chat_layout.dart';
 
 class ChatPage extends StatefulWidget {
   final CustomClass currentUser;
@@ -191,8 +193,8 @@ class _ChatPageState extends State<ChatPage> {
 
 
 /*import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
-import 'package:chatapp/Pages/Chat_layout/user_list.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -344,7 +346,7 @@ class _ChatPageState extends State<ChatPage> {
 
 
 /*import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -530,7 +532,7 @@ class _ChatPageState extends State<ChatPage> {
 
 /*
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -690,7 +692,7 @@ class _ChatPageState extends State<ChatPage> {
 /*
 
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -836,7 +838,7 @@ class _ChatPageState extends State<ChatPage> {
 
 /*
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -1003,7 +1005,7 @@ class _ChatPageState extends State<ChatPage> {
 // original
 /*
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -1213,7 +1215,7 @@ class _ChatPageState extends State<ChatPage> {
 
 import 'package:chatapp/Pages/GroupChatLayout/new_group_definition.dart';
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chat_layout/chat_layout.dart';
+import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
