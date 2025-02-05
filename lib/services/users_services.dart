@@ -1,16 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-final CollectionReference usersDb = FirebaseFirestore.instance.collection("Users");
+final CollectionReference usersDb =
+    FirebaseFirestore.instance.collection("Users");
 
 Future<List<String>> getUserNames(List<String> usersUid) async {
   List<String> userNames = [];
-print("here to fetch firstnames");
+  print("here to fetch firstnames");
   for (String user in usersUid) {
     DocumentSnapshot snapshot = await usersDb.doc(user).get();
     if (snapshot.exists) {
       print('here');
-      String firstName = snapshot.get("firstName") ?? "Unknown"; // Handle null values
+      String firstName =
+          snapshot.get("firstName") ?? "Unknown"; // Handle null values
       userNames.add(firstName);
     }
   }
@@ -18,7 +20,8 @@ print("here to fetch firstnames");
   return userNames;
 }
 
-Future<void> addGroupAndAddActiveGroupInDatabase(String groupId, String path, bool isAdmin) async {
+Future<void> addGroupAndAddActiveGroupInDatabase(
+    String groupId, String path, bool isAdmin) async {
   try {
     DocumentReference userRef = usersDb.doc(path);
     DocumentSnapshot snapshot = await userRef.get();
@@ -28,19 +31,19 @@ Future<void> addGroupAndAddActiveGroupInDatabase(String groupId, String path, bo
       return;
     }
 
-
-    List<Map<String, dynamic>> groupList = List<Map<String, dynamic>>.from(snapshot.get("groups") ?? []);
-
+    List<dynamic> groupList = snapshot.get("groups") ?? [];
 
     bool groupExists = groupList.any((group) => group["groupId"] == groupId);
 
     if (!groupExists) {
+      print("Adding new group with admin status: $isAdmin");
 
-      print("Here to updateAdmin status");
-      print('admins status is $isAdmin');
-      groupList.add({"groupId": groupId, "admin": isAdmin});
+      await userRef.update({
+        "groups": FieldValue.arrayUnion([
+          {"groupId": groupId, "admin": isAdmin}
+        ])
+      });
 
-      await userRef.update({"groups": groupList});
       print("Group added successfully");
     } else {
       print("Group already exists");
@@ -50,43 +53,122 @@ Future<void> addGroupAndAddActiveGroupInDatabase(String groupId, String path, bo
   }
 }
 
-Future<String> getFirstNameById(String userId)async{
-  final userdata= await usersDb.doc(userId).get();
+Future<String> getFirstNameById(String userId) async {
+  final userdata = await usersDb.doc(userId).get();
 
   return userdata['firstName'];
 }
 
-Future<String> getCurrentUser()async{
+Future<String> getCurrentUser() async {
   final user = FirebaseAuth.instance.currentUser;
   print("Current user is ${user!.uid}");
   return user.uid;
 }
 
-
-Future<void> updateAdminStatusForCurrentUser(String userId, String groupId, bool isAdmin) async {
+Future<void> updateAdminStatusForCurrentUser(
+    String userId, String groupId, bool isAdmin) async {
   print('${userId} is having status of $isAdmin');
   final user = usersDb.doc(userId);
   final userData = await user.get();
-try{
-
-  List<Map<String, dynamic>> userGroups = List<Map<String, dynamic>>.from(userData['groups']);
-  for (int i = 0; i < userGroups.length; i++) {
-    if (userGroups[i]['groupId'] == groupId) {
-
-      userGroups[i]['admin'] = isAdmin;
-      break;
+  try {
+    List<Map<String, dynamic>> userGroups =
+        List<Map<String, dynamic>>.from(userData['groups']);
+    for (int i = 0; i < userGroups.length; i++) {
+      if (userGroups[i]['groupId'] == groupId) {
+        userGroups[i]['admin'] = isAdmin;
+        break;
+      }
     }
+
+    await user.update({
+      'groups': userGroups,
+    });
+  } catch (e) {
+    print(e.toString());
   }
-
-
-  await user.update({
-    'groups': userGroups,
-  });
-}catch(e){
-  print(e.toString());
-}
 }
 
-Future<void> updateNotificationsForCurrentUser(String userId,bool adminStatus)async{
+Future<void> updateNotificationsForCurrentUser(
+    String userId, bool adminStatus) async {}
 
+Future<void> addGroupIdToNewMembers(String groupId, List<String> users) async {
+  final usersDb = FirebaseFirestore.instance.collection('Users');
+
+  try {
+    for (var user in users) {
+      await usersDb.doc(user).update({
+        "groups": FieldValue.arrayUnion([
+          {
+            "groupId": groupId,
+            "admin": false,
+          }
+        ])
+      });
+    }
+  } catch (e) {
+    print("Error updating users: ${e.toString()}");
+  } finally {
+    print("New group added to the member");
+  }
+}
+
+Future<void> removeGroupFromCurrentUser(String userId, String groupId) async {
+  try {
+    DocumentReference userRef = usersDb.doc(userId);
+
+    DocumentSnapshot userSnapshot = await userRef.get();
+
+    List groups = userSnapshot.get('groups');
+
+    print('${groups.length} is the lengthof user groups');
+    groups.removeWhere((group) => group['groupId'] == groupId);
+    print('${groups.length} is the lengthof user groups after removing');
+    await userRef.update({'groups': groups});
+
+    print("Group removed from user successfully.");
+  } catch (e) {
+    print("Error removing group from user: $e");
+  }
+}
+
+Future<void> makeUserAdminOfThisGroup(String groupId, String userId) async {
+  final userDoc = await usersDb.doc(userId).get();
+
+  if (!userDoc.exists) return;
+
+  try {
+    List<Map<String, dynamic>> groupsOfUser =
+        List<Map<String, dynamic>>.from(userDoc.get("groups"));
+
+    bool isUpdated = false;
+    for (var group in groupsOfUser) {
+      if (group['groupId'] == groupId) {
+        group['admin'] = true;
+        isUpdated = true;
+        break;
+      }
+    }
+
+    if (isUpdated) {
+      await usersDb.doc(userId).update({"groups": groupsOfUser});
+      print("User $userId is now an admin of group $groupId.");
+    }
+  } catch (e) {
+    print("Error making user admin: $e");
+    rethrow;
+  }
+}
+
+Future<void> removeGroupFromThisUser(String userId, String groupId) async {
+  try {
+    print("here in user services");
+    final userRef = usersDb.doc(userId);
+    final userData = await userRef.get();
+    final  userGroups =
+        List.from(userData['groups']);
+    userGroups.removeWhere((group) => group['groupId'] == groupId);
+    userRef.update(({"groups": userGroups}));
+  } catch (e) {
+    print(e.toString());
+  }
 }

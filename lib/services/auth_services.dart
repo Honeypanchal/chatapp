@@ -146,3 +146,23 @@ uid: user.uid,
   }
   return null;
 }
+Future<CustomClass?> getUserDetails(String uid)async{
+
+    final foundUser = await _cloudFirestore.doc(uid).get();
+    if (foundUser.exists) {
+      CustomClass newUser = CustomClass(
+          uid: foundUser['uid'],
+          firstName: foundUser['firstName'],
+
+
+          email: foundUser['email'],
+          password: foundUser['password'],
+          activeChats: null,
+          groups:null
+      );
+      // photoURL: foundUser['photoURL']);
+
+      return newUser;
+    }
+
+}

@@ -7,15 +7,11 @@ import 'package:chatapp/Pages/statuspage.dart';
 class MainNavigationPage extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
-  const  MainNavigationPage({
+ const  MainNavigationPage({
     required this.currentIndex,
     required this.onTap,});
-
-
-
   @override
   Widget build(BuildContext context) {
-
     return Container(
         decoration: BoxDecoration(
           color: Colors.black, // Set background color for the container
