@@ -1,10 +1,10 @@
 import 'package:chatapp/Pages/GroupChatLayout/new_group_definition.dart';
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/chat_layout.dart';
+import 'package:chatapp/Pages/ChatLayout/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'GroupChatLayout/NewGroupDefinition.dart';
+import '../GroupChatLayout/NewGroupDefinition.dart';
 
 class ChatPage extends StatefulWidget {
   final CustomClass currentUser;
@@ -84,7 +84,7 @@ class ChatPageState extends State<ChatPage> {
             child: Icon(Icons.arrow_back_ios,color: Colors.white,size: width>600 ? width *0.6 :width*0.06,),
           ),
         ),
-        backgroundColor: Colors.blue[600],
+        backgroundColor: Colors.black,
         title: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
