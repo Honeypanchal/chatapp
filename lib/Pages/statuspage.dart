@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:chatapp/services/status_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,6 +29,7 @@ class _StatusPageState extends State<StatusPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final height=MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,10 +51,6 @@ class _StatusPageState extends State<StatusPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             }
-            // if (snapshot.hasError) {
-            //   print("❌ Error fetching statuses: ${snapshot.error}");
-            //   return Center(child: Text('Error fetching statuses'));
-            // }
 
 
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -89,13 +88,43 @@ class _StatusPageState extends State<StatusPage> {
 
             return ListView(
               children: [
-                if (notSeenStatuses.isNotEmpty)
-                  _buildStatusCategory(
-                      "Recently Added", notSeenStatuses, false),
-                if (seenStatuses.isNotEmpty)
-                  _buildStatusCategory("Viewed Status", seenStatuses, true),
+                if (notSeenStatuses.isNotEmpty) ...[
+                  Padding(
+                    padding: EdgeInsets.only(top: height * 0.015, left: width * 0.06),
+                    child: Text(
+                      "Recently Added",
+                      style: TextStyle(
+                        fontSize: width * 0.045, // Reduce font size a little
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  _buildStatusCategory("", notSeenStatuses, false),
+                ] else
+                  SizedBox.shrink(), // Prevent empty space when there are no unseen statuses
+
+                if (seenStatuses.isNotEmpty) ...[
+                  Padding(
+                    padding: EdgeInsets.only(left: width * 0.06, top: height * 0.015),
+                    child: Text(
+                      "Viewed Status",
+                      style: TextStyle(
+                        fontSize: width * 0.045,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  _buildStatusCategory("", seenStatuses, true),
+                ] else
+                  SizedBox.shrink(), // Prevent empty space when there are no seen statuses
               ],
             );
+
+
+
+
           },
         ),
       ),
@@ -106,56 +135,59 @@ class _StatusPageState extends State<StatusPage> {
             MaterialPageRoute(builder: (context) => const EnterStatus()),
           );
         },
-        backgroundColor: Colors.black,
+        backgroundColor: Color(0XFF97C95C),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        child: Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add,
+          color: Colors.white,size: width*0.08,),
       ),
     );
   }
 
-  Widget _buildStatusCategory(
-      String title, Map<String, List<Status>> groupedStatuses, bool isSeen) {
+  Widget _buildStatusCategory(String title, Map<String, List<Status>> groupedStatuses, bool isSeen) {
     if (groupedStatuses.isEmpty) return SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ),
         ListView.builder(
           shrinkWrap: true,
+          padding: EdgeInsets.zero,
           physics: NeverScrollableScrollPhysics(),
           itemCount: groupedStatuses.keys.length,
           itemBuilder: (context, index) {
-            String userId = groupedStatuses.keys.elementAt(index);
             String username = groupedStatuses.keys.elementAt(index);
-            List<Status> userStatus = groupedStatuses[username]!;
+            List<Status> userStatuses = groupedStatuses[username]!;
 
             return ListTile(
+              contentPadding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 10.0),
               leading: Container(
                 decoration: BoxDecoration(
-
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: isSeen ?
-                        Colors.grey : Colors.blue.shade400,
-                        width: 2)),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSeen ? Colors.grey : Color(0XFF97C95C),
+                    width: 2,
+                  ),
+                ),
                 child: CircleAvatar(
-                  backgroundColor: Colors.black,
-                  child: Text(userStatus[0].username[0].toUpperCase(),style: TextStyle(color: Colors.white),),
+                  backgroundColor: Color(0XFFF3F9ED),
+                  child: Text(username[0].toUpperCase()),
                 ),
               ),
-              title: Text(username),
-             subtitle: Text(isSeen?'${userStatus.length}status viewed':'${userStatus.length} status available',style: TextStyle(fontFamily: 'Raleway',fontWeight: FontWeight.w400,color: Colors.black38),),
+              title: Text(username,style:
+              TextStyle(color: Colors.black,fontSize: 16,
+                  fontFamily: 'poppins',fontWeight: FontWeight.w500),),
+              subtitle: Text(
+                isSeen
+                    ? '${userStatuses.length} status views'
+                    : '${userStatuses.length} status available',
+                style: TextStyle(fontSize: 12,
+                    fontWeight: FontWeight.w700,fontFamily: 'Raleway',color: Colors.grey),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        ViewStatusScreen(statuses: userStatus),
+                    builder: (context) => ViewStatusScreen(statuses: userStatuses),
                   ),
                 );
                 setState(() {});
@@ -192,7 +224,8 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
       builder: (context) {
         return Container(
           width: MediaQuery.of(context).size.width,
-          height: 300,
+          height: MediaQuery.of(context).size.height*0.3,
+
           padding: EdgeInsets.all(10),
           child: Column(
             children: [
@@ -367,21 +400,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
               ),
             ),
 
-            // Expanded(
-            //   child: ListView.builder(
-            //     itemCount: status.statusReply.length ?? 0,
-            //     itemBuilder: (context, index) {
-            //       final reply = status.statusReply[index];
-            //       return ListTile(
-            //         leading: CircleAvatar(child: Icon(Icons.person)),
-            //         title: Text(reply['replyBy'] ?? "Unknown"),
-            //         // Fetch senderId
-            //         subtitle:
-            //             Text(reply['replyText'] ?? ""), // Fetch reply text
-            //       );
-            //     },
-            //   ),
-            // ),
+
           ],
         ),
       ),
@@ -507,22 +526,7 @@ class _EnterStatusState extends State<EnterStatus> {
               ),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      height: height * 0.15,
-                      width: width * 0.15,
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: width * 0.1,
-                      ),
-                    ),
-                  ),
+
                   Spacer(),
                   GestureDetector(
                     onTap: _changeTextStyle,
