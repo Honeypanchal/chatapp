@@ -93,10 +93,10 @@ cursorColor: Colors.green.shade700,
   }
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() {
     if (_searchText.text.isNotEmpty) {
-      String searchTerm = _searchText.text.trim().toLowerCase();
-print("searching");
+      String searchTerm = _searchText.text.trim();
+
       return _database
-          .where("firstNameLower", isEqualTo: searchTerm)
+          .where("firstName", isEqualTo: searchTerm)
           .snapshots()
           .map((snapshot) => snapshot.docs
           .where((user) => user['uid'] != widget.currentUser.uid)

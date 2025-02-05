@@ -10,12 +10,8 @@ class MainNavigationPage extends StatelessWidget {
  const  MainNavigationPage({
     required this.currentIndex,
     required this.onTap,});
-
-
-
   @override
   Widget build(BuildContext context) {
-
     return Container(
         decoration: BoxDecoration(
           color: Colors.black, // Set background color for the container

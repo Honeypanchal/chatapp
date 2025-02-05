@@ -15,6 +15,26 @@ class GroupDisplayPage extends StatefulWidget {
 
 class _GroupDisplayPageState extends State<GroupDisplayPage> {
   int _selectedIndex = 1;
+  TextEditingController _searchText = TextEditingController();
+  CollectionReference groupsDB = FirebaseFirestore.instance.collection("groups");
+  String searchQuery = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    _searchText.addListener(() {
+      setState(() {
+        searchQuery = _searchText.text.toLowerCase();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchText.dispose();
+    super.dispose();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -43,36 +63,21 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     }
   }
 
-  TextEditingController _searchText = TextEditingController();
-  CollectionReference groupsDB =
-      FirebaseFirestore.instance.collection("groups");
-  String searchQuery = "";
-
-  @override
-  void initState() {
-    super.initState();
-    _searchText.addListener(() {
-      fetchGroups();
-    });
-  }
-
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchGroups() {
-    Query query =
-        groupsDB.where("participants", arrayContains: widget.currentUser.uid);
+    Query query = groupsDB.where("participants", arrayContains: widget.currentUser.uid);
 
-    if (_searchText.text.isNotEmpty) {
-      String searchTerm = _searchText.text.toLowerCase();
+    if (searchQuery.isNotEmpty) {
 
-      String searchLowerBound = searchTerm;
-      String searchUpperBound = searchTerm + '\uf8ff';
+      String searchLowerBound = searchQuery;
+      String searchUpperBound = searchQuery + '\uf8ff';
 
       query = query
-          .where("groupNameLower", isGreaterThanOrEqualTo: searchLowerBound)
-          .where("groupNameLower", isLessThan: searchUpperBound);
+          .where("groupName", isGreaterThanOrEqualTo: searchLowerBound)
+          .where("groupName", isLessThan: searchUpperBound);
     }
 
-    return query.snapshots().map((querySnapshot) => querySnapshot.docs
-        as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
+    return query.snapshots().map((querySnapshot) =>
+    querySnapshot.docs as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
   }
 
   @override
@@ -119,6 +124,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 borderRadius: BorderRadius.circular(width * 0.03),
               ),
               child: TextField(
+                cursorColor: Colors.green.shade700,
                 controller: _searchText,
                 style: TextStyle(
                   color: Colors.black,
@@ -127,23 +133,27 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 decoration: InputDecoration(
                   hintText: 'Search groups...',
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value.toLowerCase();
+                  });
+                },
               ),
             ),
           ),
           SizedBox(height: height * 0.025),
           Expanded(
-            child: StreamBuilder<
-                List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+            child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
               stream: fetchGroups(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
                     child: CircularProgressIndicator(
-                      color: Colors.green.shade700, // WhatsApp-like green
+                      color: Colors.green.shade700,
                     ),
                   );
                 }
@@ -165,8 +175,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                         child: Icon(Icons.group, color: Colors.green.shade700),
                       ),
                       title: Text(groupData["groupName"] ?? "Unnamed Group"),
-                      subtitle:
-                          Text("Members: ${groupData["participants"].length}"),
+                      subtitle: Text("Members: ${groupData["participants"].length}"),
                       onTap: () {
                         Navigator.of(context).pushNamed('/groupchat',
                             arguments: {
