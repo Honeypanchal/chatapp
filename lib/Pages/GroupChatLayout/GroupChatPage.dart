@@ -702,7 +702,9 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                         mainAxisSize: MainAxisSize.min, // Ensures the container adjusts to content
                                         children: [
                                           // Make sure to use Flexible for long messages
-                                          Flexible(
+                                          Align(
+                                              alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                          child:Flexible(
                                             child: Text(
                                               message['message'],
                                               style: TextStyle(
@@ -713,6 +715,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                               maxLines: null, // Allow unlimited lines for long messages
                                               overflow: TextOverflow.visible, // Allow overflow to be visible
                                             ),
+                                          )
                                           ),
                                           if (isFavorite)
                                             Icon(
@@ -860,7 +863,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
             padding: EdgeInsets.all(12),
             width: MediaQuery.of(context).size.width * 0.75,
             decoration: BoxDecoration(
-              color: isSender ? Colors.green.shade300 : Colors.grey.shade100,
+              color: isSender ? Colors.green.shade700 : Colors.grey.shade100,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
