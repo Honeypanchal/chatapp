@@ -129,7 +129,7 @@ class _FirstpageState extends State<Firstpage> {
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
-                                        fontSize: width * (isWeb ? 0.04 : 0.05),
+                                        fontSize: width * (isWeb ? 0.03 : 0.04),
                                         color: Colors.white,
                                       ),
                                     ),
@@ -168,7 +168,7 @@ class _FirstpageState extends State<Firstpage> {
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
-                                        fontSize: width * (isWeb ? 0.04 : 0.05),
+                                        fontSize: width * (isWeb ? 0.03 : 0.04),
                                         color: Colors.black,
                                       ),
                                     ),

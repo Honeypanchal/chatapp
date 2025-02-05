@@ -399,9 +399,10 @@ class _SigninPageState extends State<SigninPage> {
             Image.asset(
               'assets/images/main4.png',
               fit: BoxFit.cover,
+              height: 300,
             ),
             Text("Let's Sign In",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: width * 0.09,)),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: width * 0.08,)),
             /*Text(
               'LOGIN',
               style: TextStyle(
@@ -426,7 +427,7 @@ class _SigninPageState extends State<SigninPage> {
                       child: Text(
                         'Email Address',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Poppins'),
                         textAlign: TextAlign.left,
@@ -477,7 +478,7 @@ class _SigninPageState extends State<SigninPage> {
                       child: Text(
                         'Password',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -554,7 +555,7 @@ class _SigninPageState extends State<SigninPage> {
                 child: Text('Sign In',style: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
-                  fontSize: width * 0.055,
+                  fontSize: width * 0.045,
                   color: Colors.white,
                 ),),
               ),
@@ -581,7 +582,7 @@ class _SigninPageState extends State<SigninPage> {
                     "Sign Up",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: width * 0.037,
+                      fontSize: width * 0.032,
                       color: Colors.black,
                     ),
                   ),
@@ -594,7 +595,7 @@ class _SigninPageState extends State<SigninPage> {
             Text(
               'FORGOT PASSWORD?',
               style: TextStyle(
-                fontSize: width * 0.032,
+                fontSize: width * 0.030,
                 fontWeight: FontWeight.w500,
               ),
             ),

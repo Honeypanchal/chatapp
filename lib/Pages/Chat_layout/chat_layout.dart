@@ -7,7 +7,7 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:chatapp/services/users_services.dart';
 
 import 'ChatPage.dart';
-import 'ContectInfo.dart';
+// import 'ContectInfo.dart';
 import 'UserInfoPage.dart';
 
 class ChatLayout extends StatefulWidget {
@@ -99,6 +99,7 @@ class _ChatLayoutState extends State<ChatLayout> {
       print("Failed to update message: $e");
     }
   }
+
   Future<Map<String, dynamic>> fetchUserInfo() async {
     DocumentSnapshot userDoc = await FirebaseFirestore.instance
         .collection("users")
@@ -143,7 +144,6 @@ class _ChatLayoutState extends State<ChatLayout> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-
         backgroundColor: Color(0xFF242935),
         leading: Padding(
           padding: EdgeInsets.only(left: width * 0.064),
@@ -169,8 +169,14 @@ class _ChatLayoutState extends State<ChatLayout> {
           ),
         ),
         title: GestureDetector(
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>ContectInfo(currentUser:widget.user['firstName'])));
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ContectInfo(
+                          currentUser: widget.user['firstName'],
+                          email: widget.user['email'],
+                        )));
           },
           child: Text(widget.user['firstName'],
               style: TextStyle(
@@ -265,10 +271,14 @@ class _ChatLayoutState extends State<ChatLayout> {
                                             MaterialPageRoute(
                                               builder: (context) =>
                                                   UserInfoPage(
-                                                    messageData: messages[index].data() as Map<String, dynamic>,
-                                                    deliveredAt: messages[index]['deliveredAt'],
-                                                    readAt: messages[index]['readAt'],
-                                                  ),
+                                                messageData:
+                                                    messages[index].data()
+                                                        as Map<String, dynamic>,
+                                                deliveredAt: messages[index]
+                                                    ['deliveredAt'],
+                                                readAt: messages[index]
+                                                    ['readAt'],
+                                              ),
                                             ),
                                           );
                                         },
@@ -469,7 +479,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                                   icon: Icon(
                                     Icons.send,
                                     color: Color(0xFF00A884),
-
                                   ))),
                         ),
                       )))

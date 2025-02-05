@@ -921,7 +921,7 @@ class _SignupPageState extends State<SignupPage> {
               Text(
                 'Sign Up For Free.',
                 style: TextStyle(
-                  fontSize: 35,
+                  fontSize: 33,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                   fontFamily: 'poppins',
@@ -931,7 +931,7 @@ class _SignupPageState extends State<SignupPage> {
                 padding: const EdgeInsets.only(left: 8.0, right: 20.0),
                 child: const Text(
                   "join us for less than 1 minutes, with no cost.",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -946,7 +946,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Name',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -997,7 +997,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Email Address',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Poppins'),
                         textAlign: TextAlign.left,
@@ -1035,7 +1035,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Password',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -1091,7 +1091,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Re-Type Password',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -1170,7 +1170,7 @@ class _SignupPageState extends State<SignupPage> {
                   child: Text(
                     'Sign Up',
                     style: TextStyle(
-                        fontSize: width * 0.050, fontWeight: FontWeight.w500),
+                        fontSize: width * 0.045, fontWeight: FontWeight.w500),
                   ),
                 ),
               ),
@@ -1178,7 +1178,7 @@ class _SignupPageState extends State<SignupPage> {
                 height: height * 0.015,
               ),
               SizedBox(
-                height: height * 0.070,
+                height: height * 0.060,
                 width: width * 0.9,
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -1220,14 +1220,12 @@ class _SignupPageState extends State<SignupPage> {
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
-                              fontSize: width * 0.045),
+                              fontSize: width * 0.040),
                         ),
                       ],
                     )),
               ),
-              SizedBox(
-                height: height * 0.025,
-              ),
+
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(
@@ -1253,6 +1251,7 @@ class _SignupPageState extends State<SignupPage> {
                         color: Colors.black,
                       ),
                     ),
+                    SizedBox(height: 80,)
                   ],
                 ),
               ),
