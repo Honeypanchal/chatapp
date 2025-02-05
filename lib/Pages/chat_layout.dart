@@ -2,27 +2,21 @@ import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
-
 class ChatLayout extends StatefulWidget {
   final CustomClass currentUser;
   final user;
   final DocumentReference<Map<String, dynamic>> databaseRef;
-
   const ChatLayout(
       {required this.currentUser,
         required this.user,
         required this.databaseRef});
-
   @override
   State<ChatLayout> createState() => _ChatLayoutState();
 }
-
 class _ChatLayoutState extends State<ChatLayout> {
   List messages = [];
-
   Future<void> sendMessage(String message) async {
     final timestamp = Timestamp.now();
-
     print('chat db ref here ${widget.databaseRef}');
     await widget.databaseRef.collection("messages").add({
       "sentBy": widget.currentUser.uid,
@@ -32,7 +26,6 @@ class _ChatLayoutState extends State<ChatLayout> {
       "seen": false,
     });
   }
-
   Future<void> fetchMessagesByCurrentUser() async {
     print('Fetching messages...');
 
