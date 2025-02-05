@@ -20,7 +20,7 @@ class StatusService {
     DocumentReference statusRef = _firestore.collection('Status').doc(); // Generates unique ID
 
     Status status = Status(
-      uid: statusRef.id, 
+      uid: statusRef.id,
       username: username,
       text: text,
       backgroundColor: backgroundColor,
@@ -34,7 +34,7 @@ class StatusService {
     print("Status uploaded successfully with ID: ${statusRef.id}");
   }
 
-  
+
   Future<void> sendStatusReply(String statusId, String replyText) async {
     User? currentUser = _auth.currentUser;
     if (currentUser == null) {
@@ -45,7 +45,7 @@ class StatusService {
 
     DocumentSnapshot senderDoc = await _firestore.collection('Users').doc(senderId).get();
     if (!senderDoc.exists) {
-     
+
       return;
     }
 
@@ -82,7 +82,7 @@ class StatusService {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .handleError((error) {
-     
+
     })
         .map((snapshot) {
       return snapshot.docs.map((doc) {
