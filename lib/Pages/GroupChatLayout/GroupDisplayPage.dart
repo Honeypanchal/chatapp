@@ -6,6 +6,7 @@ import '../helpers/MainNavigation.dart';
 
 class GroupDisplayPage extends StatefulWidget {
   final CustomClass currentUser;
+
   const GroupDisplayPage({super.key, required this.currentUser});
 
   @override
@@ -13,7 +14,6 @@ class GroupDisplayPage extends StatefulWidget {
 }
 
 class _GroupDisplayPageState extends State<GroupDisplayPage> {
-
   int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
@@ -23,7 +23,8 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
 
     switch (index) {
       case 0:
-Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.currentUser});
+        Navigator.pushNamed(context, '/chatPage',
+            arguments: {'currentUser': widget.currentUser});
         break;
       case 1:
         Navigator.pushNamed(
@@ -36,40 +37,43 @@ Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.curren
         Navigator.pushNamed(context, '/statusPage');
         break;
       case 3:
-        Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
+        Navigator.pushNamed(context, '/profile',
+            arguments: {'currentUser': widget.currentUser});
         break;
     }
   }
 
   TextEditingController _searchText = TextEditingController();
-  CollectionReference groupsDB = FirebaseFirestore.instance.collection("groups");
+  CollectionReference groupsDB =
+      FirebaseFirestore.instance.collection("groups");
   String searchQuery = "";
 
   @override
   void initState() {
     super.initState();
     _searchText.addListener(() {
-    fetchGroups();
+      fetchGroups();
     });
   }
+
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchGroups() {
-    Query query = groupsDB.where("participants", arrayContains: widget.currentUser.uid);
+    Query query =
+        groupsDB.where("participants", arrayContains: widget.currentUser.uid);
 
     if (_searchText.text.isNotEmpty) {
-
       String searchTerm = _searchText.text.toLowerCase();
 
       String searchLowerBound = searchTerm;
       String searchUpperBound = searchTerm + '\uf8ff';
 
-      query = query.where("groupNameLower", isGreaterThanOrEqualTo: searchLowerBound)
+      query = query
+          .where("groupNameLower", isGreaterThanOrEqualTo: searchLowerBound)
           .where("groupNameLower", isLessThan: searchUpperBound);
     }
 
-    return query.snapshots().map((querySnapshot) =>
-    querySnapshot.docs as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
+    return query.snapshots().map((querySnapshot) => querySnapshot.docs
+        as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +92,7 @@ Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.curren
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-           'Groups',
+              'Groups',
               style: TextStyle(
                 color: Colors.white,
                 fontFamily: 'Poppins',
@@ -96,7 +100,6 @@ Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.curren
                 fontSize: width > 600 ? width * 0.05 : width * 0.06,
               ),
             ),
-
           ],
         ),
       ),
@@ -123,7 +126,8 @@ Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.curren
                 ),
                 decoration: InputDecoration(
                   hintText: 'Search groups...',
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                 ),
@@ -132,7 +136,8 @@ Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.curren
           ),
           SizedBox(height: height * 0.025),
           Expanded(
-            child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+            child: StreamBuilder<
+                List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
               stream: fetchGroups(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -160,9 +165,14 @@ Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.curren
                         child: Icon(Icons.group, color: Colors.green.shade400),
                       ),
                       title: Text(groupData["groupName"] ?? "Unnamed Group"),
-                      subtitle: Text("Members: ${groupData["participants"].length}"),
+                      subtitle:
+                          Text("Members: ${groupData["participants"].length}"),
                       onTap: () {
-                        // Handle group click
+                        Navigator.of(context).pushNamed('/groupchat',
+                            arguments: {
+                              'groupId': groupData['groupId'],
+                              "currentUser": widget.currentUser.uid
+                            });
                       },
                     );
                   },
@@ -171,7 +181,9 @@ Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.curren
             ),
           ),
         ],
-      ), bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex,onTap:_onItemTapped),
+      ),
+      bottomNavigationBar: MainNavigationPage(
+          currentIndex: _selectedIndex, onTap: _onItemTapped),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(

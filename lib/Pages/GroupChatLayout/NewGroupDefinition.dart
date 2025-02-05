@@ -68,7 +68,8 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
         ),
         leading: IconButton(
             onPressed: () {
-         Navigator.pushNamed(context,"/newGroup",arguments: {'currentUser':widget.createdBy});
+              Navigator.pushNamed(context, "/newGroup",
+                  arguments: {'currentUser': widget.createdBy});
             },
             icon: Icon(
               Icons.arrow_back,
@@ -90,7 +91,6 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 children: [
                   Expanded(
                     child: CircleAvatar(
-
                       radius: width * 0.066,
                       backgroundColor: Colors.black12,
                       child: Icon(
@@ -105,11 +105,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   Expanded(
                     flex: 4,
                     child: TextFormField(
+                      cursorColor: Colors.green.shade400,
                       controller: _groupName,
                       decoration: InputDecoration(
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Colors.blue,
+                                color: Colors.green.shade400,
                                 width: 2.0), // Color when focused
                           ),
                           enabledBorder: UnderlineInputBorder(
@@ -199,20 +200,26 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Spacer(),
                           IconButton(
                               onPressed: () async {
-                                final result = await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) => GroupPermissions(
-                                            groupSettings: groupSettings,
-                                            sendMessages: sendMessages,
-                                            addOtherMembers: addOtherMembers,
-                                            admins: admins,
-                                            members: widget.members,
-                                            currentUser:
-                                                widget.createdBy.uid)));
+                                final result =
+                                    await Navigator.of(context).pushNamed(
+                                  '/groupPermissions',
+                                  arguments: {
+                                    'groupSettings': groupSettings,
+                                    'sendMessages': sendMessages,
+                                    'addOtherMembers': addOtherMembers,
+                                    'admins': admins,
+                                    'members': widget.members,
+                                    'currentUser': widget.createdBy.uid,
+                                  },
+                                );
+
                                 if (result != null) {
-                                  groupSettings = result['groupSettings'];
-                                  sendMessages = result['sendMessages'];
-                                  addOtherMembers = result['addOtherMembers'];
+                                  final data = result as Map<String, dynamic>;
+                                  setState(() {
+                                    groupSettings = data['groupSettings'];
+                                    sendMessages = data['sendMessages'];
+                                    addOtherMembers = data['addOtherMembers'];
+                                  });
                                 }
                               },
                               icon: Icon(
@@ -264,7 +271,10 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           CircleAvatar(
                             backgroundColor: Colors.black12,
                             radius: width * 0.1,
-                            child: Icon(Icons.person,color: Colors.green.shade400,),
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.green.shade400,
+                            ),
                           ),
                           SizedBox(height: height * 0.01),
                           Text(
@@ -308,27 +318,31 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   addOtherMembers);
 
               if (newGroup != null) {
-                Navigator.of(context)
-                    .pushReplacement(MaterialPageRoute(
-                        builder: (context) => Groupchatpage(currentUser: currentUser,groupId:newGroup.groupId!)))
+                Navigator.of(context).pushNamed(
+                  '/groupchat',
+                  arguments: {
+                    'currentUser': currentUser,
+                    'groupId': newGroup.groupId,
+                  },
+                )
                     .catchError((error) {
                   print(error.toString());
                 });
                 //Adding group id to user and participants
                 widget.createdBy
                     .addGroupAndAddActiveGroup(newGroup.groupId!, true);
-print(widget.members.length);
+                print(widget.members.length);
                 for (var singleMember in widget.members) {
                   print(singleMember);
                   if (singleMember == widget.createdBy.uid) {
-                    print('Here adding trur to group admin for person who created the group');
+                    print(
+                        'Here adding trur to group admin for person who created the group');
                     addGroupAndAddActiveGroupInDatabase(
                         newGroup.groupId!, singleMember, true);
-                  }else
-                    {
-                      addGroupAndAddActiveGroupInDatabase(
-                          newGroup.groupId!, singleMember, false);
-                    }
+                  } else {
+                    addGroupAndAddActiveGroupInDatabase(
+                        newGroup.groupId!, singleMember, false);
+                  }
 
                   //   addGroupAndAddActiveGroupInDatabase(groupId: newGroup.groupId!, path: singleMember,isAdmin:false);
                 }

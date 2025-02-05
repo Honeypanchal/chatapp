@@ -33,9 +33,12 @@ class _NewGroupState extends State<NewGroup> {
           onPressed: () => setState(() => _showSearch = false),
         ),
         title: TextField(
+cursorColor: Colors.green.shade400,
           controller: _searchText,
           style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
+            focusColor: Colors.green.shade400,
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color:Colors.green.shade400)),
             hintText: 'Search users...',
             hintStyle: TextStyle(color: Colors.white70),
             border: InputBorder.none,
@@ -122,7 +125,7 @@ print("searching");
       appBar: _buildAppBar(context),
       body: Column(
         children: [
-          if (groupChatUsers.isNotEmpty) ...[
+          if (groupChatUsers.isNotEmpty && firstNames.length == groupChatUsers.length) ...[
             Expanded(
               flex: 1,
               child: Padding(
@@ -266,7 +269,7 @@ print("searching");
           if (groupChatUsers.isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
-                "Add atleast one member to a new  group",
+                "Add atleast one member to  new  group",
                 style: TextStyle(color: Colors.white, fontFamily: 'Raleway'),
               ),
               backgroundColor: Colors.red.shade200,
@@ -274,7 +277,12 @@ print("searching");
           } else {
             //Adding the current user also to the group;
             groupChatUsers.add(widget.currentUser.uid);
-            Navigator.pushNamed(context,'/newGroupDefinition',  arguments: {'currentUser': widget.currentUser,'members':groupChatUsers},);
+            Navigator.pushNamed(context,'/newGroupDefinition',  arguments: {'currentUser': widget.currentUser,'members':groupChatUsers},).then((_){
+              setState(() {
+                groupChatUsers.clear();
+                firstNames.clear();
+              });
+            });
 
           }
         },

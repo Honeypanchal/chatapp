@@ -1,4 +1,6 @@
 import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
+import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
 import 'package:chatapp/Pages/Profile/Profile.dart';
 import 'package:chatapp/Pages/statuspage.dart';
@@ -10,6 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'Pages/GroupChatLayout/GroupPermissions.dart';
 import 'models/CustomClass.dart';
 
 void main() async {
@@ -68,7 +71,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Firebase Auth Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: _isLoading
-          ? Scaffold(
+          ? const Scaffold(
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -87,40 +90,65 @@ class _MyAppState extends State<MyApp> {
           ? ChatPage(currentUser: foundUser!)
           : Firstpage(),
       onGenerateRoute: (settings) {
-        if (settings.name == '/newGroup') {
-          final args = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (context) => NewGroup(currentUser: args['currentUser']),
-          );
+        final args = settings.arguments as Map<String, dynamic>?;
+        switch (settings.name) {
+          case '/newGroup':
+            return MaterialPageRoute(
+              builder: (context) => NewGroup(currentUser: args!["currentUser"]),
+            );
+          case '/chatPage':
+            return MaterialPageRoute(
+              builder: (context) => ChatPage(currentUser: args!["currentUser"]),
+            );
+          case '/newGroupDefinition':
+            return MaterialPageRoute(
+              builder: (context) =>
+                  NewGroupDefinition(
+                    members: args!["members"],
+                    createdBy: args["currentUser"],
+                  ),
+            );
+          case '/statusPage':
+            return MaterialPageRoute(builder: (context) => StatusPage());
+          case '/groupDisplay':
+            return MaterialPageRoute(
+              builder: (context) =>
+                  GroupDisplayPage(
+                    currentUser: args!["currentUser"],
+                  ),
+            );
+          case '/profile':
+            return MaterialPageRoute(
+              builder: (context) => Profile(currentUser: args!["currentUser"]),
+            );
+
+          case '/groupPermissions':
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (context) =>
+                  GroupPermissions(
+                    groupSettings: args['groupSettings'],
+                    sendMessages: args['sendMessages'],
+                    addOtherMembers: args['addOtherMembers'],
+                    admins: args['admins'],
+                    members: args['members'],
+                    currentUser: args['currentUser'],
+                  ),
+            );
+
+          case '/groupchat':
+            return MaterialPageRoute(
+                builder: (context) =>
+                    Groupchatpage(
+                        groupId: args!['groupId'],
+                        currentUser: args['currentUser']));
+          case '/groupDescription':
+            return MaterialPageRoute(builder: (context) =>
+                GroupDescription(
+                    groupId: args!['groupId'], currentUser: args['currentUser']));
+          default:
+            return null;
         }
-        else  if (settings.name == '/chatPage') {
-          final args = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (context) => ChatPage(currentUser: args['currentUser']),
-          );
-        }
-        else if (settings.name == '/newGroupDefinition') {
-          final args = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (context) => NewGroupDefinition(
-              members: args['members'],
-              createdBy: args['currentUser'],
-            ),
-          );
-        }else if(settings.name=='/statusPage'){
-          return MaterialPageRoute(builder: (context)=>StatusPage());
-        } else if (settings.name == '/groupDisplay') {
-          final args = settings.arguments as Map<String, dynamic>;
-          return MaterialPageRoute(
-            builder: (context) => GroupDisplayPage(
-              currentUser: args['currentUser'],
-            ),
-          );
-        } else if(settings.name=='/profile'){
-          final args=settings.arguments as Map<String,dynamic>;
-          return MaterialPageRoute(builder: (context)=>Profile(currentUser:args['currentUser']));
-        }
-        return null;
       },
     );
   }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 
 import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
+import 'package:chatapp/models/CustomClass.dart';
 
 import 'package:chatapp/pages/GroupChatLayout/AddNewMembersToGroup.dart';
 
@@ -11,6 +12,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:chatapp/services/users_services.dart';
 import 'package:chatapp/services/groupChat_services.dart';
+
+import '../../services/auth_services.dart';
 
 class GroupDescription extends StatefulWidget {
   final String groupId;
@@ -37,6 +40,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
   List<String> admins = [];
   bool isLoading = true;
   bool isLoadingDatabse = true;
+  late CustomClass user;
 
   TextEditingController _searchText = TextEditingController();
   bool _isSearching = false;
@@ -169,7 +173,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         "Cancel",
                         style: TextStyle(
-                            fontFamily: 'Raleway', color: Colors.black),
+                            fontFamily: 'Raleway', color: Colors.green.shade400),
                       )),
                   TextButton(
                       onPressed: () {
@@ -179,7 +183,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           removeGroupFromCurrentUser(
                                   widget.currentUser, widget.groupId)
                               .then((_) {
-                            Navigator.of(context).pop();
+                            Navigator.of(context).pushNamed('/groupDisplay',arguments: {'currentUser':user});
                           });
                         } catch (e) {
                           print(e.toString());
@@ -196,10 +200,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
           );
         });
   }
-
+  void getCurrentUserDetails() async {
+    CustomClass? found = await getUserDetails(widget.currentUser);
+    if (found != null) {
+      setState(() {
+        user = found;
+      });
+    }
+  }
   @override
   void initState() {
     super.initState();
+    getCurrentUserDetails();
 
     getGroup();
   }
@@ -220,6 +232,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
         double screenWidth = MediaQuery.of(context).size.width;
 
         return Container(
+          clipBehavior: Clip.none,
           padding: EdgeInsets.all(screenWidth * 0.05),
           height: screenHeight * 0.6,
           child: Column(
@@ -231,65 +244,76 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
+                cursorColor: Colors.green.shade400,
                 controller: descriptionController,
                 decoration: InputDecoration(
-                  hintText:
-                      group['groupDescription'] ?? "Add group description",
-                  border: UnderlineInputBorder(),
+                  hintText: group['groupDescription'] ?? "Add group description",
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade400),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade400),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade400),
+                  ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.02),
               Text(
                 "The group description is visible to members of this group and people invited to this group.",
-                style:
-                    TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+                style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
-              Row(
+              Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.015),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context, null); // Return null if canceled
-                      },
-                      child:
-                          Text("Cancel", style: TextStyle(color: Colors.red)),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.02),
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.015),
-                      ),
-                      onPressed: () {
-                        String enteredDescription = descriptionController.text;
-                        if (enteredDescription.isNotEmpty) {
-                          print("Group Description: $enteredDescription");
 
-                          Navigator.pop(context,
-                              enteredDescription); // Return the entered description
-                        }
-                      },
-                      child: Text("OK", style: TextStyle(color: Colors.white)),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                              side: BorderSide(color: Colors.grey, width: 0),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context, null);
+                          },
+                          child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                        ),
+                      ),
+                      Container(width: 1, color: Colors.grey),
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                              side: BorderSide(color: Colors.grey, width: 0),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            String enteredDescription = descriptionController.text;
+                            if (enteredDescription.isNotEmpty) {
+                              print("Group Description: $enteredDescription");
+                              Navigator.pop(context, enteredDescription);
+                            }
+                          },
+                          child: Text("Ok", style: TextStyle(color: Colors.green.shade400)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ],
           ),
         );
+
       },
     );
   }
@@ -310,6 +334,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
         double screenWidth = MediaQuery.of(context).size.width;
 
         return Container(
+          clipBehavior: Clip.none,
           padding: EdgeInsets.all(screenWidth * 0.05),
           height: screenHeight * 0.6,
           child: Column(
@@ -321,10 +346,19 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
+                cursorColor: Colors.green.shade400,
                 controller: groupName,
                 decoration: InputDecoration(
                   hintText: group['groupName'] ?? "Change group name",
-                  border: UnderlineInputBorder(),
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade400),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade400),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade400),
+                  ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.02),
@@ -334,45 +368,49 @@ class _GroupDescriptionState extends State<GroupDescription> {
                     TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
-              Row(
+              Column(mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.015),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context, null); // Return null if canceled
-                      },
-                      child:
-                          Text("Cancel", style: TextStyle(color: Colors.red)),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.02),
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.015),
-                      ),
-                      onPressed: () {
-                        String enteredName = groupName.text;
-                        if (enteredName.isNotEmpty) {
-                          print("Group Description: $enteredName");
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
 
-                          Navigator.pop(context,
-                              enteredName); // Return the entered description
-                        }
-                      },
-                      child: Text("OK", style: TextStyle(color: Colors.white)),
-                    ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                              side: BorderSide(color: Colors.grey, width: 0),),
+                            padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context, null); // Return null if canceled
+                          },
+                          child:
+                              Text("Cancel", style: TextStyle(color: Colors.red)),
+                        ),
+                      ),
+                      Container(width: 1, color: Colors.grey),
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero,
+                                side: BorderSide(color: Colors.grey, width: 0)),
+                              padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            String enteredName = groupName.text;
+                            if (enteredName.isNotEmpty) {
+                              print("Group Description: $enteredName");
+
+                              Navigator.pop(context,
+                                  enteredName); // Return the entered description
+                            }
+                          },
+                          child: Text("OK", style: TextStyle(color: Colors.green.shade400)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -411,7 +449,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
     final height = MediaQuery.of(context).size.height;
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.green.shade400,),
       );
     }
     return Scaffold(
@@ -421,11 +459,16 @@ class _GroupDescriptionState extends State<GroupDescription> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                  builder: (context) => Groupchatpage(
-                      groupId: widget.groupId,
-                      currentUser: widget.currentUser))),
+          onPressed: () {
+            Navigator.of(context).pushNamed(
+              '/groupchat',
+              arguments: {
+                'groupId': widget.groupId,
+                'currentUser': widget.currentUser,
+              },
+            );
+          },
+
         ),
         actions: [
           PopupMenuButton(
@@ -834,7 +877,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           ),
                         ),
                         if (isLoading || isLoadingDatabse)
-                          CircularProgressIndicator()
+                          CircularProgressIndicator(color: Colors.green.shade400,)
                         else ...[
                           ListView.builder(
                             shrinkWrap: true,
