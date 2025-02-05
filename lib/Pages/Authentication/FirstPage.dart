@@ -1,5 +1,5 @@
-import 'package:chatapp/Pages/SigninPage.dart';
-import 'package:chatapp/Pages/Signup.dart';
+import 'package:chatapp/Pages/Authentication/SigninPage.dart';
+import 'package:chatapp/Pages//Authentication/Signup.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

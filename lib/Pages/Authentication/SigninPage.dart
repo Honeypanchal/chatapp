@@ -1,5 +1,5 @@
 
-import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/Pages/ChatLayout/ChatPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/services/auth_services.dart';
 import 'package:chatapp/Pages/Authentication/FirstPage.dart';

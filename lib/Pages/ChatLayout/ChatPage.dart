@@ -1,4 +1,4 @@
-import 'package:chatapp/Pages/GroupChatLayout/new_group_definition.dart';
+import 'package:chatapp/Pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/ChatLayout/chat_layout.dart';
 import 'package:flutter/material.dart';
