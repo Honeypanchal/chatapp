@@ -13,7 +13,7 @@ class UserInfoPage extends StatelessWidget {
   });
 
   String formatTimestamp(Timestamp? timestamp) {
-    if (timestamp == null) return 'Not available';
+    if (timestamp == null) return 'Not Read yet!';
     DateTime dateTime = timestamp.toDate();
     return "${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} AM"; // HH:MM AM/PM format
   }
