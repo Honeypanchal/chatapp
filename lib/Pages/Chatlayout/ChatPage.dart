@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'chat_layout.dart';
 
 class ChatPage extends StatefulWidget {
+
   final CustomClass currentUser;
 
   ChatPage({required this.currentUser});

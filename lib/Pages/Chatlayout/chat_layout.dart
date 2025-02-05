@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 
 class ChatLayout extends StatefulWidget {
+
   final CustomClass currentUser;
   final user;
   final DocumentReference<Map<String, dynamic>> databaseRef;
