@@ -12,9 +12,40 @@ class StatusPage extends StatefulWidget {
 }
 
 class _StatusPageState extends State<StatusPage> {
+  // String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  //
+  // int _selectedIndex=2;
+  //
+  // void _onItemTapped(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //   });
+  //
+  //   switch (index) {
+  //     case 0:
+  //       Navigator.pushNamed(context, '/chatPage',
+  //           arguments: {'currentUser': widget.currentUser});
+  //       break;
+  //     case 1:
+  //       Navigator.pushNamed(
+  //         context,
+  //         '/groupDisplay',
+  //         arguments: {'currentUser': widget.currentUser},
+  //       );
+  //       break;
+  //     case 2:
+  //       Navigator.pushNamed(context, '/statusPage');
+  //       break;
+  //     case 3:
+  //       Navigator.pushNamed(context, '/profile',
+  //           arguments: {'currentUser': widget.currentUser});
+  //       break;
+  //   }
+  // }
+
   final StatusService _statusService = StatusService();
   final TextEditingController _statusController = TextEditingController();
-  final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
 
   void _uploadTextStatus() {
     if (_statusController.text.trim().isNotEmpty) {
