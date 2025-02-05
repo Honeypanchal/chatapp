@@ -23,7 +23,7 @@ class UserInfoPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,  // Set the background color of the entire screen
       appBar: AppBar(
-        leading: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+        leading: Icon(Icons.arrow_back, color: Colors.white),
         title: Text("Message info", style: TextStyle(color: Colors.white, fontFamily: 'Raleway')),
         backgroundColor: Colors.black,
         iconTheme: IconThemeData(color: Colors.white),  // Icon color in appBar
