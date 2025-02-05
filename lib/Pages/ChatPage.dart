@@ -377,7 +377,7 @@ class _ChatPageState extends State<ChatPage> {
 
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: Colors.blue.shade600,
+                          backgroundColor: Colors.black,
                           child: Icon(Icons.group, color: Colors.white),
                         ),
                         title: Text(
