@@ -130,7 +130,7 @@ class StatusService {
     } catch (e) {
       print(" Error marking as viewed: $e");
     }
-    }
+  }
 
 
 

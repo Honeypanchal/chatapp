@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/Pages/ChatLayout/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
 import 'package:chatapp/Pages/Profile/Profile.dart';
 import 'package:chatapp/Pages/statuspage.dart';
@@ -10,12 +10,8 @@ class MainNavigationPage extends StatelessWidget {
  const  MainNavigationPage({
     required this.currentIndex,
     required this.onTap,});
-
-
-
   @override
   Widget build(BuildContext context) {
-
     return Container(
         decoration: BoxDecoration(
           color: Colors.black, // Set background color for the container
