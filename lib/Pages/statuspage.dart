@@ -58,7 +58,6 @@ class _StatusPageState extends State<StatusPage> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final height=MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -242,125 +241,33 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
   final StatusService _statusService = StatusService();
   final TextEditingController _replyController = TextEditingController();
 
-  void _showRepliesBottomSheet() {
-    Status status = widget.statuses[currentIndex];
-
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height*0.3,
-
-          padding: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Text(
-                "Status Replies",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-
-              status.statusReplies.isEmpty
-                  ? Center(child: Text("No replies available"))
-                  : Expanded(
-                child: ListView.builder(
-                  itemCount: status.statusReplies.length,
-                  itemBuilder: (context, index) {
-                    final reply = status.statusReplies[index];
-
-                    String replyBy = reply['replyBy'] ?? "Unknown";
-                    String replyText = reply['replyText'] ?? "No reply";
-
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: Text(
-                          replyBy[0].toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      title: Text(
-                        replyBy,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(replyText),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-
   int currentIndex = 0;
 
   @override
-  void initState() {
+  void _sendReply() {
+    if (_replyController.text.trim().isNotEmpty) {
+      String replyText = _replyController.text.trim();
+      String statusText = widget.statuses[currentIndex].text;
+      String receiverId =
+          widget.statuses[currentIndex].uid; // Status owner's ID
 
+      // Send reply to the chat of the status owner
+      _statusService.sendStatusReply(receiverId, statusText, replyText);
+
+      _replyController.clear();
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Reply sent!")));
+    }
+  }
+
+  void initState() {
     super.initState();
     _markStatusAsViewed();
-    _statusService.fetchAndPrintStatuses();
   }
 
-
-  void _markStatusAsViewed() async {
-    Status currentStatus = widget.statuses[currentIndex];
-    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
-
-    if (!currentStatus.viewedBy.contains(currentUserId)) {
-      await _statusService.markStatusAsViewed(currentStatus.uid, currentUserId);
-
-      setState(() {
-        widget.statuses[currentIndex].viewedBy.add(currentUserId);
-      });
-
-      // Force StreamBuilder to refresh
-      Navigator.pop(context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => StatusPage()),
-      );
-    }
+  void _markStatusAsViewed() {
+    _statusService.markStatusAsViewed(widget.statuses[currentIndex].uid);
   }
-
-  void _sendReply() async {
-    String replyText = _replyController.text.trim();
-    if (replyText.isEmpty) return;
-
-    User? currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) {
-      print(" Error: User is not authenticated.");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("You must be logged in to reply.")),
-      );
-      return;
-    }
-
-    String statusId = widget.statuses[currentIndex].uid;
-    String currentUserId = currentUser.uid;
-
-    try {
-      await _statusService.sendStatusReply(statusId, replyText);
-      _replyController.clear();
-      setState(() {}); // Refresh UI
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(" sent successfully!")),
-      );
-    } catch (e) {
-      print("Error sending reply: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to send reply. Try again.")),
-      );
-    }
-  }
-
 
   void _nextStatus() {
     if (currentIndex < widget.statuses.length - 1) {
@@ -403,33 +310,112 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                 children: [
                   Expanded(
                     child: TextField(
-                      style: TextStyle(color: Colors.white,),
-
                       controller: _replyController,
                       decoration: InputDecoration(
-
-                        prefixIcon: IconButton(onPressed: (){
-                          _showRepliesBottomSheet();
-                        },icon:  Icon(Icons.remove_red_eye,color: Colors.white,)),
                         fillColor: Colors.black26,
                         filled: true,
-                        hintText: " Reply    ",
                         focusedBorder: InputBorder.none,
+                        prefixIcon: GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                              ),
+                              builder: (BuildContext context) {
+                                return Container(
+                                  padding: EdgeInsets.all(16),
+                                  height: 300, // Adjust height based on content
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "Status Replies",
+                                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                      ),
+                                      Divider(),
+                                      Expanded(
+                                        child: status.statusReply == null || status.statusReply.isEmpty
+                                            ? Center(child: Text("No Replies Available"))
+                                            : ListView.builder(
+                                          shrinkWrap: true, // Ensures correct height
+                                          itemCount: status.statusReply.length,
+                                          itemBuilder: (context, index) {
+                                            final reply = status.statusReply[index];
 
+                                            return ListTile(
+                                              leading: CircleAvatar(child: Icon(Icons.person)),
+                                              title: Text(reply ['replyBy']?.toString() ?? "Unknown"),
+                                              subtitle: Text(reply['replyText']?.toString() ?? ""),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            color: Colors.white54,
+                          ),
+                        ),
+
+
+
+
+                        hintText: "Reply",
                         hintStyle: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                        suffixIcon: IconButton(onPressed: _sendReply, icon:Icon(Icons.send,color: Colors.white,),
+                            color: Colors.white54, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
+                  SizedBox(
+                    width: width * 0.04,
                   ),
-
-
+                  Container(
+                    height: height * 0.08,
+                    width: width * 0.08,
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                    ),
+                    child: IconButton(
+                        icon: Icon(
+                          Icons.send,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          if (_replyController.text.trim().isNotEmpty) {
+                            _statusService.sendStatusReply(
+                                widget.statuses[currentIndex].uid,
+                                widget.statuses[currentIndex].uid,
+                                _replyController.text.trim());
+                            _replyController.clear();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Reply sent!")));
+                          }
+                        }),
+                  ),
                 ],
               ),
             ),
-
-
+            // Expanded(
+            //   child: ListView.builder(
+            //     itemCount: status.statusReply.length ?? 0,
+            //     itemBuilder: (context, index) {
+            //       final reply = status.statusReply[index];
+            //       return ListTile(
+            //         leading: CircleAvatar(child: Icon(Icons.person)),
+            //         title: Text(reply['replyBy'] ?? "Unknown"),
+            //         // Fetch senderId
+            //         subtitle:
+            //             Text(reply['replyText'] ?? ""), // Fetch reply text
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -555,7 +541,22 @@ class _EnterStatusState extends State<EnterStatus> {
               ),
               child: Row(
                 children: [
-
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      height: height * 0.15,
+                      width: width * 0.15,
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: width * 0.1,
+                      ),
+                    ),
+                  ),
                   Spacer(),
                   GestureDetector(
                     onTap: _changeTextStyle,
