@@ -3,8 +3,10 @@ import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/CustomClass.dart';
+
 class NewGroup extends StatefulWidget {
-  final String currentUser;
+  final CustomClass currentUser;
 
   const NewGroup({super.key, required this.currentUser});
 
@@ -47,10 +49,8 @@ class _NewGroupState extends State<NewGroup> {
       leading: Padding(
         padding: EdgeInsets.only(left: width * 0.064),
         child: GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) =>
-                  GroupDisplayPage(currentUser: widget.currentUser))),
-          child: Icon(
+          onTap: () => Navigator.pushNamed(context,'/groupDisplay',arguments: {'currentUser':widget.currentUser})
+       ,   child: Icon(
             Icons.arrow_back_ios,
             color: Colors.white,
             size: width > 600 ? width * 0.6 : width * 0.06,
@@ -88,21 +88,25 @@ class _NewGroupState extends State<NewGroup> {
       ],
     );
   }
-
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() {
     if (_searchText.text.isNotEmpty) {
       String searchTerm = _searchText.text.trim().toLowerCase();
-      String upperBound = searchTerm + '\uf8ff';
-
+print("searching");
       return _database
           .where("firstNameLower", isEqualTo: searchTerm)
           .snapshots()
-          .map((snapshot) => snapshot.docs);
+          .map((snapshot) => snapshot.docs
+          .where((user) => user['uid'] != widget.currentUser.uid)
+          .toList());
     }
 
     return _database.snapshots().map((snapshot) {
-      snapshot.docs.sort((a, b) => a['firstName'].compareTo(b['firstName']));
-      return snapshot.docs;
+      var filteredDocs = snapshot.docs
+          .where((user) => user['uid'] != widget.currentUser.uid)
+          .toList();
+
+      filteredDocs.sort((a, b) => a['firstName'].compareTo(b['firstName']));
+      return filteredDocs;
     });
   }
 
@@ -123,7 +127,7 @@ class _NewGroupState extends State<NewGroup> {
               flex: 1,
               child: Padding(
                 padding: EdgeInsets.symmetric(
-                    vertical: height * 0.002, horizontal: width * 0.032),
+                   horizontal: width * 0.032),
                 child: SizedBox(
                   height: width * 0.15,
                   child: Center(
@@ -140,10 +144,7 @@ class _NewGroupState extends State<NewGroup> {
                               CircleAvatar(
                                 radius: width * 0.067,
                                 backgroundColor: Colors.black,
-                                child: Icon(
-                                  Icons.person,
-                                  color: Colors.green[200],
-                                ),
+                                child: Text(firstNames[index][0].toUpperCase(),style: TextStyle(color: Colors.green.shade400),)
                               ),
                               Text(firstNames[index])
                             ],
@@ -156,16 +157,16 @@ class _NewGroupState extends State<NewGroup> {
               ),
             ),
             Divider(
-              height: height * 0.012,
+
               thickness: width * 0.00015,
               color: Colors.grey,
             )
           ],
           Expanded(
-            flex: 5,
+            flex: 6,
             child: Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: height * 0.012, vertical: width * 0.032),
+                  horizontal: width * 0.012, vertical: height * 0.012),
               child: StreamBuilder<
                   List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
                 stream: fetchUsers(),
@@ -182,6 +183,7 @@ class _NewGroupState extends State<NewGroup> {
                     itemCount: users.length,
                     itemBuilder: (context, index) {
                       var user = users[index].data();
+
                       return ListTile(
                         title: Text(user['firstName'] ?? 'No Name'),
                         subtitle: Text(user['email'] ?? 'No Email'),
@@ -270,6 +272,8 @@ class _NewGroupState extends State<NewGroup> {
               backgroundColor: Colors.red.shade200,
             ));
           } else {
+            //Adding the current user also to the group;
+            groupChatUsers.add(widget.currentUser.uid);
             Navigator.pushNamed(context,'/newGroupDefinition',  arguments: {'currentUser': widget.currentUser,'members':groupChatUsers},);
 
           }

@@ -169,7 +169,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         "Cancel",
                         style: TextStyle(
-                            fontFamily: 'Raleway', color: Colors.blue.shade200),
+                            fontFamily: 'Raleway', color: Colors.black),
                       )),
                   TextButton(
                       onPressed: () {
@@ -572,7 +572,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         groupDescription,
                         style: TextStyle(
-                            color: Colors.blue[500], fontSize: width * 0.037),
+                            color: Colors.green[400], fontSize: width * 0.037),
                       ),
                     ),
                     SizedBox(height: height * 0.005),
@@ -876,7 +876,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                                                 fontFamily:
                                                                 'Raleway',
                                                                 color: Colors
-                                                                    .blue.shade200),
+                                                                    .black),
                                                           )),
                                                       TextButton(
                                                           onPressed: () async{
@@ -935,9 +935,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                         group['participants'][index])
                                     ? Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.blue.shade200,
+                                            color: Colors.green.shade400,
                                             border: Border.all(
-                                                color: Colors.blue.shade200),
+                                                color: Colors.green.shade400),
                                             borderRadius: BorderRadius.circular(
                                                 width * 0.01)),
                                         width: width * 0.12,

@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:chatapp/models/CustomClass.dart';
+
+import '../helpers/MainNavigation.dart';
 
 class GroupDisplayPage extends StatefulWidget {
-  final String currentUser;
+  final CustomClass currentUser;
   const GroupDisplayPage({super.key, required this.currentUser});
 
   @override
@@ -10,6 +13,33 @@ class GroupDisplayPage extends StatefulWidget {
 }
 
 class _GroupDisplayPageState extends State<GroupDisplayPage> {
+
+  int _selectedIndex = 1;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.currentUser});
+        break;
+      case 1:
+        Navigator.pushNamed(
+          context,
+          '/groupDisplay',
+          arguments: {'currentUser': widget.currentUser},
+        );
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/statusPage');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
+        break;
+    }
+  }
 
   TextEditingController _searchText = TextEditingController();
   CollectionReference groupsDB = FirebaseFirestore.instance.collection("groups");
@@ -23,7 +53,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     });
   }
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchGroups() {
-    Query query = groupsDB.where("participants", arrayContains: widget.currentUser);
+    Query query = groupsDB.where("participants", arrayContains: widget.currentUser.uid);
 
     if (_searchText.text.isNotEmpty) {
 
@@ -141,7 +171,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
             ),
           ),
         ],
-      ),
+      ), bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex,onTap:_onItemTapped),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(

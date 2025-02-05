@@ -68,7 +68,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
         ),
         leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+         Navigator.pushNamed(context,"/newGroup",arguments: {'currentUser':widget.createdBy});
             },
             icon: Icon(
               Icons.arrow_back,
@@ -90,6 +90,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 children: [
                   Expanded(
                     child: CircleAvatar(
+
                       radius: width * 0.066,
                       backgroundColor: Colors.black12,
                       child: Icon(
@@ -261,8 +262,9 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                       child: Column(
                         children: [
                           CircleAvatar(
+                            backgroundColor: Colors.black12,
                             radius: width * 0.1,
-                            child: Icon(Icons.person),
+                            child: Icon(Icons.person,color: Colors.green.shade400,),
                           ),
                           SizedBox(height: height * 0.01),
                           Text(
@@ -346,7 +348,7 @@ print(widget.members.length);
         backgroundColor: Colors.black,
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.white,
+          color: Colors.green.shade400,
         ),
       ),
     );
