@@ -1,10 +1,11 @@
-import 'package:chatapp/Pages/GroupChatLayout/NewGroupDefinition.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/Pages/ChatLayout/chat_layout.dart';
+import 'package:chatapp/Pages/ChatLayout/user_list.dart';
+import 'package:chatapp/pages/helpers/MainNavigation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../GroupChatLayout/NewGroupDefinition.dart';
+//
+// import 'chat_layout.dart';
 
 class ChatPage extends StatefulWidget {
 
@@ -221,8 +222,3 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 }
-
-
-
-
-

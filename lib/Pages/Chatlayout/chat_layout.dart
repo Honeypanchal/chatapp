@@ -301,53 +301,65 @@ class _ChatLayoutState extends State<ChatLayout> {
                     // Handle edit action
 
                     final TextEditingController editController =
-                        TextEditingController(text: messages[index]['message']);
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text("Edit Message"),
-                          content: TextField(
-                            controller: editController,
-                            decoration:
-                                const InputDecoration(labelText: "Message"),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Cancel"),
+                    TextEditingController(text: messages[index]['message']);
+
+                    if (selectedMessages.length == 1) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Edit Message"),
+                            content: TextField(
+                              controller: editController,
+                              decoration:
+                              const InputDecoration(labelText: "Message"),
                             ),
-                            TextButton(
-                              onPressed: () async {
-                                final updatedMessage =
-                                    editController.text.trim();
-                                // if (updatedMessage.isNotEmpty) {
-                                //   await editMessage(
-                                //       messages[index].id, updatedMessage);
-                                //   Navigator.of(context).pop();
-                                // }
-                                if (updatedMessage.isNotEmpty) {
-                                  await editMessage(
-                                      messages[index].id, updatedMessage);
-                                  // setState(() {
-                                  //   messages[index]['message'] = updatedMessage; // Update the message locally
-                                  //   // messages.sort((a, b) => a['timestamp'].compareTo(b['timestamp'])); // Re-sort messages based on timestamp to keep them in order
-                                  // });
+                            actions: [
+                              TextButton(
+                                onPressed: () {
                                   Navigator.of(context).pop();
-                                }
-                                setState(() {
-                                  selectedMessages
-                                      .clear(); // Clear selected messages after delete
-                                });
-                              },
-                              child: const Text("Save"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
+                                },
+                                child: const Text(
+                                  "Cancel",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  final updatedMessage =
+                                  editController.text.trim();
+                                  if (updatedMessage.isNotEmpty) {
+                                    await editMessage(
+                                        messages[index].id, updatedMessage);
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                child: const Text(
+                                  "Save",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      setState(() {
+                        selectedMessages
+                            .clear(); // Clear selected messages after delete
+                        isAppBarForSelectedMessages = false;
+                        // Reset any other necessary state for your AppBar or layout
+                      });
+                    } else {
+                      final snackbar = SnackBar(
+                          content: const Text('updated only on 1 message'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      setState(() {
+                        selectedMessages
+                            .clear(); // Clear selected messages after delete
+                        isAppBarForSelectedMessages = false;
+                        // Reset any other necessary state for your AppBar or layout
+                      });
+                    }
                   } else if (value == 'copy') {
                     // Handle copy action
                     Clipboard.setData(
