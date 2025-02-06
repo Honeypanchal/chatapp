@@ -83,7 +83,8 @@ class _StatusPageState extends State<StatusPage> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+
+
 
         backgroundColor: Colors.black,
         title: Text(

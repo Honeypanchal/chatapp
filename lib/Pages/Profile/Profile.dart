@@ -6,8 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Profile extends StatefulWidget {
-  final CustomClass currentUser;
-  const Profile({super.key, required this.currentUser});
+
   final CustomClass currentUser;
   const Profile({super.key,required this.currentUser});
 
@@ -124,13 +123,15 @@ class _ProfileState extends State<Profile> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 8,right: 8,top: 5),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.perm_identity,color: Colors.black26,size: width*0.08,),
+                    Icon(Icons.perm_identity,color: Colors.black26,size: width*0.09,),
                     SizedBox(width: width*0.03,),
                     Column(
                       children: [Text("Name",style: TextStyle(color: Colors.black,fontSize: width*0.035,fontFamily: 'poppins',fontWeight: FontWeight.w700),
                       ),
-                        SizedBox(height: height*0.005,),
+                        SizedBox(height: height*0.003,),
                         Text(firstName.isNotEmpty ? firstName :"",style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w600,fontFamily: 'Raleways',fontSize: width*0.035),
                         ),
 
@@ -141,7 +142,7 @@ class _ProfileState extends State<Profile> {
               ),
 
             ),
-            SizedBox(height: height*0.02,),
+
             Container(
               margin: EdgeInsets.symmetric(horizontal: width*0.02),
               height:height*0.1,
@@ -153,9 +154,10 @@ class _ProfileState extends State<Profile> {
                 padding: const EdgeInsets.only(left: 8,right: 8,top: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    Icon(Icons.email_outlined,color: Colors.black26,size: width*0.07,),
+                    Icon(Icons.email_outlined,color: Colors.black26,size: width*0.09,),
                     SizedBox(width: width*0.05,),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,44 +178,11 @@ class _ProfileState extends State<Profile> {
             ),
 
 
-            // Text(
-            //   "Name",
-            //   style: TextStyle(color: Colors.grey, fontSize: 14),
-            // ),
-            // SizedBox(height: 5),
-            // Container(
-            //   width: double.infinity,
-            //   padding: EdgeInsets.all(12),
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(10),
-            //   ),
-            //   child: Text(
-            //     firstName.isNotEmpty ? firstName : "Loading...",
-            //     style: TextStyle(fontSize: 16),
-            //   ),
-            // ),
-            //SizedBox(height: 20),
-            // Text(
-            //   "Email Address",
-            //   style: TextStyle(color: Colors.grey, fontSize: 14),
-            // ),
-            // SizedBox(height: 5),
-            // Container(
-            //   width: double.infinity,
-            //   padding: EdgeInsets.all(12),
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(10),
-            //   ),
-            //   child: Text(
-            //     email.isNotEmpty ? email : "Loading...", // Correct field
-            //     style: TextStyle(fontSize: 16),
-            //   ),
-            // ),
+
           ],
         ),
       ),
+      bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex, onTap: _onItemTapped),
     );
   }
 }
