@@ -8,7 +8,7 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 
 Future<CustomClass?> signUpUser(
     String firstName,
-
+    // var status,
 
     String email,
     String password) async {
@@ -22,6 +22,7 @@ Future<CustomClass?> signUpUser(
         uid: user.user!.uid,
           firstName: firstName,
           email: email,
+          // status: null,
           password: password,
         activeChats:null,
         groups: null,
@@ -29,7 +30,7 @@ Future<CustomClass?> signUpUser(
       await _cloudFirestore.doc(user.user!.uid).set({
         "uid": user.user!.uid,
         "firstName": firstName,
-        "status": "unavailable",//changes
+        "status": "offline",//changes
 
         "email": email,
         "password": password,
@@ -56,8 +57,12 @@ Future<CustomClass?> signInUser(String email, String password) async {
       email: email,
       password: password,
     );
+
     if (user.user != null) {
       final foundUser = await _cloudFirestore.doc(user.user!.uid).get();
+
+
+
       if (foundUser.exists) {
         CustomClass newUser = CustomClass(
           uid: foundUser['uid'],
@@ -77,6 +82,7 @@ Future<CustomClass?> signInUser(String email, String password) async {
   } catch (e) {
     print("Error signing in: $e");
     throw Exception("Error signing in: ${e.toString()}");
+
   }
   return null;
 }
@@ -111,7 +117,7 @@ Future<CustomClass?> signInWithGoogle() async {
 "uid":user.uid,
 
         "firstName": user.displayName!,
-        "status": "unavailable",//changes
+        "status": "offline",//changes
 
 
         "email": user.email!,
