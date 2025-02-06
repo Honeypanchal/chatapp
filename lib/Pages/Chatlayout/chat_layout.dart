@@ -4,6 +4,7 @@ import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 
 class ChatLayout extends StatefulWidget {
@@ -169,6 +170,7 @@ class _ChatLayoutState extends State<ChatLayout> {
       }
     }
   }
+
 
   @override
   void initState() {
@@ -450,7 +452,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                             horizontal: width * 0.02,
                             vertical: height * 0.01,
                           ),
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.only(left:12.0,right: 12.0,top: 7.0,bottom: 7.0),
                           decoration: BoxDecoration(
                             color: isCurrentUser
                                 ? Colors.green.shade400
@@ -466,18 +468,27 @@ class _ChatLayoutState extends State<ChatLayout> {
                             minWidth: 50, // Minimum width to ensure the bubble isn't too small
                             maxWidth: width * 0.6, // Dynamically adjusts, but max width is 60% of the screen
                           ),
-                          child: Text(
-                            messages[index]['message'],
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
-                              color: isCurrentUser ? Colors.white : Colors.black87,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                messages[index]['message'],
+                                style: TextStyle(
+                                  fontFamily: 'Raleway',
+                                  fontSize: 15,
+                                  color: isCurrentUser ? Colors.white : Colors.black87,
+                                ),
+                              ),
+
+                          SizedBox(height: 5),
+                              Text(
+                                DateFormat.jm().format((messages[index]['timestamp'] as Timestamp).toDate()),
+                                style: TextStyle(fontSize: 9, color: isCurrentUser ? Colors.white : Colors.black87,),
+                              ),
+
+                            ],
                           ),
                         ),
-
-
-
-                        SizedBox(height: 4), // Small gap
 
                         if (x) // Only show for sent messages
                           Padding(
@@ -547,40 +558,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                 ],
               ),
             ),
-          // Align(
-          //     alignment: Alignment.bottomCenter,
-          //     child: Container(
-          //       padding: EdgeInsets.symmetric(
-          //           horizontal: width * 0.042, vertical: height * 0.012),
-          //       decoration: BoxDecoration(
-          //         border: Border(
-          //           top: BorderSide(
-          //               color: Colors.grey.shade300, width: width * 0.001),
-          //         ),
-          //         color: Colors.white,
-          //       ),
-          //       child: TextFormField(
-          //         controller: message,
-          //         decoration: InputDecoration(
-          //             hintText: "Type a message",
-          //             hintStyle: TextStyle(color: Colors.grey),
-          //             border: InputBorder.none,
-          //             suffixIcon: IconButton(
-          //                 onPressed: () async {
-          //                   setState(() {
-          //                     messages = [];
-          //                   });
-          //                   await sendMessage(message.text.trim());
-          //                   fetchMessagesByCurrentUser();
-          //                   // ----------
-          //                   message.clear();
-          //                 },
-          //                 icon: Icon(
-          //                   Icons.send,
-          //                   color: Color(0xFF00A884),
-          //                 ))),
-          //       ),
-          //     ))
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -593,14 +570,6 @@ class _ChatLayoutState extends State<ChatLayout> {
               child: Row(
                 children: [
                   GestureDetector(
-                    // onTap: () => Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => CreatePollPage(
-                    //       sendMessage: sendMessage,
-                    //     ),
-                    //   ),
-                    // ),
                     child: Icon(Icons.poll, color: Colors.green.shade400),
                   ),
                   SizedBox(width: 10),
