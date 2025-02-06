@@ -33,8 +33,11 @@ class _StatusPageState extends State<StatusPage> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+
         backgroundColor: Colors.black,
         title: Text(
+
           'Status',
           style: TextStyle(
               color: Colors.white,
@@ -135,7 +138,7 @@ class _StatusPageState extends State<StatusPage> {
             MaterialPageRoute(builder: (context) => const EnterStatus()),
           );
         },
-        backgroundColor: Colors.black87,
+        backgroundColor: Colors.green.shade400,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         child: Icon(Icons.add, color: Colors.white,size: width*0.08,),
       ),
