@@ -4,10 +4,9 @@ import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
-
+import 'package:intl/intl.dart';
 
 class ChatLayout extends StatefulWidget {
-
   final CustomClass currentUser;
   final user;
   final DocumentReference<Map<String, dynamic>> databaseRef;
@@ -31,7 +30,6 @@ class _ChatLayoutState extends State<ChatLayout> {
   bool isAppBarForSelectedMessages =
   false; // Check if the app bar should show options for selected messages
   List<String> selectedMessages = []; // To store selected message ids
-  // TextEditingController message=TextEditingController();
 
   // Function to handle message selection (add/remove from selectedMessages)
   void toggleMessageSelection(String messageId) {
@@ -61,11 +59,14 @@ class _ChatLayoutState extends State<ChatLayout> {
   }
 
   // Function to handle marking a message as favorite
-  Future<void> favoriteMessages() async {
-    for (String messageId in selectedMessages) {
-      await widget.databaseRef.collection("messages").doc(messageId).update({
-        "isFavorite": true, // Example field to indicate a favorite message
-      });
+  Future<void> favoriteMessages(id) async {
+    for (var messageId in selectedMessages) {
+      var message =
+      messages.firstWhere((msg) => msg.id == messageId, orElse: () => null);
+      if (message != null) {
+        favoriteMessages(message
+            .id); // Implement favoriteMessage functionality to update the star status in your database
+      }
     }
 
     setState(() {
@@ -139,8 +140,6 @@ class _ChatLayoutState extends State<ChatLayout> {
     try {
       await widget.databaseRef.collection("messages").doc(messageId).update({
         "message": updatedMessage,
-        "timestamp": Timestamp.now(),
-        // Optional: Update the timestamp to reflect the edit time
         "edited": true,
       });
       print("Message updated successfully.");
@@ -211,7 +210,10 @@ class _ChatLayoutState extends State<ChatLayout> {
             ),
           ),
           title: isAppBarForSelectedMessages
-              ? Text("${selectedMessages.length} selected", style: TextStyle(color: Colors.white),)
+              ? Text(
+            "${selectedMessages.length} selected",
+            style: TextStyle(color: Colors.white),
+          )
               : GestureDetector(
             onTap: () {
               Navigator.push(
@@ -238,7 +240,22 @@ class _ChatLayoutState extends State<ChatLayout> {
               // Favorite button
               IconButton(
                 icon: const Icon(Icons.star, color: Colors.white),
-                onPressed: favoriteMessages,
+                // onPressed: favoriteMessages(message.id),
+                onPressed: () {
+                  for (var messageId in selectedMessages) {
+                    var message = messages.firstWhere(
+                            (msg) => msg.id == messageId,
+                        orElse: () => null);
+                    if (message != null) {
+                      favoriteMessages(message.id); // Pass the message ID here
+                    }
+                  }
+                  setState(() {
+                    selectedMessages
+                        .clear(); // Clear selection after star action
+                    isAppBarForSelectedMessages = false; // Reset AppBar state
+                  });
+                },
               ),
               Builder(
                 builder: (context) {
@@ -249,7 +266,22 @@ class _ChatLayoutState extends State<ChatLayout> {
                           selectedMessages
                               .contains(message.id)); // Find index dynamically
                       if (index != -1) {
-                        deleteMessage(messages[index].id);
+                        for (var messageId in selectedMessages) {
+                          var message = messages.firstWhere(
+                                  (msg) => msg.id == messageId,
+                              orElse: () => null);
+                          if (message != null) {
+                            deleteMessage(message.id);
+                          }
+                        }
+
+                        setState(() {
+                          selectedMessages
+                              .clear(); // Clear selected messages after delete
+                          isAppBarForSelectedMessages = false;
+
+                          // Reset any other necessary state for your AppBar or layout
+                        });
                       }
                     },
                   );
@@ -265,68 +297,113 @@ class _ChatLayoutState extends State<ChatLayout> {
                       .first; // Using the first selected message as an example
                   if (value == 'reply') {
                     // Handle reply action
-                  }
-                  else if (value == 'edit') {
+                  } else if (value == 'edit') {
                     // Handle edit action
 
                     final TextEditingController editController =
                     TextEditingController(text: messages[index]['message']);
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text("Edit Message"),
-                          content: TextField(
-                            controller: editController,
-                            decoration:
-                            const InputDecoration(labelText: "Message"),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Cancel"),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                final updatedMessage =
-                                editController.text.trim();
-                                if (updatedMessage.isNotEmpty) {
-                                  await editMessage(
-                                      messages[index].id, updatedMessage);
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                              child: const Text("Save"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
 
-                  else if (value == 'copy') {
+                    if (selectedMessages.length == 1) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Edit Message"),
+                            content: TextField(
+                              controller: editController,
+                              decoration:
+                              const InputDecoration(labelText: "Message"),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text(
+                                  "Cancel",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  final updatedMessage =
+                                  editController.text.trim();
+                                  if (updatedMessage.isNotEmpty) {
+                                    await editMessage(
+                                        messages[index].id, updatedMessage);
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                child: const Text(
+                                  "Save",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      setState(() {
+                        selectedMessages
+                            .clear(); // Clear selected messages after delete
+                        isAppBarForSelectedMessages = false;
+                        // Reset any other necessary state for your AppBar or layout
+                      });
+                    } else {
+                      final snackbar = SnackBar(
+                          content: const Text('updated only on 1 message'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      setState(() {
+                        selectedMessages
+                            .clear(); // Clear selected messages after delete
+                        isAppBarForSelectedMessages = false;
+                        // Reset any other necessary state for your AppBar or layout
+                      });
+                    }
+                  } else if (value == 'copy') {
                     // Handle copy action
                     Clipboard.setData(
-                        ClipboardData(text: messages[index]['message']));
-                  }
-                  else if (value == 'info') {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            UserInfoPage(
-                              messageData:
-                              messages[index].data()
-                              as Map<String, dynamic>,
-                              deliveredAt: messages[index]
-                              ['deliveredAt'],
-                              readAt: messages[index]
-                              ['readAt'],
-                            ),
+                      ClipboardData(
+                          text: selectedMessages.map((messageId) {
+                            var msgData =
+                            messages.firstWhere((msg) => msg.id == messageId);
+                            return msgData['message'];
+                          }).join("\n") // Join all selected messages with a newline
                       ),
                     );
+                    setState(() {
+                      selectedMessages
+                          .clear(); // Clear selected messages after delete
+                      isAppBarForSelectedMessages = false;
+                      // Reset any other necessary state for your AppBar or layout
+                    });
+
+                    // Close the selection mode and revert AppBar
+                    // Navigator.of(context).pop();
+                  } else if (value == 'info') {
+                    if (selectedMessages.length == 1) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserInfoPage(
+                            messageData:
+                            messages[index].data() as Map<String, dynamic>,
+                            deliveredAt: messages[index]['deliveredAt'],
+                            readAt: messages[index]['readAt'],
+                          ),
+                        ),
+                      );
+                    } else {
+                      final snackbar = SnackBar(
+                          content: const Text('Info only on 1 message'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      setState(() {
+                        selectedMessages
+                            .clear(); // Clear selected messages after delete
+                        isAppBarForSelectedMessages = false;
+                        // Reset any other necessary state for your AppBar or layout
+                      });
+                    }
                   }
                 },
                 itemBuilder: (context) => [
@@ -386,17 +463,18 @@ class _ChatLayoutState extends State<ChatLayout> {
 
                   bool x =
                       messages[index]['sentBy'] == widget.currentUser.uid;
-                  bool seenStatus =
-                  messageData.containsKey('seen') ? messageData['seen'] : false;
+                  bool seenStatus = messageData.containsKey('seen')
+                      ? messageData['seen']
+                      : false;
 
-                  bool isEdited =
-                  messageData.containsKey('edited') ? messageData['edited'] : false;
+                  bool isEdited = messageData.containsKey('edited')
+                      ? messageData['edited']
+                      : false;
 
                   return GestureDetector(
                     onLongPress: () {
                       toggleMessageSelection(messageId);
                     },
-
                     onHorizontalDragEnd: (details) {
                       setState(() {
                         replyToMessage = messageData['message'];
@@ -453,29 +531,46 @@ class _ChatLayoutState extends State<ChatLayout> {
                           padding: const EdgeInsets.all(12.0),
                           decoration: BoxDecoration(
                             color: isCurrentUser
-                                ? Colors.green.shade400
+                                ? Colors.green.shade700
                                 : Colors.grey.shade300,
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(16),
                               topRight: Radius.circular(16),
-                              bottomLeft: isCurrentUser ? Radius.circular(16) : Radius.circular(16),
-                              bottomRight: isCurrentUser ?  Radius.circular(16) : Radius.circular(16),
+                              bottomLeft: isCurrentUser
+                                  ? Radius.circular(16)
+                                  : Radius.circular(16),
+                              bottomRight: isCurrentUser
+                                  ? Radius.circular(16)
+                                  : Radius.circular(16),
                             ),
                           ),
                           constraints: BoxConstraints(
-                            minWidth: 50, // Minimum width to ensure the bubble isn't too small
-                            maxWidth: width * 0.6, // Dynamically adjusts, but max width is 60% of the screen
+                            minWidth: 50,
+                            // Minimum width to ensure the bubble isn't too small
+                            maxWidth: width *
+                                0.6, // Dynamically adjusts, but max width is 60% of the screen
                           ),
-                          child: Text(
-                            messages[index]['message'],
-                            style: TextStyle(
-                              fontFamily: 'Raleway',
-                              color: isCurrentUser ? Colors.white : Colors.black87,
-                            ),
+                          child:  Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                messages[index]['message'],
+                                style: TextStyle(
+                                  fontFamily: 'Raleway',
+                                  fontSize: 15,
+                                  color: isCurrentUser ? Colors.white : Colors.black87,
+                                ),
+                              ),
+
+                              SizedBox(height: 5),
+                              Text(
+                                DateFormat.Hm().format((messages[index]['timestamp'] as Timestamp).toDate()),
+                                style: TextStyle(fontSize: 9, color: isCurrentUser ? Colors.white : Colors.black87,),
+                              ),
+
+                            ],
                           ),
                         ),
-
-
 
                         SizedBox(height: 4), // Small gap
 
@@ -486,10 +581,13 @@ class _ChatLayoutState extends State<ChatLayout> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 if (isEdited) // Show green tick if the message is edited
-                                  if (messages[index]['edited'] == true) // Show "edited" label if edited
+                                  if (messages[index]['edited'] ==
+                                      true) // Show "edited" label if edited
                                     const Text(
                                       "edited",
-                                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey),
                                     ),
                                 Icon(
                                   seenStatus
@@ -547,40 +645,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                 ],
               ),
             ),
-          // Align(
-          //     alignment: Alignment.bottomCenter,
-          //     child: Container(
-          //       padding: EdgeInsets.symmetric(
-          //           horizontal: width * 0.042, vertical: height * 0.012),
-          //       decoration: BoxDecoration(
-          //         border: Border(
-          //           top: BorderSide(
-          //               color: Colors.grey.shade300, width: width * 0.001),
-          //         ),
-          //         color: Colors.white,
-          //       ),
-          //       child: TextFormField(
-          //         controller: message,
-          //         decoration: InputDecoration(
-          //             hintText: "Type a message",
-          //             hintStyle: TextStyle(color: Colors.grey),
-          //             border: InputBorder.none,
-          //             suffixIcon: IconButton(
-          //                 onPressed: () async {
-          //                   setState(() {
-          //                     messages = [];
-          //                   });
-          //                   await sendMessage(message.text.trim());
-          //                   fetchMessagesByCurrentUser();
-          //                   // ----------
-          //                   message.clear();
-          //                 },
-          //                 icon: Icon(
-          //                   Icons.send,
-          //                   color: Color(0xFF00A884),
-          //                 ))),
-          //       ),
-          //     ))
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -601,7 +665,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                     //     ),
                     //   ),
                     // ),
-                    child: Icon(Icons.poll, color: Colors.green.shade400),
+                    child: Icon(Icons.poll, color: Colors.green.shade700),
                   ),
                   SizedBox(width: 10),
                   Expanded(
@@ -611,7 +675,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                         hintText: "Type a message",
                         border: InputBorder.none,
                       ),
-
                     ),
                   ),
                   GestureDetector(
@@ -621,10 +684,9 @@ class _ChatLayoutState extends State<ChatLayout> {
                       });
                       await sendMessage(message.text.trim());
                       fetchMessagesByCurrentUser();
-                      // ----------
                       message.clear();
                     },
-                    child: Icon(Icons.send, color: Colors.green.shade400),
+                    child: Icon(Icons.send, color: Colors.green.shade700),
                   ),
                 ],
               ),
@@ -635,4 +697,3 @@ class _ChatLayoutState extends State<ChatLayout> {
     );
   }
 }
-

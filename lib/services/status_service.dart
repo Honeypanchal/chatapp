@@ -87,7 +87,7 @@ class StatusService {
         .map((snapshot) {
       return snapshot.docs.map((doc) {
         var data = doc.data();
-        print(" Status Data: ${doc.id} -> $data");
+        // print(" Status Data: ${doc.id} -> $data");
         return Status.fromMap(data);
       }).toList();
     });
@@ -99,7 +99,7 @@ class StatusService {
       print("No statuses found in Firestore!");
     } else {
       for (var doc in snapshot.docs) {
-        print("Status Found: ${doc.id} -> ${doc.data()}");
+        // print("Status Found: ${doc.id} -> ${doc.data()}");
       }
     }
   }
