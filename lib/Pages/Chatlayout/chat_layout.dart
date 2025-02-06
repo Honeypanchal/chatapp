@@ -1,5 +1,5 @@
-import 'package:chatapp/Pages/ChatLayout/ContectInfo.dart';
-import 'package:chatapp/Pages/ChatLayout/UserInfoPage.dart';
+import 'package:chatapp/Pages/Chatlayout/ContectInfo.dart';
+import 'package:chatapp/Pages/Chatlayout/UserInfoPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
