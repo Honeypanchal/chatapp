@@ -1,4 +1,4 @@
-import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/pages/ChatLayout/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';

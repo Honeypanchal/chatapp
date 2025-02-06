@@ -39,6 +39,7 @@ dependencies:
   intl:
   file_picker:
   firebase_storage:
+  swipe_to: ^1.0.1
 
 
   google_sign_in:

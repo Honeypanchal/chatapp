@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chatapp/Pages/ChatPage.dart';
-import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
-import 'package:chatapp/Pages/Profile/Profile.dart';
-import 'package:chatapp/Pages/statuspage.dart';
+
 
 class MainNavigationPage extends StatelessWidget {
   final int currentIndex;

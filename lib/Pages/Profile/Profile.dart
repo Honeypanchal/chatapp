@@ -1,5 +1,7 @@
+import 'package:chatapp/Pages/helpers/MainNavigation.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
+
 class Profile extends StatefulWidget {
   final CustomClass currentUser;
   const Profile({super.key,required this.currentUser});
@@ -9,7 +11,8 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  int _selectedIndex = 3;
+
+  int _selectedIndex=3;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -18,7 +21,8 @@ class _ProfileState extends State<Profile> {
 
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.currentUser});
+        Navigator.pushNamed(context, '/chatPage',
+            arguments: {'currentUser': widget.currentUser});
         break;
       case 1:
         Navigator.pushNamed(
@@ -31,13 +35,16 @@ class _ProfileState extends State<Profile> {
         Navigator.pushNamed(context, '/statusPage');
         break;
       case 3:
-        Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
+        Navigator.pushNamed(context, '/profile',
+            arguments: {'currentUser': widget.currentUser});
         break;
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Center(child: Text('data',style: TextStyle(fontSize: 30),),),
+    bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex, onTap: _onItemTapped),
+    );
   }
 }

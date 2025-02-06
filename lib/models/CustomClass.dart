@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CustomClass {
   String firstName;
 
@@ -12,12 +14,15 @@ bool isActive=true;
 
   String? password;
 
+  String? status='offline';
+
 
   CustomClass(
       {required this.firstName,
 
 required this.uid,
       required this.email,
+        this.status,
 
       this.password,
      this.profilePicture,
@@ -49,6 +54,8 @@ required this.activeChats
       "firstName": firstName,
       "uid": uid,
       "email": email,
+      "status" : status,
+
       "password": password,
       "profilePic": profilePicture,
       "groups": groups,
@@ -57,6 +64,13 @@ required this.activeChats
       "isActive": isActive,
     };
   }
+
+  // Inside CustomClass.dart
+  Future<void> updateStatus(String status) async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    await _firestore.collection('Users').doc(uid).update({'status': status});
+  }
+
 }
 
 
