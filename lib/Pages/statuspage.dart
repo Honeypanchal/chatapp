@@ -1,10 +1,15 @@
 import 'dart:convert';
 
+import 'package:chatapp/Pages/helpers/MainNavigation.dart';
 import 'package:chatapp/services/status_service.dart';
+import 'package:chatapp/services/users_services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../models/CustomClass.dart';
 import '../models/Status.dart';
 import 'package:intl/intl.dart';
+
+import '../services/auth_services.dart';
 
 class StatusPage extends StatefulWidget {
   @override
@@ -12,9 +17,10 @@ class StatusPage extends StatefulWidget {
 }
 
 class _StatusPageState extends State<StatusPage> {
+
   final StatusService _statusService = StatusService();
   final TextEditingController _statusController = TextEditingController();
-  final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
 
   void _uploadTextStatus() {
     if (_statusController.text.trim().isNotEmpty) {
@@ -23,6 +29,50 @@ class _StatusPageState extends State<StatusPage> {
           _statusController.text.trim(), defaultColor, "0");
       _statusController.clear();
       Navigator.pop(context);
+    }
+  }
+  String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  late CustomClass currentUser;
+  int _selectedIndex=2;
+
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    void fetchCurrentUser()async
+    {
+      final user= await getUserDetails(currentUserId);
+      setState(() {
+        currentUser=user!;
+      });
+    }
+    @override
+    void initState()
+    {
+      fetchCurrentUser();
+    }
+
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, '/chatPage',
+            arguments: {'currentUser': currentUser});
+        break;
+      case 1:
+        Navigator.pushNamed(
+          context,
+          '/groupDisplay',
+          arguments: {'currentUser': currentUser},
+        );
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/statusPage');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profile',
+            arguments: {'currentUser': currentUser});
+        break;
     }
   }
 
@@ -142,6 +192,7 @@ class _StatusPageState extends State<StatusPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         child: Icon(Icons.add, color: Colors.white,size: width*0.08,),
       ),
+      bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex, onTap: _onItemTapped),
     );
   }
 
@@ -201,6 +252,7 @@ class _StatusPageState extends State<StatusPage> {
         ),
       ],
     );
+
   }
 }
 
@@ -214,6 +266,17 @@ class ViewStatusScreen extends StatefulWidget {
 }
 
 class _ViewStatusScreenState extends State<ViewStatusScreen> {
+
+
+  int currentIndex=0;
+  @override
+  void initState() {
+
+    super.initState();
+    _markStatusAsViewed();
+    _statusService.fetchAndPrintStatuses();
+
+  }
   final StatusService _statusService = StatusService();
   final TextEditingController _replyController = TextEditingController();
 
@@ -274,15 +337,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
   }
 
 
-  int currentIndex = 0;
 
-  @override
-  void initState() {
-
-    super.initState();
-    _markStatusAsViewed();
-    _statusService.fetchAndPrintStatuses();
-  }
 
 
   void _markStatusAsViewed() async {
@@ -407,6 +462,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
 
           ],
         ),
+
       ),
     );
   }
@@ -605,6 +661,7 @@ class _EnterStatusState extends State<EnterStatus> {
           ],
         ),
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: _uploadTextStatus,
         backgroundColor: Colors.black26,
