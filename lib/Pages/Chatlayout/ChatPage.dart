@@ -1,9 +1,10 @@
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
-import 'package:chatapp/Pages/Chatlayout/user_list.dart';
+import 'package:chatapp/Pages/ChatLayout/chat_layout.dart';
+import 'package:chatapp/Pages/ChatLayout/user_list.dart';
+import 'package:chatapp/pages/helpers/MainNavigation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+//
 // import 'chat_layout.dart';
 
 class ChatPage extends StatefulWidget {
@@ -28,6 +29,35 @@ class _ChatPageState extends State<ChatPage> {
     loadSelectedUsers();
   }
 
+
+  int _selectedIndex=0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(context, '/chatPage',
+            arguments: {'currentUser': widget.currentUser});
+        break;
+      case 1:
+        Navigator.pushNamed(
+          context,
+          '/groupDisplay',
+          arguments: {'currentUser': widget.currentUser},
+        );
+        break;
+      case 2:
+        Navigator.pushNamed(context, '/statusPage');
+        break;
+      case 3:
+        Navigator.pushNamed(context, '/profile',
+            arguments: {'currentUser': widget.currentUser});
+        break;
+    }
+  }
   Future<void> loadSelectedUsers() async {
     DocumentSnapshot userDoc = await _database.doc(widget.currentUser.uid).get();
     if (userDoc.exists && userDoc.data() != null) {
@@ -188,380 +218,12 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: Colors.green.shade700,
         child: Icon(Icons.add, color: Colors.black, size: 40),
       ),
+      bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex, onTap: _onItemTapped),
     );
   }
 }
 
-/*
-import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-class ChatPage extends StatefulWidget {
-  final CustomClass currentUser;
-
-  ChatPage({required this.currentUser});
-
-  @override
-  _ChatPageState createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> {
-  final _database = FirebaseFirestore.instance.collection('Users');
-  dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
-  List _chatUsers = [];
-
-  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() async {
-    final users = await _database.get();
-    return users.docs;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.blue[600],
-        title: Text(
-          'Chats',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-            fontSize: width > 600 ? width * 0.05 : width * 0.06,
-          ),
-        ),
-      ),
-      body: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-        future: fetchUsers(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No chats available. Click + to start a chat."));
-          }
-
-          _chatUsers = snapshot.data!;
-
-          return ListView.builder(
-            itemCount: _chatUsers.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                onTap: () {
-                  String docId = widget.currentUser.uid.compareTo(_chatUsers[index]['uid']) < 0
-                      ? "${widget.currentUser.uid}_${_chatUsers[index]['uid']}"
-                      : "${_chatUsers[index]['uid']}_${widget.currentUser.uid}";
-
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ChatLayout(
-                      currentUser: widget.currentUser,
-                      user: _chatUsers[index],
-                      databaseRef: chatsDB.doc(docId),
-                    ),
-                  ));
-                },
-                leading: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    "${_chatUsers[index]['firstName'][0].toUpperCase()}",
-                  ),
-                ),
-                title: Text(
-                  "${_chatUsers[index]['firstName']} ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: 'Raleway',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-                future: fetchUsers(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text("No users available."));
-                  }
-
-                  return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        onTap: () {
-                          String docId = widget.currentUser.uid.compareTo(snapshot.data![index]['uid']) < 0
-                              ? "${widget.currentUser.uid}_${snapshot.data![index]['uid']}"
-                              : "${snapshot.data![index]['uid']}_${widget.currentUser.uid}";
-
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ChatLayout(
-                              currentUser: widget.currentUser,
-                              user: snapshot.data![index],
-                              databaseRef: chatsDB.doc(docId),
-                            ),
-                          ));
-                        },
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Text(
-                            "${snapshot.data![index]['firstName'][0].toUpperCase()}",
-                          ),
-                        ),
-                        title: Text(
-                          "${snapshot.data![index]['firstName']} ",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Raleway',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          );
-        },
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blue,
-      ),
-    );
-  }
-}
-*/
 
 
-// original
-/*
-import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ChatPage extends StatefulWidget {
-  final CustomClass currentUser;
-
-  ChatPage({
-    required this.currentUser,
-  });
-
-  @override
-  _ChatPageState createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> {
-  final _database = FirebaseFirestore.instance.collection('Users');
-  dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
-  TextEditingController _searchText = TextEditingController();
-  dynamic _Chatdatabase = '';
-
-  List _chatUsers = [];
-
-  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() async {
-    if (_searchText.text.isNotEmpty) {
-      final users = await _database
-          .where("firstName", isEqualTo: _searchText.text.trim().toString())
-          .get();
-      return users.docs;
-    } else {
-      final users = await _database.get();
-      return users.docs;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _searchText.addListener(() {
-      fetchUsers();
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchText.removeListener(() {});
-    _searchText.dispose(); // Don't forget to dispose of the controller
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: Padding(
-          padding: EdgeInsets.only(left: width * 0.064),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            child: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.white,
-              size: width > 600 ? width * 0.6 : width * 0.06,
-            ),
-          ),
-        ),
-        backgroundColor: Colors.blue[600],
-        title: Text(
-          'Chats',
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-            fontSize: width > 600 ? width * 0.05 : width * 0.06,
-          ),
-        ),
-      ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          bool isWeb = constraints.maxWidth > 800;
-
-          return Container(
-            margin: EdgeInsets.symmetric(
-              horizontal: isWeb ? width * 0.1 : width * 0.012,
-              vertical: height * 0.012,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: width * 0.01,
-                        right: width * 0.01,
-                        top: height * 0.018,
-                        bottom: height * 0.01),
-                    child: Container(
-                      height: height * 0.052,
-                      width: isWeb ? width * 0.9 : width * 0.9,
-                      decoration: BoxDecoration(
-                        boxShadow: [],
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(width * 0.03),
-                      ),
-                      child: TextField(
-                        controller: _searchText,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: 'Raleway',
-                        ),
-                        decoration: InputDecoration(
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Raleway',
-                          ),
-                          hintText: 'Search',
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 12.0),
-                          prefixIcon: Icon(Icons.search, color: Colors.grey),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: height * 0.025),
-
-                // FutureBuilder to fetch users
-                FutureBuilder<
-                    List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-                  future: fetchUsers(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-
-                    if (snapshot.hasError) {
-                      return Center(child: Text("Error: ${snapshot.error}"));
-                    }
-
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text("No users found"));
-                    }
-
-                    _chatUsers = snapshot.data!;
-
-                    return Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _chatUsers.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () {
-                              String docId = widget.currentUser.uid
-                                  .compareTo(_chatUsers[index]['uid']) <
-                                  0
-                                  ? "${widget.currentUser.uid}_${_chatUsers[index]['uid']}"
-                                  : "${_chatUsers[index]['uid']}_${widget.currentUser.uid}";
-                              _Chatdatabase = chatsDB.doc(docId);
-
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => ChatLayout(
-                                  currentUser: widget.currentUser,
-                                  user: _chatUsers[index],
-                                  databaseRef: _Chatdatabase,
-                                ),
-                              ));
-                            },
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              child: Text(
-                                "${_chatUsers[index]['firstName'][0].toUpperCase()}",
-                              ),
-                            ),
-                            title: Text(
-                              "${_chatUsers[index]['firstName']} ",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Raleway',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-*/
 

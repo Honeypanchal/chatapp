@@ -2,10 +2,9 @@ import 'package:chatapp/Pages/ChatLayout/ChatPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/auth_services.dart';
-import '../helpers/MainNavigation.dart';
 
-import 'SigninPage.dart';
-
+import 'package:chatapp/pages/Authentication/SigninPage.dart';
+import 'package:chatapp/Pages/Authentication/FirstPage.dart';
 
 
 class SignupPage extends StatefulWidget {
@@ -22,7 +21,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmpasswordController =
-      TextEditingController();
+  TextEditingController();
 
   final TextEditingController _firstnameController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
@@ -70,17 +69,55 @@ class _SignupPageState extends State<SignupPage> {
     final height = mediaQuery.size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 60),
           child: Column(
             children: [
-
+              /*Container(
+                  height: height * 0.5,
+                  width: width,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0XFF5098FA),
+                        Color(0XFF526CF7),
+                        Color(0XFF533BF1),
+                        Color(0XFF5327EE),
+                        Color(0XFF5317EB),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: height * 0.065),
+                          ClipOval(
+                            child: SizedBox.fromSize(
+                              size: Size.fromRadius(50),
+                              child: Image.asset(
+                                'assets/images/Icon_homepage.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),*/
+              /*Image.asset(
+                'assets/images/main3.png',
+                height: 200,
+                fit: BoxFit.cover,
+              ),*/
               Text(
                 'Sign Up For Free.',
                 style: TextStyle(
-                  fontSize: 35,
+                  fontSize: 33,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                   fontFamily: 'poppins',
@@ -89,8 +126,8 @@ class _SignupPageState extends State<SignupPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 20.0),
                 child: const Text(
-                  "Join us for less than 1 minutes",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  "join us for less than 1 minutes, with no cost.",
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -105,7 +142,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Name',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -124,7 +161,7 @@ class _SignupPageState extends State<SignupPage> {
                     ),*/
                     TextFormField(
                       style:
-                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _firstnameController,
                       decoration: InputDecoration(
                           hintText: 'your name',
@@ -156,7 +193,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Email Address',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Poppins'),
                         textAlign: TextAlign.left,
@@ -167,13 +204,13 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     TextFormField(
                       style:
-                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _emailController,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'Email is required';
                         } else if (!RegExp(
-                                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
                             .hasMatch(val.trim())) {
                           return 'Enter a valid email';
                         }
@@ -194,7 +231,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Password',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -203,7 +240,7 @@ class _SignupPageState extends State<SignupPage> {
                     SizedBox(height: height * 0.010),
                     TextFormField(
                       style:
-                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _passwordController,
                       validator: (val) {
                         if (val!.isEmpty) {
@@ -225,23 +262,23 @@ class _SignupPageState extends State<SignupPage> {
                           //         color: Colors.red)),
                           suffixIcon: showPass
                               ? IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      showPass = !showPass;
-                                    });
-                                  },
-                                  icon: Icon(
-                                      color: Colors.black,
-                                      Icons.visibility_outlined))
+                              onPressed: () {
+                                setState(() {
+                                  showPass = !showPass;
+                                });
+                              },
+                              icon: Icon(
+                                  color: Colors.black,
+                                  Icons.visibility_outlined))
                               : IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      showPass = !showPass;
-                                    });
-                                  },
-                                  icon: Icon(
-                                      color: Colors.grey,
-                                      Icons.visibility_off_outlined))),
+                              onPressed: () {
+                                setState(() {
+                                  showPass = !showPass;
+                                });
+                              },
+                              icon: Icon(
+                                  color: Colors.grey,
+                                  Icons.visibility_off_outlined))),
                       obscureText: !showPass,
                     ),
                     SizedBox(height: height * 0.030),
@@ -250,7 +287,7 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Re-Type Password',
                         style: TextStyle(
-                            fontSize: width * 0.036,
+                            fontSize: width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -267,7 +304,7 @@ class _SignupPageState extends State<SignupPage> {
                     SizedBox(height: height * 0.010),
                     TextFormField(
                       style:
-                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _confirmpasswordController,
                       validator: (val) {
                         if (val!.isEmpty) {
@@ -290,23 +327,23 @@ class _SignupPageState extends State<SignupPage> {
                           //         color: Colors.red)),
                           suffixIcon: showPass
                               ? IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      showPass = !showPass;
-                                    });
-                                  },
-                                  icon: Icon(
-                                      color: Colors.black,
-                                      Icons.visibility_outlined))
+                              onPressed: () {
+                                setState(() {
+                                  showPass = !showPass;
+                                });
+                              },
+                              icon: Icon(
+                                  color: Colors.black,
+                                  Icons.visibility_outlined))
                               : IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      showPass = !showPass;
-                                    });
-                                  },
-                                  icon: Icon(
-                                      color: Colors.grey,
-                                      Icons.visibility_off_outlined))),
+                              onPressed: () {
+                                setState(() {
+                                  showPass = !showPass;
+                                });
+                              },
+                              icon: Icon(
+                                  color: Colors.grey,
+                                  Icons.visibility_off_outlined))),
                       obscureText: !showPass,
                     ),
                   ],
@@ -321,7 +358,7 @@ class _SignupPageState extends State<SignupPage> {
                     _signup();
                   },
                   style: ElevatedButton.styleFrom(
-                      // Color(0XFF185FED)
+                    // Color(0XFF185FED)
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
@@ -329,7 +366,7 @@ class _SignupPageState extends State<SignupPage> {
                   child: Text(
                     'Sign Up',
                     style: TextStyle(
-                        fontSize: width * 0.050, fontWeight: FontWeight.w500),
+                        fontSize: width * 0.045, fontWeight: FontWeight.w500),
                   ),
                 ),
               ),
@@ -337,17 +374,17 @@ class _SignupPageState extends State<SignupPage> {
                 height: height * 0.015,
               ),
               SizedBox(
-                height: height * 0.070,
+                height: height * 0.060,
                 width: width * 0.9,
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
-                        side: BorderSide(
-                          color: Colors.black,
-                          width: 2
-                        ))),
+                            side: BorderSide(
+                                color: Colors.black,
+                                width: 2
+                            ))),
                     onPressed: () async {
                       CustomClass? user = await signInWithGoogle();
 
@@ -379,14 +416,12 @@ class _SignupPageState extends State<SignupPage> {
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
-                              fontSize: width * 0.045),
+                              fontSize: width * 0.040),
                         ),
                       ],
                     )),
               ),
-              SizedBox(
-                height: height * 0.025,
-              ),
+
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(
@@ -405,13 +440,14 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                     Text(
-                      "Sign in",
+                      "Login",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: width * 0.040,
                         color: Colors.black,
                       ),
                     ),
+                    SizedBox(height: 80,)
                   ],
                 ),
               ),
