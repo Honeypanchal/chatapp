@@ -23,7 +23,9 @@ class _StatusPageState extends State<StatusPage> {
 
 
   void _uploadTextStatus() {
-    if (_statusController.text.trim().isNotEmpty) {
+    if (_statusController.text
+        .trim()
+        .isNotEmpty) {
       String defaultColor = "#FFFFFF";
       _statusService.uploadStatus(
           _statusController.text.trim(), defaultColor, "0");
@@ -31,9 +33,10 @@ class _StatusPageState extends State<StatusPage> {
       Navigator.pop(context);
     }
   }
+
   String currentUserId = FirebaseAuth.instance.currentUser!.uid;
   late CustomClass currentUser;
-  int _selectedIndex=2;
+  int _selectedIndex = 2;
 
 
   void _onItemTapped(int index) {
@@ -41,16 +44,16 @@ class _StatusPageState extends State<StatusPage> {
       _selectedIndex = index;
     });
 
-    void fetchCurrentUser()async
+    void fetchCurrentUser() async
     {
-      final user= await getUserDetails(currentUserId);
+      final user = await getUserDetails(currentUserId);
+      print('$currentUserId is this ');
       setState(() {
-        currentUser=user!;
+        currentUser = user!;
       });
     }
     @override
-    void initState()
-    {
+    void initState() {
       fetchCurrentUser();
     }
 
@@ -78,12 +81,18 @@ class _StatusPageState extends State<StatusPage> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height=MediaQuery.of(context).size.height;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-
 
 
         backgroundColor: Colors.black,
@@ -97,90 +106,86 @@ class _StatusPageState extends State<StatusPage> {
               fontSize: width * 0.06),
         ),
       ),
-      body: Expanded(
-        child:
-        StreamBuilder<List<Status>>(
-          stream: _statusService.getStatuses(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
+      body: StreamBuilder<List<Status>>(
+        stream: _statusService.getStatuses(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(
-                child: Text('No statuses available'),
-              );
-            }
-            //print("Statuses Fetched: ${snapshot.data!.length}");
-
-            Map<String, List<Status>> notSeenStatuses = {};
-            Map<String, List<Status>> seenStatuses = {};
-
-            String currentUserId = FirebaseAuth.instance.currentUser!.uid;
-
-            for (var status in snapshot.data!) {
-              String username = status.username; // Grouping by username
-
-              if (status.viewedBy.contains(currentUserId)) {
-                if (!seenStatuses.containsKey(username)) {
-                  seenStatuses[username] = [];
-                }
-                seenStatuses[username]!.add(status);
-              } else {
-                if (!notSeenStatuses.containsKey(username)) {
-                  notSeenStatuses[username] = [];
-                }
-                notSeenStatuses[username]!.add(status);
-              }
-            }
-
-            if (notSeenStatuses.isEmpty && seenStatuses.isEmpty) {
-
-              return Center(child: Text('No statuses available'));
-            }
-
-            return ListView(
-              children: [
-                if (notSeenStatuses.isNotEmpty) ...[
-                  Padding(
-                    padding: EdgeInsets.only(top: height * 0.015, left: width * 0.06),
-                    child: Text(
-                      "Recently Added",
-                      style: TextStyle(
-                        fontSize: width * 0.045, // Reduce font size a little
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  _buildStatusCategory("", notSeenStatuses, false),
-                ] else
-                  SizedBox.shrink(), // Prevent empty space when there are no unseen statuses
-
-                if (seenStatuses.isNotEmpty) ...[
-                  Padding(
-                    padding: EdgeInsets.only(left: width * 0.06, top: height * 0.015),
-                    child: Text(
-                      "Viewed Status",
-                      style: TextStyle(
-                        fontSize: width * 0.045,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  _buildStatusCategory("", seenStatuses, true),
-                ] else
-                  SizedBox.shrink(), // Prevent empty space when there are no seen statuses
-              ],
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Text('No statuses available'),
             );
+          }
+          //print("Statuses Fetched: ${snapshot.data!.length}");
 
+          Map<String, List<Status>> notSeenStatuses = {};
+          Map<String, List<Status>> seenStatuses = {};
 
+          String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
+          for (var status in snapshot.data!) {
+            String username = status.username; // Grouping by username
 
-          },
-        ),
+            if (status.viewedBy.contains(currentUserId)) {
+              if (!seenStatuses.containsKey(username)) {
+                seenStatuses[username] = [];
+              }
+              seenStatuses[username]!.add(status);
+            } else {
+              if (!notSeenStatuses.containsKey(username)) {
+                notSeenStatuses[username] = [];
+              }
+              notSeenStatuses[username]!.add(status);
+            }
+          }
+
+          if (notSeenStatuses.isEmpty && seenStatuses.isEmpty) {
+            return Center(child: Text('No statuses available'));
+          }
+
+          return ListView(
+            children: [
+              if (notSeenStatuses.isNotEmpty) ...[
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: height * 0.015, left: width * 0.06),
+                  child: Text(
+                    "Recently Added",
+                    style: TextStyle(
+                      fontSize: width * 0.045, // Reduce font size a little
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                _buildStatusCategory("", notSeenStatuses, false),
+              ] else
+                SizedBox.shrink(),
+              // Prevent empty space when there are no unseen statuses
+
+              if (seenStatuses.isNotEmpty) ...[
+                Padding(
+                  padding: EdgeInsets.only(
+                      left: width * 0.06, top: height * 0.015),
+                  child: Text(
+                    "Viewed Status",
+                    style: TextStyle(
+                      fontSize: width * 0.045,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+                _buildStatusCategory("", seenStatuses, true),
+              ] else
+                SizedBox.shrink(),
+              // Prevent empty space when there are no seen statuses
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -189,23 +194,25 @@ class _StatusPageState extends State<StatusPage> {
             MaterialPageRoute(builder: (context) => const EnterStatus()),
           );
         },
-        backgroundColor: Colors.green.shade400,
+        backgroundColor: Colors.black,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        child: Icon(Icons.add, color: Colors.white,size: width*0.08,),
+        child: Icon(
+          Icons.add, color: Colors.green.shade700, size: width * 0.08,),
       ),
-      bottomNavigationBar: MainNavigationPage(currentIndex: _selectedIndex, onTap: _onItemTapped),
+      bottomNavigationBar: MainNavigationPage(
+          currentIndex: _selectedIndex, onTap: _onItemTapped),
     );
   }
 
-  Widget  _buildStatusCategory(
-      String title, Map<String, List<Status>> groupedStatuses, bool isSeen) {
+  Widget _buildStatusCategory(String title,
+      Map<String, List<Status>> groupedStatuses, bool isSeen) {
     if (groupedStatuses.isEmpty) return SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 8,right: 8),
+          padding: const EdgeInsets.only(left: 8, right: 8),
           child: Text(title,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         ),
@@ -219,41 +226,49 @@ class _StatusPageState extends State<StatusPage> {
             List<Status> userStatus = groupedStatuses[username]!;
 
             return ListTile(
-              leading: Container(
+                leading: Container(
                 decoration: BoxDecoration(
 
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: isSeen ?
-                        Colors.grey : Color(0XFF45C178),
-                        width: 2)),
-                child: CircleAvatar(
-                  backgroundColor: Color(0XFFF3F9ED),
-                  child: Text(userStatus[0].username[0].toUpperCase(),
-                    style: TextStyle(color: Color(0XFF8BC34A)),),
-                ),
-              ),
-              title: Text(username,style: TextStyle(fontFamily: 'poppins',fontWeight: FontWeight.w500),),
-              subtitle: Text(isSeen?
-              '${userStatus.length} status viewed ':'${userStatus.length}'
-                  ' status available',style: TextStyle(
-                  fontFamily: 'poppins',fontWeight: FontWeight.w600,color: Colors.grey),),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        ViewStatusScreen(statuses: userStatus),
-                  ),
-                );
-                setState(() {});
-              },
+                shape: BoxShape.circle,
+                border: Border.all(
+                color: isSeen ?
+                Colors.grey : Color(0XFF45C178),
+            width: 2)),
+            child: CircleAvatar(
+            backgroundColor: Color(0XFFF3F9ED),
+            child: Text(userStatus[0].username[0].toUpperCase(),
+            style: TextStyle(color: Color(0XFF8BC34A)),),
+            ),
+            ),
+
+            title: Text(username,style: TextStyle(fontFamily: 'poppins',fontWeight: FontWeight.w500),),
+            subtitle: Text(isSeen?
+            '${userStatus.length} status viewed ':'${userStatus.length}'
+            ' status available',style: TextStyle(
+            fontFamily: 'poppins',fontWeight: FontWeight.w600,color: Colors.grey),),
+            onTap: () {
+            Navigator.push(
+            context,
+            MaterialPageRoute(
+            builder: (context) =>
+            ViewStatusScreen(statuses: userStatus),
+            ),
             );
+            setState(() {});
+            },
+            trailing: Text(
+            DateFormat("HH:mm").format(userStatus.last.timestamp.toDate()), style: TextStyle(
+            fontFamily: 'poppins',
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.black54, // Adjust color if needed
+            )
+            ,
+            ));
           },
         ),
       ],
     );
-
   }
 }
 
@@ -269,15 +284,15 @@ class ViewStatusScreen extends StatefulWidget {
 class _ViewStatusScreenState extends State<ViewStatusScreen> {
 
 
-  int currentIndex=0;
+  int currentIndex = 0;
+
   @override
   void initState() {
-
     super.initState();
     _markStatusAsViewed();
     _statusService.fetchAndPrintStatuses();
-
   }
+
   final StatusService _statusService = StatusService();
   final TextEditingController _replyController = TextEditingController();
 
@@ -285,14 +300,21 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
     Status status = widget.statuses[currentIndex];
 
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
         return Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height*0.3,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height * 0.3,
 
           padding: EdgeInsets.all(10),
           child: Column(
@@ -316,9 +338,10 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
 
                     return ListTile(
                       leading: CircleAvatar(
+                        backgroundColor: Color(0xFFF3F9ED),
                         child: Text(
                           replyBy[0].toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(fontWeight: FontWeight.bold,color: Color(0xFF8BC34A)),
                         ),
                       ),
                       title: Text(
@@ -338,14 +361,12 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
   }
 
 
-
-
-
   void _markStatusAsViewed() async {
     Status currentStatus = widget.statuses[currentIndex];
     String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
     if (!currentStatus.viewedBy.contains(currentUserId)) {
+      await Future.delayed(Duration(seconds: 3));
       await _statusService.markStatusAsViewed(currentStatus.uid, currentUserId);
 
       setState(() {
@@ -406,8 +427,14 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
     Status status = widget.statuses[currentIndex];
 
     return GestureDetector(
@@ -439,9 +466,10 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                       controller: _replyController,
                       decoration: InputDecoration(
 
-                        prefixIcon: IconButton(onPressed: (){
+                        prefixIcon: IconButton(onPressed: () {
                           _showRepliesBottomSheet();
-                        },icon:  Icon(Icons.remove_red_eye,color: Colors.white,)),
+                        }, icon: Icon(Icons.remove_red_eye,
+                          color: Colors.white,)),
                         fillColor: Colors.black26,
                         filled: true,
                         hintText: " Reply    ",
@@ -449,7 +477,9 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
 
                         hintStyle: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
-                        suffixIcon: IconButton(onPressed: _sendReply, icon:Icon(Icons.send,color: Colors.white,),
+                        suffixIcon: IconButton(
+                          onPressed: _sendReply, icon: Icon(Icons.send,
+                          color: Colors.white,),
                         ),
                       ),
                     ),
@@ -561,20 +591,28 @@ class _EnterStatusState extends State<EnterStatus> {
   }
 
   void _uploadTextStatus() {
-    if (_statusController.text.trim().isNotEmpty) {
+    if (_statusController.text
+        .trim()
+        .isNotEmpty) {
       String selectedColorHEX = _colorHexCodes[_colorIndex];
       String selectedStyleIndex = _selectedStyleIndex.toString();
       _statusService.uploadStatus(
           _statusController.text.trim(), selectedColorHEX, selectedStyleIndex);
       _statusController.clear();
-      Navigator.pop(context);
+      (context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery
+        .of(context)
+        .size
+        .height;
+    final width = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Scaffold(
       backgroundColor: _backgroundColors[_colorIndex],
       body: Container(

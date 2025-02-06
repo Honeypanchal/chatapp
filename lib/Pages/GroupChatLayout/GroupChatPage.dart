@@ -857,16 +857,19 @@ class _GroupchatpageState extends State<Groupchatpage> {
     return StatefulBuilder(
       builder: (context, setState) {
         Future<void> fetchVoterNames(List<dynamic> voterUids) async {
-          List<String> fetchedNames = await getUserNames(voterUids.cast<String>());
-          if (fetchedNames.isNotEmpty) {
-            setState(() {
-              for (int i = 0; i < voterUids.length; i++) {
-                voterNames[voterUids[i]] = fetchedNames[i];
-              }
-            });
+          if (mounted) {
+            List<String> fetchedNames = await getUserNames(
+                voterUids.cast<String>());
+
+            if (fetchedNames.isNotEmpty) {
+              setState(() {
+                for (int i = 0; i < voterUids.length; i++) {
+                  voterNames[voterUids[i]] = fetchedNames[i];
+                }
+              });
+            }
           }
         }
-
         return Align(
           alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
@@ -874,7 +877,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
             padding: EdgeInsets.all(12),
             width: MediaQuery.of(context).size.width * 0.75,
             decoration: BoxDecoration(
-              color: isSender ? Colors.green.shade300 : Colors.grey.shade100,
+              color: isSender ? Colors.green.shade700 : Colors.grey.shade100,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -994,7 +997,10 @@ class _GroupchatpageState extends State<Groupchatpage> {
       if (messageSnapshot.exists) {
         Map<String, dynamic>? data = messageSnapshot.data();
         List<dynamic> readBy = data?['readBy'] ?? [];
-        return await getUserNames(List<String>.from(readBy)); // Await here
+        if(mounted){
+          return await getUserNames(List<String>.from(readBy)); // Await here
+        }
+
       }
       return [];
     });

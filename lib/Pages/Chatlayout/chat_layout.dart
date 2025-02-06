@@ -450,6 +450,7 @@ class _ChatLayoutState extends State<ChatLayout> {
               padding: EdgeInsets.only(top: 5, bottom: 5),
               child: messages.isNotEmpty
                   ? ListView.builder(
+
                 controller: scrollController,
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
@@ -474,7 +475,9 @@ class _ChatLayoutState extends State<ChatLayout> {
                   return GestureDetector(
                     onLongPress: () {
                       toggleMessageSelection(messageId);
+
                     },
+
                     onHorizontalDragEnd: (details) {
                       setState(() {
                         replyToMessage = messageData['message'];
