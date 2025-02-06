@@ -6,10 +6,10 @@ class StatusService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<void> uploadStatus(String text, String backgroundColor,String textStyle) async {
-    String uid = _auth.currentUser!.uid;
+  Future<void> uploadStatus(String text, String backgroundColor, String textStyle) async {
+    String userId = _auth.currentUser!.uid;
 
-    DocumentSnapshot userDoc = await _firestore.collection('Users').doc(uid).get();
+    DocumentSnapshot userDoc = await _firestore.collection('Users').doc(userId).get();
     if (!userDoc.exists) {
       print("Error: User document not found!");
       return;
@@ -17,39 +17,122 @@ class StatusService {
 
     String username = userDoc['firstName'] ?? "Unknown";
 
+    DocumentReference statusRef = _firestore.collection('Status').doc(); // Generates unique ID
+
     Status status = Status(
-      uid: uid,
+      uid: statusRef.id,
       username: username,
       text: text,
       backgroundColor: backgroundColor,
-      textStyle: textStyle, // Store selected text style
+      textStyle: textStyle,
       timestamp: Timestamp.now(),
       viewedBy: [],
+      statusReplies: [],
     );
 
-    await _firestore.collection('Status').add(status.toMap());
-    print("Status uploaded successfully with color: $backgroundColor and style: $textStyle");
+    await statusRef.set(status.toMap());
+    print("Status uploaded successfully with ID: ${statusRef.id}");
   }
+
+
+  Future<void> sendStatusReply(String statusId, String replyText) async {
+    User? currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      return;
+    }
+
+    String senderId = currentUser.uid;
+
+    DocumentSnapshot senderDoc = await _firestore.collection('Users').doc(senderId).get();
+    if (!senderDoc.exists) {
+
+      return;
+    }
+
+    String senderName = senderDoc['firstName'] ?? "Unknown";
+
+    DocumentReference statusRef = _firestore.collection('Status').doc(statusId);
+    DocumentSnapshot statusDoc = await statusRef.get();
+    if (!statusDoc.exists) {
+
+      return;
+    }
+
+    try {
+      await statusRef.update({
+        'statusReplies': FieldValue.arrayUnion([
+          {
+            'replyBy': senderName,
+            'replyText': replyText,
+            'timestamp': Timestamp.now(),
+          }
+        ])
+      });
+      print("Reply added successfully: $senderName - $replyText");
+    } catch (e) {
+      print(" Error sending reply: $e");
+    }
+  }
+
 
   Stream<List<Status>> getStatuses() {
-    return _firestore.
-    collection('Status').
-        where('timestamp',isGreaterThan: Timestamp.now().toDate().subtract(Duration(hours: 24)))
-    .orderBy('timestamp',
-        descending: true).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => Status.fromMap(doc.data())).toList();
+
+    return _firestore.collection('Status').
+    where('timestamp',isGreaterThan: Timestamp.now().toDate().subtract(Duration(hours: 24)))
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .handleError((error) {
+
+    })
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        var data = doc.data();
+        print(" Status Data: ${doc.id} -> $data");
+        return Status.fromMap(data);
+      }).toList();
     });
   }
 
-// Mark Status as Viewed
-  Future<void> markStatusAsViewed(String statusOwnerId) async {
-    String viewerId = _auth.currentUser!.uid;
-    DocumentSnapshot viewerDoc = await _firestore.collection('Users').doc(viewerId).get();
-    String viewerName = viewerDoc.exists ? viewerDoc['firstName'] : "Unknown";
-
-    DocumentReference statusRef = _firestore.collection('Status').doc(statusOwnerId);
-    await statusRef.update({
-      'viewedBy': FieldValue.arrayUnion([viewerName])
-    });
+  void fetchAndPrintStatuses() async {
+    var snapshot = await _firestore.collection('Status').get();
+    if (snapshot.docs.isEmpty) {
+      print("No statuses found in Firestore!");
+    } else {
+      for (var doc in snapshot.docs) {
+        print("Status Found: ${doc.id} -> ${doc.data()}");
+      }
+    }
   }
+
+
+  void debugFetchStatuses() async {
+    var snapshot = await _firestore.collection('Status').get();
+    for (var doc in snapshot.docs) {
+      print("Fetched status: ${doc.id} -> ${doc.data()}");
+    }
+  }
+
+
+
+  Future<void> markStatusAsViewed(String statusId, String userId) async {
+    try {
+      DocumentReference statusRef = FirebaseFirestore.instance.collection('Status').doc(statusId);
+      DocumentSnapshot statusDoc = await statusRef.get();
+
+      if (statusDoc.exists) {
+        await statusRef.update({
+          'viewedBy': FieldValue.arrayUnion([userId])
+        });
+        print(" Marked as viewed successfully for: $statusId");
+      } else {
+        print(" Status document not found in Firestore: $statusId");
+      }
+    } catch (e) {
+      print(" Error marking as viewed: $e");
+    }
+  }
+
+
+
+
 }

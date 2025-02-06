@@ -4,7 +4,7 @@ import 'package:chatapp/services/auth_services.dart';
 import 'MainNavigation.dart';
 import 'Profile.dart';
 import 'SigninPage.dart';
-import 'FirstPage.dart';
+import 'package:chatapp/Pages/Authentication/FirstPage.dart';
 
 //
 //

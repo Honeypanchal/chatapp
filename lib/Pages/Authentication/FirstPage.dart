@@ -1,5 +1,7 @@
-import 'package:chatapp/Pages/SigninPage.dart';
-import 'package:chatapp/Pages/Signup.dart';
+import 'package:chatapp/Pages/Authentication/SigninPage.dart';
+import 'package:chatapp/Pages//Authentication/Signup.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Firstpage extends StatefulWidget {
@@ -9,7 +11,57 @@ class Firstpage extends StatefulWidget {
   State<Firstpage> createState() => _FirstpageState();
 }
 
-class _FirstpageState extends State<Firstpage> {
+class _FirstpageState extends State<Firstpage>  {
+
+  // with WidgetsBindingObserver
+// -----------------------
+//   final FirebaseAuth _auth = FirebaseAuth.instance;
+//   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // ---------------------------
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addObserver(this);
+  //
+  //   // Update status to online when the app starts
+  //   _updateUserStatus(true);
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   // Ensure to remove the observer
+  //   WidgetsBinding.instance.removeObserver(this);
+  //
+  //   // Update status to offline when the app is disposed
+  //   _updateUserStatus(false);
+  //   super.dispose();
+  // }
+  //
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   // Detect app lifecycle changes
+  //   if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+  //     // App is in background or closed
+  //     _updateUserStatus(false);
+  //   } else if (state == AppLifecycleState.resumed) {
+  //     // App is in foreground
+  //     _updateUserStatus(true);
+  //   }
+  // }
+  //
+  // Future<void> _updateUserStatus(bool isActive) async {
+  //   User? user = _auth.currentUser;
+  //   if (user != null) {
+  //     await _firestore.collection('Users').doc(user.uid).update({
+  //       "isActive": isActive,
+  //       "lastActive": DateTime.now().millisecondsSinceEpoch,
+  //     });
+  //   }
+  // }
+
+  // ---------------------------------
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

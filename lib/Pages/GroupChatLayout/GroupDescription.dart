@@ -1,17 +1,26 @@
-import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
+import 'dart:async';
+
+import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
+
 import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
-import 'package:chatapp/models/Group.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chatapp/models/CustomClass.dart';
+
+import 'package:chatapp/pages/GroupChatLayout/AddNewMembersToGroup.dart';
+
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:chatapp/services/users_services.dart';
 import 'package:chatapp/services/groupChat_services.dart';
+
+import '../../services/auth_services.dart';
 
 class GroupDescription extends StatefulWidget {
   final String groupId;
   final String currentUser;
 
-  const GroupDescription({super.key, required this.groupId, required this.currentUser});
+  const GroupDescription(
+      {super.key, required this.groupId, required this.currentUser});
 
   @override
   State<GroupDescription> createState() => _GroupDescriptionState();
@@ -20,15 +29,65 @@ class GroupDescription extends StatefulWidget {
 class _GroupDescriptionState extends State<GroupDescription> {
   String firstName = '';
   String groupDescription = '';
+  String groupName = '';
   dynamic group;
-  bool groupSettings =true;
-      bool sendMessages =true;
-  bool addOtherMembers =true;
+  bool groupSettings = true;
+  bool sendMessages = true;
+  bool addOtherMembers = true;
 
   List<String> membersFirstNameList = [];
   List<String> participants = [];
   List<String> admins = [];
   bool isLoading = true;
+  bool isLoadingDatabse = true;
+  late CustomClass user;
+
+  TextEditingController _searchText = TextEditingController();
+  bool _isSearching = false;
+
+
+
+  StreamSubscription? _groupSubscription;
+
+  void listenToDatabaseUpdates() {
+    final groupRef =
+        FirebaseFirestore.instance.collection("groups").doc(group['groupId']);
+
+    _groupSubscription = groupRef.snapshots().listen((snapshot) async {
+      print("Listening to changes");
+
+      if (snapshot.exists && mounted) {
+        var updatedGroupData = snapshot.data() as Map<String, dynamic>;
+
+        setState(() {
+          isLoading=true;
+          isLoadingDatabse = true;
+        });
+
+        await Future.delayed(Duration(seconds: 2));
+
+        if (mounted) {
+          setState(() {
+            group = updatedGroupData;
+            participants = (group['participants'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList();
+            admins = (group['admins'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList();
+            groupSettings = group['groupSettings'];
+            sendMessages = group['sendMessages'];
+            addOtherMembers = group['addOtherMembers'];
+            isLoading = false;
+            isLoadingDatabse=false;
+          });
+
+          await membersFirstName();
+        }
+      }
+    });
+  }
+
   Future<void> getGroup() async {
     try {
       final anothergroup = await fetchGroupByGroupId(widget.groupId);
@@ -46,13 +105,16 @@ class _GroupDescriptionState extends State<GroupDescription> {
           groupSettings = group['groupSettings'];
           sendMessages = group['sendMessages'];
           addOtherMembers = group['addOtherMembers'];
+          participants = (group['participants'] as List<dynamic>)
+              .map((e) => e.toString())
+              .toList();
         });
 
+        listenToDatabaseUpdates();
         await getDataAndUpdateUI();
         await membersFirstName();
       }
     } catch (e) {
-
       print('Error fetching group details: $e');
     } finally {
       setState(() {
@@ -67,14 +129,14 @@ class _GroupDescriptionState extends State<GroupDescription> {
   }
 
   Future<void> membersFirstName() async {
-    print(group['participants']);
+    print('here populating participants');
 
-    setState(() {
-      participants = (group['participants'] as List<dynamic>)
-          .map((e) => e.toString())
-          .toList();
-      print(participants[0]);
-    });
+    // setState(() {
+    //   participants = (group['participants'] as List<dynamic>)
+    //       .map((e) => e.toString())
+    //       .toList();
+    //   print(participants[0]);
+    // });
 
     List<String> fetchedNames = await getUserNames(participants);
 
@@ -84,20 +146,74 @@ class _GroupDescriptionState extends State<GroupDescription> {
   }
 
   Future<void> getDataAndUpdateUI() async {
-    String enteredFirstName = await getFirstNameById(
-        group['createdBy']); // Await the Future to get the value
+    String enteredFirstName = await getFirstNameById(group['createdBy']);
 
     setState(() {
       firstName = enteredFirstName;
     });
   }
 
+  Future<void> exitGroup(String currentUser, String groupId) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: Text("Are you sure you want to exit the group?",
+                style: TextStyle(fontFamily: 'Raleway', color: Colors.black)),
+            actions: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                            fontFamily: 'Raleway', color: Colors.green.shade700),
+                      )),
+                  TextButton(
+                      onPressed: () {
+                        try {
+                          removeUserFromGroupParticipants(
+                              widget.groupId, widget.currentUser);
+                          removeGroupFromCurrentUser(
+                                  widget.currentUser, widget.groupId)
+                              .then((_) {
+                            Navigator.of(context).pushNamed('/groupDisplay',arguments: {'currentUser':user});
+                          });
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      },
+                      child: Text(
+                        "Exit",
+                        style:
+                            TextStyle(fontFamily: 'Raleway', color: Colors.red),
+                      ))
+                ],
+              ),
+            ],
+          );
+        });
+  }
+  void getCurrentUserDetails() async {
+    CustomClass? found = await getUserDetails(widget.currentUser);
+    if (found != null) {
+      setState(() {
+        user = found;
+      });
+    }
+  }
   @override
   void initState() {
     super.initState();
+    getCurrentUserDetails();
 
     getGroup();
-
   }
 
   Future<String?> _showGroupDescriptionModal() async {
@@ -112,16 +228,11 @@ class _GroupDescriptionState extends State<GroupDescription> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        double screenHeight = MediaQuery
-            .of(context)
-            .size
-            .height;
-        double screenWidth = MediaQuery
-            .of(context)
-            .size
-            .width;
+        double screenHeight = MediaQuery.of(context).size.height;
+        double screenWidth = MediaQuery.of(context).size.width;
 
         return Container(
+          clipBehavior: Clip.none,
           padding: EdgeInsets.all(screenWidth * 0.05),
           height: screenHeight * 0.6,
           child: Column(
@@ -133,59 +244,173 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
+                cursorColor: Colors.green.shade700,
                 controller: descriptionController,
                 decoration: InputDecoration(
-                  hintText:
-                  group['groupDescription'] ?? "Add group description",
-                  border: UnderlineInputBorder(),
+                  hintText: group['groupDescription'] ?? "Add group description",
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700),
+                  ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.02),
               Text(
                 "The group description is visible to members of this group and people invited to this group.",
-                style:
-                TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+                style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
-              Row(
+              Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.015),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context, null); // Return null if canceled
-                      },
-                      child:
-                      Text("Cancel", style: TextStyle(color: Colors.red)),
-                    ),
-                  ),
-                  SizedBox(width: screenWidth * 0.02),
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: EdgeInsets.symmetric(
-                            vertical: screenHeight * 0.015),
-                      ),
-                      onPressed: () {
-                        String enteredDescription = descriptionController.text;
-                        if (enteredDescription.isNotEmpty) {
-                          print("Group Description: $enteredDescription");
 
-                          Navigator.pop(context,
-                              enteredDescription); // Return the entered description
-                        }
-                      },
-                      child: Text("OK", style: TextStyle(color: Colors.white)),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                              side: BorderSide(color: Colors.grey, width: 0),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context, null);
+                          },
+                          child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                        ),
+                      ),
+                      Container(width: 1, color: Colors.grey),
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                              side: BorderSide(color: Colors.grey, width: 0),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            String enteredDescription = descriptionController.text;
+                            if (enteredDescription.isNotEmpty) {
+                              print("Group Description: $enteredDescription");
+                              Navigator.pop(context, enteredDescription);
+                            }
+                          },
+                          child: Text("Ok", style: TextStyle(color: Colors.green.shade700)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+
+      },
+    );
+  }
+
+  Future<String?> _showGroupNameModal() async {
+    TextEditingController groupName = TextEditingController();
+    groupName.text = group['groupName'] ?? "";
+
+    return await showModalBottomSheet<String?>(
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        double screenHeight = MediaQuery.of(context).size.height;
+        double screenWidth = MediaQuery.of(context).size.width;
+
+        return Container(
+          clipBehavior: Clip.none,
+          padding: EdgeInsets.all(screenWidth * 0.05),
+          height: screenHeight * 0.6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Group Name",
+                style: TextStyle(fontSize: screenWidth * 0.05),
+              ),
+              SizedBox(height: screenHeight * 0.015),
+              TextFormField(
+                cursorColor: Colors.green.shade700,
+                controller: groupName,
+                decoration: InputDecoration(
+                  hintText: group['groupName'] ?? "Change group name",
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green.shade700),
+                  ),
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.02),
+              Text(
+                "The group Name is visible to members of this group and people invited to this group.",
+                style:
+                    TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+              ),
+              Spacer(),
+              Column(mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                              side: BorderSide(color: Colors.grey, width: 0),),
+                            padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context, null); // Return null if canceled
+                          },
+                          child:
+                              Text("Cancel", style: TextStyle(color: Colors.red)),
+                        ),
+                      ),
+                      Container(width: 1, color: Colors.grey),
+                      Expanded(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero,
+                                side: BorderSide(color: Colors.grey, width: 0)),
+                              padding: EdgeInsets.zero,
+                          ),
+                          onPressed: () {
+                            String enteredName = groupName.text;
+                            if (enteredName.isNotEmpty) {
+                              print("Group Description: $enteredName");
+
+                              Navigator.pop(context,
+                                  enteredName); // Return the entered description
+                            }
+                          },
+                          child: Text("OK", style: TextStyle(color: Colors.green.shade700)),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -196,19 +421,37 @@ class _GroupDescriptionState extends State<GroupDescription> {
     );
   }
 
+  Future<void> changeGroupName() async {
+    String? name = await _showGroupNameModal();
+    if (name != null) {
+      try {
+        await editGroupName(group['groupId'], name);
+        // setState(() {
+        //   group['groupDescription'] = desc;
+        // });
+        setState(() {
+          groupName = name;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Group Name edited succesfully"),
+          backgroundColor: Colors.blue.shade200,
+        ));
+      } catch (e) {
+        print(e.toString());
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final height = MediaQuery
-        .of(context)
-        .size
-        .height;
-if(isLoading){
-  return Center(child: CircularProgressIndicator(),);
-}
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    if (isLoading) {
+      return Center(
+        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.green.shade700,),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -216,13 +459,67 @@ if(isLoading){
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.of(context).pushNamed(
+              '/groupchat',
+              arguments: {
+                'groupId': widget.groupId,
+                'currentUser': widget.currentUser,
+              },
+            );
+          },
+
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
-          ),
+          PopupMenuButton(
+            offset: Offset(0, height * 0.052),
+            elevation: 2,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 0,
+                child: Text("Add members"),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: Text("Change group name"),
+              )
+            ],
+            color: Colors.grey.shade200,
+            onSelected: (value) {
+              if (value == 0) {
+                print('$addOtherMembers');
+                if (addOtherMembers || admins.contains(widget.currentUser)) {
+                  Navigator.of(context).pushNamed(
+                    '/addNewMembers',
+                    arguments: {
+                      'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                      'groupId': widget.groupId,
+                    },
+                  );
+
+
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("You are not an admin of this group.",
+                        style: TextStyle(
+                            color: Colors.white, fontFamily: 'Raleway')),
+                    backgroundColor: Colors.red.shade200,
+                  ));
+                }
+              } else if (value == 1) {
+                if (!isCurrentUserAdmin(widget.currentUser)) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("You are not an admin",
+                        style: TextStyle(
+                            color: Colors.white, fontFamily: 'Raleway')),
+                    backgroundColor: Colors.red.shade200,
+                  ));
+                } else {
+                  changeGroupName();
+                }
+              }
+            },
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -231,9 +528,9 @@ if(isLoading){
             Center(
               child: CircleAvatar(
                 radius: width * 0.13,
-                backgroundColor: Colors.black,
+                backgroundColor: Colors.green.shade700,
                 child:
-                Icon(Icons.group, color: Colors.white, size: width * 0.09),
+                    Icon(Icons.group, color: Colors.white, size: width * 0.09),
               ),
             ),
             SizedBox(height: height * 0.012),
@@ -244,12 +541,32 @@ if(isLoading){
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildButton(Icons.call, 'Audio'),
-                _buildButton(Icons.videocam, 'Video'),
+                _buildButton(Icons.wifi_calling_3_outlined, 'Audio'),
+                _buildButton(Icons.video_call_outlined, 'Video'),
 
                 //Adding a new member to the group ;
                 GestureDetector(
-                    onTap: () {}, child: _buildButton(Icons.person_add, 'Add')),
+                    onTap: () {
+                      print('$addOtherMembers');
+                      if (addOtherMembers ||
+                          admins.contains(widget.currentUser)) {
+                        Navigator.of(context).pushNamed(
+                          '/addNewMembers',
+                          arguments: {
+                            'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                            'groupId': widget.groupId,
+                          },
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("You are not an admin of this group.",
+                              style: TextStyle(
+                                  color: Colors.white, fontFamily: 'Raleway')),
+                          backgroundColor: Colors.red.shade200,
+                        ));
+                      }
+                    },
+                    child: _buildButton(Icons.person_add_alt, 'Add')),
                 _buildButton(Icons.search, 'Search'),
               ],
             ),
@@ -261,45 +578,60 @@ if(isLoading){
             SizedBox(height: height * 0.012),
             Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.047, vertical: height * 0.017),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      String? desc = await _showGroupDescriptionModal();
-                      if (desc != null) {
-                        try {
-                          await editGroupInfo(group['groupId'], desc);
-                          // setState(() {
-                          //   group['groupDescription'] = desc;
-                          // });
-                          setState(() {
-                            groupDescription = desc;
-                          });
-
+                  horizontal: width * 0.057, vertical: height * 0.017),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        if (!isCurrentUserAdmin(widget.currentUser)) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content:
-                            Text("Group description edited succesfully"),
-                            backgroundColor: Colors.blue.shade200,
+                            content: Text("You are not an admin",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Raleway')),
+                            backgroundColor: Colors.red.shade200,
                           ));
-                        } catch (e) {
-                          print(e.toString());
+                        } else {
+                          String? desc = await _showGroupDescriptionModal();
+                          if (desc != null) {
+                            try {
+                              await editGroupInfo(group['groupId'], desc);
+                              // setState(() {
+                              //   group['groupDescription'] = desc;
+                              // });
+                              setState(() {
+                                groupDescription = desc;
+                              });
+
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(
+                                    "Group description edited succesfully"),
+                                backgroundColor: Colors.blue.shade200,
+                              ));
+                            } catch (e) {
+                              print(e.toString());
+                            }
+                          }
                         }
-                      }
-                    },
-                    child: Text(
-                      groupDescription,
-                      style: TextStyle(
-                          color: Colors.blue[500], fontSize: width * 0.037),
+                      },
+                      child: Text(
+                        groupDescription,
+                        style: TextStyle(
+                            color: Colors.green[400], fontSize: width * 0.037),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: height * 0.005),
-                  Text(
-                    'Created by ${firstName}, ${(group['createdAt'])}',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                ],
+                    SizedBox(height: height * 0.005),
+                    Text(
+                      'Created by ${firstName}, ${group['createdAt'].toDate().hour} : ${group['createdAt'].toDate().minute}',
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                  ],
+                ),
               ),
             ),
             Divider(
@@ -422,59 +754,56 @@ if(isLoading){
             if (isCurrentUserAdmin(widget.currentUser)) ...[
               ListTile(
                 onTap: () async {
-                  final result = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            UpdateGroupPermissions(
-                              groupSettings: group['groupSettings'],
-                              sendMessages: group['sendMessages'],
-                              addOtherMembers: group['addOtherMembers'],
-                              admins: admins,
-                              members: participants,
-                              currentUser: widget.currentUser,),));
-                  if (result != null) {
-    List<String> newAdmins = result['admins'];
-    List<String> removedAdmins = admins.where((admin) => !newAdmins.contains(admin)).toList();
-    if (!listEquals(admins, newAdmins)) {
-      setState(() {
-        admins = newAdmins;
-      });
-    }
+                  final result = await Navigator.of(context).pushNamed(
+                    '/updateGroupPermissions',
+                    arguments: {
+                      'groupSettings': group['groupSettings'],
+                      'sendMessages': group['sendMessages'],
+                      'addOtherMembers': group['addOtherMembers'],
+                      'admins': admins,
+                      'members': participants,
+                      'currentUser': widget.currentUser,
+                      'createdBy': group['createdBy']
+                    },
+                  ) as Map<String, dynamic>?;
+                  if(result!=null){
+                    List<String> newAdmins = result['admins'];
+
                     setState(() {
-                      sendMessages=result['sendMessages'];
-                      addOtherMembers=result['addOtherMembers'];
-                      groupSettings=result['groupSettings'];
+                      admins = newAdmins;
+                      sendMessages = result['sendMessages'];
+                      addOtherMembers = result['addOtherMembers'];
+                      groupSettings = result['groupSettings'];
                     });
-                   try{
-                     print("Here to update group settings");
-                     updateGroupSettings(
-                         group['groupId'], result['groupSettings'], result['sendMessages'],
-                         result['addOtherMembers'], admins);
 
+                    try {
+                      print("Here to update group settings");
+                      print(
+                          '${result['groupSettings']}, ${result['sendMessages']},${result['addOtherMembers']}');
+                      updateGroupSettings(
+                        group['groupId'],
+                        result['groupSettings'],
+                        result['sendMessages'],
+                        result['addOtherMembers'],
+                        admins,
+                      );
 
-for(String addedAdmin in newAdmins){
-  print('HER TO Add');
-  updateAdminStatusForCurrentUser(addedAdmin, group['groupId'], true);
-  updateNotificationsForCurrentUser(addedAdmin, true);
-
-}
-                     // if (admins.contains(widget.currentUser)) {
-                     //   updateAdminStatusForCurrentUser(widget.currentUser, group['groupId'], true);
-                     //   updateNotificationsForCurrentUser(widget.currentUser, true);
-                     // } else {
-                     //   updateAdminStatusForCurrentUser(widget.currentUser, group['groupId'], false);
-                     //   updateNotificationsForCurrentUser(widget.currentUser, false);
-                     // }
-
-                     for (String removedAdmin in removedAdmins) {
-               print("Here to remove");        updateAdminStatusForCurrentUser(removedAdmin, group['groupId'], false);
-                       updateNotificationsForCurrentUser(removedAdmin, false);
-                     }
-
-                   }catch(e){
-                     print((e.toString()));
-                   }
+                      for (String members in group['participants']) {
+                        if (admins.contains(members)) {
+                          print('$members is an admin');
+                          updateAdminStatusForCurrentUser(
+                              members, group['groupId'], true);
+                        } else {
+                          print('$members is  not an admin');
+                          updateAdminStatusForCurrentUser(
+                              members, group['groupId'], false);
+                        }
+                      }
+                    } catch (e) {
+                      print(e.toString());
+                    }
                   }
+
                 },
                 leading: Icon(
                   Icons.settings,
@@ -523,9 +852,33 @@ for(String addedAdmin in newAdmins){
                     child: Column(
                       children: [
                         ListTile(
+                          //Adding new members to the group after checking if the user is an admin and the permissions
+                          onTap: () {
+                            print('$addOtherMembers');
+                            if (addOtherMembers ||
+                                admins.contains(widget.currentUser)) {
+                              Navigator.of(context).pushNamed(
+                                '/addNewMembers',
+                                arguments: {
+                                  'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                                  'groupId': widget.groupId,
+                                },
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content: Text(
+                                    "You are not an admin of this group.",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway')),
+                                backgroundColor: Colors.red.shade200,
+                              ));
+                            }
+                          },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                              backgroundColor: Colors.black,
+                              backgroundColor: Colors.green.shade700,
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
@@ -536,45 +889,129 @@ for(String addedAdmin in newAdmins){
                             style: TextStyle(fontSize: width * 0.045),
                           ),
                         ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: group['participants'].length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.black,
-                                child: Text(
-                                  membersFirstNameList[index][0].toUpperCase(),
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              title: Text(membersFirstNameList[index]),
-                              trailing: isCurrentUserAdmin(
-                                  group['participants'][index])
-                                  ? Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.blue.shade200,
-                                    border: Border.all(
-                                        color: Colors.blue.shade200),
-                                    borderRadius: BorderRadius.circular(
-                                        width * 0.01)),
-                                width: width * 0.12,
-                                height: height * 0.017,
-                                child: Center(
+                        if (isLoading || isLoadingDatabse)
+                          CircularProgressIndicator(color: Colors.green.shade700,)
+                        else ...[
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: group['participants'].length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                onLongPress: () {
+                                  if(widget.currentUser==group['participants'][index]) {
+
+                                  }else
+                                    {
+                                      if (isCurrentUserAdmin(widget.currentUser)) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                backgroundColor: Colors.white,
+                                                title: Text(
+                                                    "Remove ${membersFirstNameList[index]} from this group?",
+                                                    style: TextStyle(
+                                                        fontFamily: 'Raleway',
+                                                        color: Colors.black)),
+                                                actions: [
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                    crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                    children: [
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(context)
+                                                                .pop();
+                                                          },
+                                                          child: Text(
+                                                            "Cancel",
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                'Raleway',
+                                                                color: Colors
+                                                                    .black),
+                                                          )),
+                                                      TextButton(
+                                                          onPressed: () async{
+                                                            try {
+                                                              print("The particpant you are removing is ${group['participants'][index]} their name is ${membersFirstNameList[index]}");
+
+                                                              await   removeGroupFromThisUser(group['participants'][index],widget.groupId);
+                                                              removeUserFromThisGroup(widget.groupId,group['participants'][index])
+                                                                  .then((_) {
+                                                                Navigator.of(
+                                                                    context)
+                                                                    .pop();
+                                                              });
+                                                            } catch (e) {
+                                                              print(e.toString());
+                                                            }
+                                                          },
+                                                          child: Text(
+                                                            "Remove",
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                'Raleway',
+                                                                color: Colors.red),
+                                                          ))
+                                                    ],
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                            "You cant remove participants",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'Raleway'),
+                                          ),
+                                          backgroundColor: Colors.red.shade200,
+                                        ));
+                                      }
+                                    }
+
+                                },
+                                contentPadding: EdgeInsets.zero,
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.green.shade700,
                                   child: Text(
-                                    "Admin",
-                                    style: TextStyle(
-                                        fontSize: width * 0.027,
-                                        color: Colors.white),
+                                    membersFirstNameList[index][0]
+                                        .toUpperCase(),
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ),
-                              )
-                                  : null,
-                            );
-                          },
-                        ),
+                                title: Text(membersFirstNameList[index]),
+                                trailing: isCurrentUserAdmin(
+                                        group['participants'][index])
+                                    ? Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.green.shade700,
+                                            border: Border.all(
+                                                color: Colors.green.shade700),
+                                            borderRadius: BorderRadius.circular(
+                                                width * 0.01)),
+                                        width: width * 0.12,
+                                        height: height * 0.017,
+                                        child: Center(
+                                          child: Text(
+                                            "Admin",
+                                            style: TextStyle(
+                                                fontSize: width * 0.027,
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                              );
+                            },
+                          ),
+                        ]
                       ],
                     ),
                   ),
@@ -605,6 +1042,9 @@ for(String addedAdmin in newAdmins){
                   style: TextStyle(fontSize: width * 0.045)),
             ),
             ListTile(
+              onTap: () {
+                exitGroup(widget.currentUser, widget.groupId);
+              },
               leading: Icon(
                 Icons.exit_to_app,
                 size: width * 0.06,
@@ -629,14 +1069,8 @@ for(String addedAdmin in newAdmins){
   }
 
   Widget _buildButton(IconData icon, String label) {
-    final height = MediaQuery
-        .of(context)
-        .size
-        .height;
-    final width = MediaQuery
-        .of(context)
-        .size
-        .width;
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
     return Column(
       children: [
         Container(
@@ -646,7 +1080,7 @@ for(String addedAdmin in newAdmins){
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(width * 0.032),
           ),
-          child: Icon(icon, color: Colors.black),
+          child: Icon(icon, color: Colors.green.shade700),
         ),
         SizedBox(height: height * 0.01),
         Text(label),
