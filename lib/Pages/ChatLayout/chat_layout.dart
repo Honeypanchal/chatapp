@@ -517,6 +517,8 @@ class _ChatLayoutState extends State<ChatLayout> {
                   : const Center(
                       child: Text("No messages yet."),
                     ),
+                child: Text("No messages yet."),
+              ),
             ),
           ),
           if (replyToMessage != null)
