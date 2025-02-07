@@ -22,7 +22,6 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
   @override
   void initState() {
     super.initState();
-
     _searchText.addListener(() {
       setState(() {
         searchQuery = _searchText.text.toLowerCase();
@@ -67,7 +66,6 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     Query query = groupsDB.where("participants", arrayContains: widget.currentUser.uid);
 
     if (searchQuery.isNotEmpty) {
-
       String searchLowerBound = searchQuery;
       String searchUpperBound = searchQuery + '\uf8ff';
 
@@ -78,6 +76,25 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
 
     return query.snapshots().map((querySnapshot) =>
     querySnapshot.docs as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
+  }
+
+
+  Future<Map<String, String>> getLastMessage(String groupId) async {
+    var snapshot = await groupsDB
+        .doc(groupId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      var lastMessageData = snapshot.docs.first.data();
+      return {
+        'sender': lastMessageData['sender'] ?? 'Unknown',
+        'message': lastMessageData['message'] ?? ''
+      };
+    }
+    return {'sender': '', 'message': 'No messages yet'};
   }
 
   @override
@@ -169,19 +186,36 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                   itemCount: groups.length,
                   itemBuilder: (context, index) {
                     var groupData = groups[index].data();
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.black,
-                        child: Icon(Icons.group, color: Colors.white),
-                      ),
-                      title: Text(groupData["groupName"] ?? "Unnamed Group"),
-                      subtitle: Text("Members: ${groupData["participants"].length}"),
-                      onTap: () {
-                        Navigator.of(context).pushNamed('/groupchat',
-                            arguments: {
-                              'groupId': groupData['groupId'],
-                              "currentUser": widget.currentUser.uid
-                            });
+                    var groupId = groupData['groupId'];
+
+                    return FutureBuilder<Map<String, String>>(
+                      future: getLastMessage(groupId),
+                      builder: (context, lastMessageSnapshot) {
+                        String lastMessageText = "No messages yet";
+                        String sender = "";
+
+                        if (lastMessageSnapshot.hasData) {
+                          sender = lastMessageSnapshot.data!['sender']!;
+                          lastMessageText = lastMessageSnapshot.data!['message']!;
+                        }
+
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.black,
+                            child: Icon(Icons.group, color: Colors.white),
+                          ),
+                          title: Text(groupData["groupName"] ?? "Unnamed Group"),
+                          subtitle: sender.isNotEmpty
+                              ? Text('$sender: $lastMessageText')
+                              : Text(lastMessageText),
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/groupchat',
+                                arguments: {
+                                  'groupId': groupId,
+                                  "currentUser": widget.currentUser.uid
+                                });
+                          },
+                        );
                       },
                     );
                   },

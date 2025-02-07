@@ -1,3 +1,4 @@
+import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
 
 
@@ -14,31 +15,39 @@ class MainNavigationPage extends StatelessWidget {
           color: Colors.black, // Set background color for the container
           border: Border.all(color: Colors.white),
         ),
-        child: BottomNavigationBar(
+        child: FlashyTabBar(
           backgroundColor: Colors.black,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
+          items: [
+            FlashyTabBarItem(
+              inactiveColor: Colors.grey,
+              activeColor: Colors.white,
               icon: Icon(Icons.chat_sharp),
-              label: 'Chats',
+              title: Text("Chats",style: TextStyle(color: Colors.white)),
             ),
-            BottomNavigationBarItem(
+             FlashyTabBarItem(
+               inactiveColor: Colors.grey,
+               activeColor: Colors.white,
               icon: Icon(Icons.groups_outlined),
-              label: 'Groups',
+              title: Text("Groups",style: TextStyle(color: Colors.white)),
             ),
-            BottomNavigationBarItem(
+             FlashyTabBarItem(
+               inactiveColor: Colors.grey,
+               activeColor: Colors.white,
               icon: Icon(Icons.camera),
-              label: 'Status',
+              title: Text("Status",style: TextStyle(color: Colors.white)),
             ),
-            BottomNavigationBarItem(
+             FlashyTabBarItem(
+               activeColor: Colors.white,
+              inactiveColor: Colors.grey,
               icon: Icon(Icons.person),
-              label: 'Profile',
+              title: Text("Profile",style: TextStyle(color: Colors.white),),
             ),
           ],
-          currentIndex: currentIndex,
-          selectedItemColor: Colors.grey,
-          unselectedItemColor: Colors.white,
-          onTap: onTap,
-          type: BottomNavigationBarType.fixed // Ensures full background color
+
+            selectedIndex: currentIndex,
+
+          onItemSelected: onTap,
+
         ));
   }
 }
