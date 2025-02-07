@@ -379,13 +379,11 @@ class _GroupchatpageState extends State<Groupchatpage> {
   }
 
 
-  // Function to start the search
   void startSearch() => setState(() => isSearching = true);
 
-  // Function to stop the search
+
   void stopSearch() => setState(() => isSearching = false);
 
-  // Function to handle the action of pinning messages
   void pinMessages() {
     selectedMessages.forEach((messageId) async {
       var docRef = _firestore
@@ -402,7 +400,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     });
   }
 
-  // Function to handle the action of favoriting messages
+
   void favoriteMessages() {
     selectedMessages.forEach((messageId) async {
       var docRef = _firestore
@@ -467,14 +465,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
   late bool sendMessages;
 
   late bool addOtherMembers;
-  // void getCurrentUserDetails() async {
-  //   CustomClass? found = await getUserDetails(widget.currentUser);
-  //   if (found != null) {
-  //     setState(() {
-  //       user = found;
-  //     });
-  //   }
-  // }
+
   void getCurrentUserDetails() async {
     CustomClass? found = await getUserDetails(widget.currentUser);
     if (found != null && mounted) {
@@ -484,14 +475,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     }
   }
 
-  // @override
 
-  // void initState() {
-  //   super.initState();
-  //   getCurrentUserDetails();
-  //   getGroup();
-  //   membersFirstName();
-  // }
   @override
   void initState() {
     super.initState();
@@ -697,10 +681,10 @@ class _GroupchatpageState extends State<Groupchatpage> {
         for (var message in messages) {
           Map<String, dynamic> messageData = message.data() as Map<String, dynamic>;
 
-          // Check if 'timestamp' exists and is not null
+
           Timestamp? timestamp = messageData['timestamp'] as Timestamp?;
 
-          // Use a fallback value to prevent errors (e.g., current time if timestamp is null)
+
           String messageDate = timestamp != null
               ? formatDateForGrouping(timestamp)
               : ''; // Fallback value
@@ -708,7 +692,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
           groupedMessages.putIfAbsent(messageDate, () => []).add(message);
         }
 
-        // Sort the grouped dates so that 'Yesterday' appears above 'Today'
+
         List<String> sortedDates = groupedMessages.keys.toList()
           ..sort((a, b) {
             if (a == 'Today') return 1;
@@ -716,13 +700,13 @@ class _GroupchatpageState extends State<Groupchatpage> {
             if (a == 'Yesterday') return -1;
             if (b == 'Yesterday') return 1;
 
-            // Ensure no empty or invalid date strings are passed to DateFormat.parse()
+
             if (a.isEmpty || b.isEmpty) return 0;
 
             try {
               return DateFormat('MMM dd').parse(a).compareTo(DateFormat('MMM dd').parse(b));
             } catch (e) {
-              return 0; // Avoid crashing on parsing errors
+              return 0;
             }
           });
 

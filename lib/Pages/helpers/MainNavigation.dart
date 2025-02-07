@@ -38,8 +38,8 @@ class MainNavigationPage extends StatelessWidget {
             ),
           ],
           currentIndex: currentIndex,
-          selectedItemColor: Colors.grey[500],
-          unselectedItemColor: Colors.white,
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.grey,
           onTap: onTap,
           type: BottomNavigationBarType.fixed, // Ensures full background color
         ));
