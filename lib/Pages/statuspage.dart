@@ -35,7 +35,7 @@ class _StatusPageState extends State<StatusPage> {
   }
 
   String currentUserId = FirebaseAuth.instance.currentUser!.uid;
-  late CustomClass currentUser;
+   CustomClass? currentUser;
   int _selectedIndex = 2;
 
 
@@ -44,17 +44,9 @@ class _StatusPageState extends State<StatusPage> {
       _selectedIndex = index;
     });
 
-    void fetchCurrentUser() async
-    {
-      final user = await getUserDetails(currentUserId);
-      print('$currentUserId is this ');
-      setState(() {
-        currentUser = user!;
-      });
-    }
-    @override
-    void initState() {
-      fetchCurrentUser();
+    if (currentUser == null) {
+      print("User data not loaded yet.");
+      return;
     }
 
     switch (index) {
@@ -78,6 +70,22 @@ class _StatusPageState extends State<StatusPage> {
         break;
     }
   }
+  @override
+  void initState() {
+    super.initState();
+    fetchCurrentUser();
+  }
+
+  void fetchCurrentUser() async {
+    final user = await getUserDetails(currentUserId);
+
+    if (user != null) {
+      setState(() {
+        currentUser = user;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {

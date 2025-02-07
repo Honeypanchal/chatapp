@@ -835,13 +835,13 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         style: TextStyle(fontSize: width * 0.042),
                       ),
                       Spacer(),
-                      Padding(
-                        padding: EdgeInsets.only(right: width * 0.052),
-                        child: Icon(
-                          Icons.search,
-                          size: width * 0.062,
-                        ),
-                      )
+                      // Padding(
+                      //   padding: EdgeInsets.only(right: width * 0.052),
+                      //   child: Icon(
+                      //     Icons.search,
+                      //     size: width * 0.062,
+                      //   ),
+                      // )
                     ],
                   ),
                   SizedBox(
