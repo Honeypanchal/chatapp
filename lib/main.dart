@@ -1,4 +1,4 @@
-import 'package:chatapp/Pages/ChatPage.dart';
+import 'package:chatapp/pages/ChatLayout/ChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
@@ -69,101 +69,101 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Firebase Auth Demo',
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: _isLoading
-            ? const Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 20),
-                Text(
-                  "Redirecting you to your chats...",
-                  style: TextStyle(fontSize: 16),
-                ),
-              ],
-            ),
+      debugShowCheckedModeBanner: false,
+      title: 'Firebase Auth Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: _isLoading
+          ? const Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+              Text(
+                "Redirecting you to your chats...",
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
           ),
-        )
-            : _user != null
-            ? ChatPage(currentUser: foundUser!)
-            : Firstpage(),
-        onGenerateRoute: (settings) {
-          final args = settings.arguments as Map<String, dynamic>?;
-          switch (settings.name) {
-            case '/newGroup':
-              return MaterialPageRoute(
-                builder: (context) => NewGroup(currentUser: args!["currentUser"]),
-              );
-            case '/chatPage':
-              return MaterialPageRoute(
-                builder: (context) => ChatPage(currentUser: args!["currentUser"]),
-              );
-            case '/newGroupDefinition':
-              return MaterialPageRoute(
-                builder: (context) => NewGroupDefinition(
-                  members: args!["members"],
-                  createdBy: args["currentUser"],
-                ),
-              );
-            case '/statusPage':
-              return MaterialPageRoute(builder: (context) => StatusPage());
-            case '/groupDisplay':
-              return MaterialPageRoute(
-                builder: (context) => GroupDisplayPage(
-                  currentUser: args!["currentUser"],
-                ),
-              );
-            case '/profile':
-              return MaterialPageRoute(
-                builder: (context) => Profile(currentUser: args!["currentUser"]),
-              );
+        ),
+      )
+          : _user != null
+          ? ChatPage(currentUser: foundUser!)
+          : Firstpage(),
+      onGenerateRoute: (settings) {
+        final args = settings.arguments as Map<String, dynamic>?;
+        switch (settings.name) {
+          case '/newGroup':
+            return MaterialPageRoute(
+              builder: (context) => NewGroup(currentUser: args!["currentUser"]),
+            );
+          case '/chatPage':
+            return MaterialPageRoute(
+              builder: (context) => ChatPage(currentUser: args!["currentUser"]),
+            );
+          case '/newGroupDefinition':
+            return MaterialPageRoute(
+              builder: (context) => NewGroupDefinition(
+                members: args!["members"],
+                createdBy: args["currentUser"],
+              ),
+            );
+          case '/statusPage':
+            return MaterialPageRoute(builder: (context) => StatusPage());
+          case '/groupDisplay':
+            return MaterialPageRoute(
+              builder: (context) => GroupDisplayPage(
+                currentUser: args!["currentUser"],
+              ),
+            );
+          case '/profile':
+            return MaterialPageRoute(
+              builder: (context) => Profile(currentUser: args!["currentUser"]),
+            );
 
-            case '/groupPermissions':
-              final args = settings.arguments as Map<String, dynamic>;
-              return MaterialPageRoute(
-                builder: (context) => GroupPermissions(
-                  groupSettings: args['groupSettings'],
-                  sendMessages: args['sendMessages'],
-                  addOtherMembers: args['addOtherMembers'],
-                  admins: args['admins'],
-                  members: args['members'],
-                  currentUser: args['currentUser'],
-                ),
-              );
+          case '/groupPermissions':
+            final args = settings.arguments as Map<String, dynamic>;
+            return MaterialPageRoute(
+              builder: (context) => GroupPermissions(
+                groupSettings: args['groupSettings'],
+                sendMessages: args['sendMessages'],
+                addOtherMembers: args['addOtherMembers'],
+                admins: args['admins'],
+                members: args['members'],
+                currentUser: args['currentUser'],
+              ),
+            );
 
-            case '/groupchat':
-              return MaterialPageRoute(
-                  builder: (context) => Groupchatpage(
-                      groupId: args!['groupId'],
-                      currentUser: args['currentUser']));
-            case '/groupDescription':
-              return MaterialPageRoute(
-                  builder: (context) => GroupDescription(
-                      groupId: args!['groupId'],
-                      currentUser: args['currentUser']));
-            case '/addNewMembers':
-              return MaterialPageRoute(
-                  builder: (context) => AddNewMembersToGroup(
-                      existingMembers: args!['existingMembers'],
-                      groupId: args['groupId']));
-            case '/updateGroupPermissions':
-              return MaterialPageRoute(
-                  builder: (context) => UpdateGroupPermissions(
-                      groupSettings: args!['groupSettings'],
-                      sendMessages: args['sendMessages'],
-                      addOtherMembers: args['addOtherMembers'],
-                      admins: args['admins'],
-                      members: args['members'],
-                      currentUser: args['currentUser'],
-                      createdBy:args['createdBy']));
-            default:
-              return null;
-          }
-          },
-        );
-    }
+          case '/groupchat':
+            return MaterialPageRoute(
+                builder: (context) => Groupchatpage(
+                    groupId: args!['groupId'],
+                    currentUser: args['currentUser']));
+          case '/groupDescription':
+            return MaterialPageRoute(
+                builder: (context) => GroupDescription(
+                    groupId: args!['groupId'],
+                    currentUser: args['currentUser']));
+          case '/addNewMembers':
+            return MaterialPageRoute(
+                builder: (context) => AddNewMembersToGroup(
+                    existingMembers: args!['existingMembers'],
+                    groupId: args['groupId']));
+          case '/updateGroupPermissions':
+            return MaterialPageRoute(
+                builder: (context) => UpdateGroupPermissions(
+                    groupSettings: args!['groupSettings'],
+                    sendMessages: args['sendMessages'],
+                    addOtherMembers: args['addOtherMembers'],
+                    admins: args['admins'],
+                    members: args['members'],
+                    currentUser: args['currentUser'],
+                    createdBy:args['createdBy']));
+          default:
+            return null;
+        }
+      },
+    );
+  }
 }

@@ -449,7 +449,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
     final height = MediaQuery.of(context).size.height;
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.green.shade700,),
+        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.black87,),
       );
     }
     return Scaffold(
@@ -622,7 +622,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         groupDescription,
                         style: TextStyle(
-                            color: Colors.green[400], fontSize: width * 0.037),
+                            color: Colors.grey[500], fontSize: width * 0.037),
                       ),
                     ),
                     SizedBox(height: height * 0.005),
@@ -878,7 +878,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                              backgroundColor: Colors.green.shade700,
+                              backgroundColor: Colors.black87,
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
@@ -979,7 +979,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                 },
                                 contentPadding: EdgeInsets.zero,
                                 leading: CircleAvatar(
-                                  backgroundColor: Colors.green.shade700,
+                                  backgroundColor: Colors.black87,
                                   child: Text(
                                     membersFirstNameList[index][0]
                                         .toUpperCase(),
@@ -991,9 +991,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                         group['participants'][index])
                                     ? Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.green.shade700,
+                                            color: Colors.grey[400],
                                             border: Border.all(
-                                                color: Colors.green.shade700),
+                                                color: Colors.grey.shade400),
                                             borderRadius: BorderRadius.circular(
                                                 width * 0.01)),
                                         width: width * 0.12,

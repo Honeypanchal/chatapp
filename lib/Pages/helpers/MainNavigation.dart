@@ -38,7 +38,7 @@ class MainNavigationPage extends StatelessWidget {
             ),
           ],
           currentIndex: currentIndex,
-          selectedItemColor: Colors.green.shade700,
+          selectedItemColor: Colors.grey[500],
           unselectedItemColor: Colors.white,
           onTap: onTap,
           type: BottomNavigationBarType.fixed, // Ensures full background color

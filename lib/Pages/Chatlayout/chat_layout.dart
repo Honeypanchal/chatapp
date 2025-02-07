@@ -4,8 +4,8 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter/services.dart';
 import '../../models/CustomClass.dart';
 import 'ChatPage.dart';
-import 'package:chatapp/Pages/ChatLayout/Contactinfo.dart';
-import 'package:chatapp/Pages/ChatLayout/userinfo.dart';
+import 'package:chatapp/Pages/ChatLayout/Contectinfo.dart';
+import 'package:chatapp/Pages/ChatLayout/userinfoPage.dart';
 
 class ChatLayout extends StatefulWidget {
   final CustomClass currentUser;
