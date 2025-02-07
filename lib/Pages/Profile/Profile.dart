@@ -8,8 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Profile extends StatefulWidget {
   final CustomClass currentUser;
   const Profile({super.key, required this.currentUser});
-  final CustomClass currentUser;
-  const Profile({super.key,required this.currentUser});
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -174,43 +172,6 @@ class _ProfileState extends State<Profile> {
               ),
 
             ),
-
-
-            // Text(
-            //   "Name",
-            //   style: TextStyle(color: Colors.grey, fontSize: 14),
-            // ),
-            // SizedBox(height: 5),
-            // Container(
-            //   width: double.infinity,
-            //   padding: EdgeInsets.all(12),
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(10),
-            //   ),
-            //   child: Text(
-            //     firstName.isNotEmpty ? firstName : "Loading...",
-            //     style: TextStyle(fontSize: 16),
-            //   ),
-            // ),
-            //SizedBox(height: 20),
-            // Text(
-            //   "Email Address",
-            //   style: TextStyle(color: Colors.grey, fontSize: 14),
-            // ),
-            // SizedBox(height: 5),
-            // Container(
-            //   width: double.infinity,
-            //   padding: EdgeInsets.all(12),
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     borderRadius: BorderRadius.circular(10),
-            //   ),
-            //   child: Text(
-            //     email.isNotEmpty ? email : "Loading...", // Correct field
-            //     style: TextStyle(fontSize: 16),
-            //   ),
-            // ),
           ],
         ),
       ),

@@ -28,7 +28,16 @@ A modern group chat application built with **Flutter** and **Firebase**.
     - **Authentication** for user login
     - **Cloud Firestore** for real-time database
 
+## status functionality 
+- User can upload status .
+- User have options for background and different text for put status .
+- status will be disappear after 24 hours.
+- other user can reply on other user's status and also user can see what reply is.
+- only user can delete their own status .
 
 
+## Profile functionality 
 
+- user have details of their own while going on profile page.
+- user can logout and again login after logout.
 
