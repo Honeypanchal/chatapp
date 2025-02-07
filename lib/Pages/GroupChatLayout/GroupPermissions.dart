@@ -115,8 +115,8 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.groupSettings,
                             onChanged: (val) {
                               setState(() {
@@ -151,8 +151,8 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.sendMessages,
                             onChanged: (val) {
                               setState(() {
@@ -187,8 +187,8 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.addOtherMembers,
                             onChanged: (val) {
                               setState(() {

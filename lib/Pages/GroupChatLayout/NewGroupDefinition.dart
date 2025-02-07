@@ -92,7 +92,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   Expanded(
                     child: CircleAvatar(
                       radius: width * 0.066,
-                      backgroundColor: Colors.black12,
+                      backgroundColor: Colors.black,
                       child: Icon(
                         Icons.camera_alt,
                         color: Colors.white,
@@ -105,12 +105,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   Expanded(
                     flex: 4,
                     child: TextFormField(
-                      cursorColor: Colors.green.shade700,
+                      cursorColor: Colors.grey,
                       controller: _groupName,
                       decoration: InputDecoration(
                           focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Colors.green.shade700,
+                                color: Colors.grey,
                                 width: 2.0), // Color when focused
                           ),
                           enabledBorder: UnderlineInputBorder(
@@ -125,10 +125,11 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                         color: Colors.black,
                       ),
                       validator: (val) {
-                        if (val!.isEmpty)
+                        if (val!.isEmpty) {
                           return 'Enter Group Name';
-                        else
+                        } else {
                           return null;
+                        }
                       },
                     ),
                   ),
@@ -173,7 +174,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               },
                               icon: Icon(
                                 Icons.timer,
-                                color: Colors.grey,
+                                color: Colors.black,
                                 size: width * 0.06,
                               ))
                         ],
@@ -224,7 +225,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               },
                               icon: Icon(
                                 Icons.settings,
-                                color: Colors.grey,
+                                color: Colors.black,
                                 size: width * 0.06,
                               ))
                         ],
@@ -273,7 +274,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                             radius: width * 0.1,
                             child: Icon(
                               Icons.person,
-                              color: Colors.green.shade700,
+                              color: Colors.grey,
                             ),
                           ),
                           SizedBox(height: height * 0.01),
@@ -362,7 +363,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
         backgroundColor: Colors.black,
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.green.shade700,
+          color: Colors.grey,
         ),
       ),
     );

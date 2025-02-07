@@ -173,7 +173,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         "Cancel",
                         style: TextStyle(
-                            fontFamily: 'Raleway', color: Colors.green.shade700),
+                            fontFamily: 'Raleway', color: Colors.grey),
                       )),
                   TextButton(
                       onPressed: () {
@@ -244,18 +244,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
-                cursorColor: Colors.green.shade700,
+                cursorColor: Colors.grey,
                 controller: descriptionController,
                 decoration: InputDecoration(
                   hintText: group['groupDescription'] ?? "Add group description",
                   border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                 ),
               ),
@@ -303,7 +303,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               Navigator.pop(context, enteredDescription);
                             }
                           },
-                          child: Text("Ok", style: TextStyle(color: Colors.green.shade700)),
+                          child: Text("Ok", style: TextStyle(color: Colors.green)),
                         ),
                       ),
                     ],
@@ -346,18 +346,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
-                cursorColor: Colors.green.shade700,
+                cursorColor: Colors.grey,
                 controller: groupName,
                 decoration: InputDecoration(
                   hintText: group['groupName'] ?? "Change group name",
                   border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                 ),
               ),
@@ -407,7 +407,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                   enteredName); // Return the entered description
                             }
                           },
-                          child: Text("OK", style: TextStyle(color: Colors.green.shade700)),
+                          child: Text("OK", style: TextStyle(color: Colors.green)),
                         ),
                       ),
                     ],
@@ -449,7 +449,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
     final height = MediaQuery.of(context).size.height;
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.green.shade700,),
+        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,),
       );
     }
     return Scaffold(
@@ -528,7 +528,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             Center(
               child: CircleAvatar(
                 radius: width * 0.13,
-                backgroundColor: Colors.green.shade700,
+                backgroundColor: Colors.black,
                 child:
                     Icon(Icons.group, color: Colors.white, size: width * 0.09),
               ),
@@ -622,7 +622,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         groupDescription,
                         style: TextStyle(
-                            color: Colors.green[400], fontSize: width * 0.037),
+                            color: Colors.black, fontSize: width * 0.037),
                       ),
                     ),
                     SizedBox(height: height * 0.005),
@@ -878,7 +878,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                              backgroundColor: Colors.green.shade700,
+                              backgroundColor: Colors.black,
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
@@ -890,7 +890,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           ),
                         ),
                         if (isLoading || isLoadingDatabse)
-                          CircularProgressIndicator(color: Colors.green.shade700,)
+                          CircularProgressIndicator(color: Colors.grey,)
                         else ...[
                           ListView.builder(
                             shrinkWrap: true,
@@ -979,7 +979,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                 },
                                 contentPadding: EdgeInsets.zero,
                                 leading: CircleAvatar(
-                                  backgroundColor: Colors.green.shade700,
+                                  backgroundColor: Colors.black,
                                   child: Text(
                                     membersFirstNameList[index][0]
                                         .toUpperCase(),
@@ -991,9 +991,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                         group['participants'][index])
                                     ? Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.green.shade700,
+                                            color: Colors.black,
                                             border: Border.all(
-                                                color: Colors.green.shade700),
+                                                color: Colors.black),
                                             borderRadius: BorderRadius.circular(
                                                 width * 0.01)),
                                         width: width * 0.12,
@@ -1080,7 +1080,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(width * 0.032),
           ),
-          child: Icon(icon, color: Colors.green.shade700),
+          child: Icon(icon, color: Colors.black),
         ),
         SizedBox(height: height * 0.01),
         Text(label),

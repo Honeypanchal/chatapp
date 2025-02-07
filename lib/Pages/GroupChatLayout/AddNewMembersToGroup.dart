@@ -67,7 +67,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         backgroundColor: Colors.black,
         title: _isSearching
             ? TextField(
-          cursorColor: Colors.green.shade700,
+          cursorColor: Colors.grey,
                 controller: _searchText,
                 autofocus: true,
                 style: TextStyle(color: Colors.white),
@@ -75,12 +75,12 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                   hintText: "Search users...",
                   hintStyle: TextStyle(color: Colors.white54),
                   border:UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700)
+                    borderSide: BorderSide(color: Colors.grey)
                   ),
                   focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.green.shade700)
+                      borderSide: BorderSide(color: Colors.grey)
                   ),enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700)
+                    borderSide: BorderSide(color: Colors.grey)
                 )
                 ),
 
@@ -147,7 +147,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                             backgroundColor: Colors.black,
                             child: Text(
                             newMembersName[index][0].toUpperCase(),
-                             style: TextStyle( color: Colors.green.shade700),
+                             style: TextStyle( color: Colors.grey),
                             ),
                           ),
                           Text(newMembersName[index])
@@ -192,7 +192,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                               radius: width * 0.05,
                               child: Text(
                                user['firstName'][0].toUpperCase(),
-                                style: TextStyle(color: Colors.green.shade700),
+                                style: TextStyle(color: Colors.grey),
                               ),
                             ),
                             if (newMembers.contains(user['uid']))
@@ -207,7 +207,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                                   child: Icon(
                                     Icons.check_circle,
                                     size: width * 0.035,
-                                    color: Colors.green.shade700,
+                                    color: Colors.grey,
                                   ),
                                 ),
                               ),
@@ -262,7 +262,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         backgroundColor: Colors.black,
         child: Icon(
           Icons.check,
-          color: Colors.green.shade700,
+          color: Colors.grey,
         ),
       ),
     );

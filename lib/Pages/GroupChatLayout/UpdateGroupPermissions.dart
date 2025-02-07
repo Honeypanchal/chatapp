@@ -117,8 +117,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.groupSettings,
                             onChanged: (val) {
                               setState(() {
@@ -153,8 +153,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.sendMessages,
                             onChanged: (val) {
                               setState(() {
@@ -189,8 +189,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Colors.black,
+                            focusColor: Colors.black,
                             value: widget.addOtherMembers,
                             onChanged: (val) {
                               setState(() {
@@ -384,7 +384,7 @@ class _GroupMembersState extends State<GroupMembers> {
               if (isLoading)
                 CircularProgressIndicator(
                   backgroundColor: Colors.white,
-                  color: Colors.green.shade700,
+                  color: Colors.black,
                 ),
               ListView.builder(
                 shrinkWrap: true,
@@ -429,7 +429,7 @@ class _GroupMembersState extends State<GroupMembers> {
                           radius: width * 0.05,
                           child: Text(
                             membersFirstNameList[index][0].toUpperCase(),
-                            style: TextStyle(color: Colors.green.shade700),
+                            style: TextStyle(color: Colors.grey),
                           ),
                         ),
                         if (isCurrentUserAdmin(widget.groupMembers[index]))
@@ -444,7 +444,7 @@ class _GroupMembersState extends State<GroupMembers> {
                               child: Icon(
                                 Icons.check_circle,
                                 size: width * 0.035,
-                                color: Colors.green.shade700,
+                                color: Colors.grey,
                               ),
                             ),
                           ),
@@ -454,9 +454,9 @@ class _GroupMembersState extends State<GroupMembers> {
                     trailing: isCurrentUserAdmin(widget.groupMembers[index])
                         ? Container(
                             decoration: BoxDecoration(
-                                color: Colors.green.shade700,
+                                color: Colors.black,
                                 border:
-                                    Border.all(color: Colors.green.shade700),
+                                    Border.all(color: Colors.black),
                                 borderRadius:
                                     BorderRadius.circular(width * 0.01)),
                             width: width * 0.12,
