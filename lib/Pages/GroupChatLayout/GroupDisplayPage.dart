@@ -171,8 +171,8 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                     var groupData = groups[index].data();
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: Colors.grey.shade100,
-                        child: Icon(Icons.group, color: Colors.green.shade700),
+                        backgroundColor: Colors.black,
+                        child: Icon(Icons.group, color: Colors.white),
                       ),
                       title: Text(groupData["groupName"] ?? "Unnamed Group"),
                       subtitle: Text("Members: ${groupData["participants"].length}"),
@@ -205,7 +205,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
         tooltip: 'Create New Group',
         child: Icon(
           Icons.group_add,
-          color: Colors.green.shade700,
+          color: Colors.white,
           size: width < 600 ? width * 0.08 : width * 0.09,
         ),
       ),
