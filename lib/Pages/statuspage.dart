@@ -102,7 +102,7 @@ class _StatusPageState extends State<StatusPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
 
-
+automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         title: Text(
 
