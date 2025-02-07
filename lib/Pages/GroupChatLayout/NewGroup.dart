@@ -27,20 +27,20 @@ class _NewGroupState extends State<NewGroup> {
 
     if (_showSearch) {
       return AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => setState(() => _showSearch = false),
         ),
         title: TextField(
-cursorColor: Colors.grey,
+cursorColor:              Color.fromRGBO(21, 171, 97, 1),
           controller: _searchText,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.black),
           decoration: InputDecoration(
-            focusColor: Colors.grey,
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color:Colors.grey)),
+            focusColor:Color.fromRGBO(21, 171, 97, 1),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1),)),
             hintText: 'Search users...',
-            hintStyle: TextStyle(color: Colors.white70),
+            hintStyle: TextStyle(color: Colors.black),
             border: InputBorder.none,
           ),
           autofocus: true,
@@ -55,19 +55,19 @@ cursorColor: Colors.grey,
           onTap: () => Navigator.pushNamed(context,'/groupDisplay',arguments: {'currentUser':widget.currentUser})
        ,   child: Icon(
             Icons.arrow_back_ios,
-            color: Colors.white,
+            color: Colors.black,
             size: width > 600 ? width * 0.6 : width * 0.06,
           ),
         ),
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'New Group',
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: width > 600 ? width * 0.05 : width * 0.06,
@@ -76,7 +76,7 @@ cursorColor: Colors.grey,
           Text(
             "Add members",
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontFamily: 'Poppins',
               fontSize: width > 600 ? width * 0.04 : width * 0.032,
             ),
@@ -85,7 +85,7 @@ cursorColor: Colors.grey,
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.search, color: Colors.white),
+          icon: Icon(Icons.search, color: Colors.black),
           onPressed: () => setState(() => _showSearch = true),
         ),
       ],
@@ -146,9 +146,9 @@ cursorColor: Colors.grey,
                               children: [
                                 CircleAvatar(
                                   radius: width * 0.067,
-                                  backgroundColor: Colors.black,
+                                  backgroundColor:Color.fromRGBO(21, 171, 97, 1),
                                   child: Text(firstNames[index][0].toUpperCase(),
-                                      style: TextStyle(color: Colors.grey)),
+                                      style: TextStyle(color: Colors.white)),
                                 ),
                                 Text(firstNames[index])
                               ],
@@ -166,7 +166,7 @@ cursorColor: Colors.grey,
                       stream: fetchUsers(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return Center(child: CircularProgressIndicator(backgroundColor: Colors.black45,color: Colors.grey,));
+                          return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,color: Color.fromRGBO(21, 171, 97, 1),));
                         }
 
                         var users = snapshot.data!;
@@ -181,11 +181,11 @@ cursorColor: Colors.grey,
                                 clipBehavior: Clip.none,
                                 children: [
                                   CircleAvatar(
-                                    backgroundColor: Colors.black,
+                                    backgroundColor:Color.fromRGBO(21, 171, 97, 1),
                                     radius: width * 0.05,
                                     child: Text(
                                       user['firstName'][0].toUpperCase(),
-                                      style: TextStyle(color: Colors.grey),
+                                      style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                   if (groupChatUsers.contains(user['uid']))
@@ -200,7 +200,7 @@ cursorColor: Colors.grey,
                                         child: Icon(
                                           Icons.check_circle,
                                           size: width * 0.035,
-                                          color: Colors.grey,
+                                          color: Color.fromRGBO(21, 171, 97, 1),
                                         ),
                                       ),
                                     ),
@@ -257,10 +257,10 @@ cursorColor: Colors.grey,
 
           }
         },
-        backgroundColor: Colors.black,
+        backgroundColor:Color.fromRGBO(21, 171, 97, 1),
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.grey,
+          color: Colors.white,
         ),
       ),
     );

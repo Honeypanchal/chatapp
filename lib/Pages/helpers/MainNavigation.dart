@@ -12,35 +12,35 @@ class MainNavigationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         decoration: BoxDecoration(
-          color: Colors.black, // Set background color for the container
+          color: Colors.white, // Set background color for the container
           border: Border.all(color: Colors.white),
         ),
         child: FlashyTabBar(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.white,
           items: [
             FlashyTabBarItem(
               inactiveColor: Colors.grey,
-              activeColor: Colors.white,
+              activeColor:Color.fromRGBO(21, 171, 97, 1),
               icon: Icon(Icons.chat_sharp),
-              title: Text("Chats",style: TextStyle(color: Colors.white)),
+              title: Text("Chats",style: TextStyle(fontWeight: FontWeight.bold)),
             ),
              FlashyTabBarItem(
                inactiveColor: Colors.grey,
-               activeColor: Colors.white,
+               activeColor: Color.fromRGBO(21, 171, 97, 1),
               icon: Icon(Icons.groups_outlined),
-              title: Text("Groups",style: TextStyle(color: Colors.white)),
+              title: Text("Groups",style: TextStyle(fontWeight: FontWeight.bold),),
             ),
              FlashyTabBarItem(
                inactiveColor: Colors.grey,
-               activeColor: Colors.white,
+               activeColor: Color.fromRGBO(21, 171, 97, 1),
               icon: Icon(Icons.camera),
-              title: Text("Status",style: TextStyle(color: Colors.white)),
+              title: Text("Status",style: TextStyle(fontWeight: FontWeight.bold)),
             ),
              FlashyTabBarItem(
-               activeColor: Colors.white,
-              inactiveColor: Colors.grey,
+               inactiveColor: Colors.grey,
+               activeColor:Color.fromRGBO(21, 171, 97, 1),
               icon: Icon(Icons.person),
-              title: Text("Profile",style: TextStyle(color: Colors.white),),
+              title: Text("Profile",style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
 
