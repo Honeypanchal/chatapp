@@ -1099,7 +1099,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
   }
 }
 
-
+// for starred message
 class StarredMessagesPage extends StatefulWidget {
   final String groupId;
 
