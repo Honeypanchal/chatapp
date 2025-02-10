@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+
 final _cloudFirestore = FirebaseFirestore.instance.collection('Users');
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -174,4 +175,12 @@ Future<CustomClass?> getUserDetails(String uid)async{
       return newUser;
     }
 
+}
+Future<void> logOutUser() async {
+  try {
+    await FirebaseAuth.instance.signOut();
+
+  } catch (e) {
+    print(e.toString());
+  }
 }

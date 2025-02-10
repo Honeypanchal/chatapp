@@ -69,9 +69,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       debugShowCheckedModeBanner: false,
       title: 'Firebase Auth Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData( textSelectionTheme: TextSelectionThemeData(
+        cursorColor: Color.fromRGBO(21, 171, 97, 1),
+        selectionColor: Color.fromRGBO(21, 171, 97, 1),
+    selectionHandleColor: Color.fromRGBO(21, 171, 97, 1), )),
       home: _isLoading
           ? const Scaffold(
         body: Center(

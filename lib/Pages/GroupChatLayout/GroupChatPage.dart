@@ -1165,9 +1165,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
       appBar: AppBar(
         title: Text(
           "Create a Poll",
-          style: TextStyle(color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         iconTheme: IconThemeData(color: Colors.black),

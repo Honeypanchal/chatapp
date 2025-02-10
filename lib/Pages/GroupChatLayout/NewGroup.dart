@@ -27,20 +27,20 @@ class _NewGroupState extends State<NewGroup> {
 
     if (_showSearch) {
       return AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => setState(() => _showSearch = false),
         ),
         title: TextField(
-cursorColor: Colors.green.shade700,
+cursorColor:              Color.fromRGBO(21, 171, 97, 1),
           controller: _searchText,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.black),
           decoration: InputDecoration(
-            focusColor: Colors.green.shade700,
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color:Colors.green.shade700)),
+            focusColor:Color.fromRGBO(21, 171, 97, 1),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1),)),
             hintText: 'Search users...',
-            hintStyle: TextStyle(color: Colors.white70),
+            hintStyle: TextStyle(color: Colors.black),
             border: InputBorder.none,
           ),
           autofocus: true,
@@ -55,19 +55,19 @@ cursorColor: Colors.green.shade700,
           onTap: () => Navigator.pushNamed(context,'/groupDisplay',arguments: {'currentUser':widget.currentUser})
        ,   child: Icon(
             Icons.arrow_back_ios,
-            color: Colors.white,
+            color: Colors.black,
             size: width > 600 ? width * 0.6 : width * 0.06,
           ),
         ),
       ),
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'New Group',
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: width > 600 ? width * 0.05 : width * 0.06,
@@ -76,7 +76,7 @@ cursorColor: Colors.green.shade700,
           Text(
             "Add members",
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontFamily: 'Poppins',
               fontSize: width > 600 ? width * 0.04 : width * 0.032,
             ),
@@ -85,7 +85,7 @@ cursorColor: Colors.green.shade700,
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.search, color: Colors.white),
+          icon: Icon(Icons.search, color: Colors.black),
           onPressed: () => setState(() => _showSearch = true),
         ),
       ],
@@ -125,144 +125,137 @@ cursorColor: Colors.green.shade700,
       appBar: _buildAppBar(context),
       body: Column(
         children: [
-          if (groupChatUsers.isNotEmpty && firstNames.length == groupChatUsers.length) ...[
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                   horizontal: width * 0.032),
-                child: SizedBox(
-                  height: width * 0.15,
-                  child: Center(
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: groupChatUsers.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: width * 0.02,
-                              vertical: height * 0.012),
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                radius: width * 0.067,
-                                backgroundColor: Colors.black,
-                                child: Text(firstNames[index][0].toUpperCase(),style: TextStyle(color: Colors.green.shade700),)
-                              ),
-                              Text(firstNames[index])
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Divider(
-
-              thickness: width * 0.00015,
-              color: Colors.grey,
-            )
-          ],
           Expanded(
             flex: 6,
             child: Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: width * 0.012, vertical: height * 0.012),
-              child: StreamBuilder<
-                  List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-                stream: fetchUsers(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No users found.'));
-                  }
-
-                  final users = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      var user = users[index].data();
-
-                      return ListTile(
-                        title: Text(user['firstName'] ?? 'No Name'),
-                        subtitle: Text(user['email'] ?? 'No Email'),
-                        leading: Container(
-                          padding: EdgeInsets.all(width * 0.002),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: groupChatUsers.any((x) => x == user['uid'])
-                                  ? Colors.green.shade700
-                                  : Colors.black,
-                              width: width * 0.002,
-                            ),
-                          ),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: width * 0.05,
-                                child: Text(
-                                  user['firstName'][0].toUpperCase(),
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                              if (groupChatUsers.contains(user['uid']))
-                                Positioned(
-                                  right: -2,
-                                  bottom: -2,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white,
-                                    ),
-                                    child: Icon(
-                                      Icons.check_circle,
-                                      size: width * 0.035,
-                                      color: Colors.green.shade700,
+              child: Column(
+                children: [
+                  if (groupChatUsers.isNotEmpty && firstNames.isNotEmpty)
+                    SizedBox(
+                      height: height * 0.12,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: firstNames.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: width * 0.02, vertical: height * 0.012),
+                            child: Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
+                                      width: width*0.002, // Set the border width
                                     ),
                                   ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            bool exists =
-                                groupChatUsers.any((x) => x == user['uid']);
-
-                            if (exists) {
-                              groupChatUsers
-                                  .removeWhere((x) => x == user['uid']);
-                            } else {
-                              groupChatUsers.add(user['uid']);
-                            }
-                          });
-                          setState(() {
-                            bool exists =
-                                firstNames.any((x) => x == user['firstName']);
-
-                            if (exists) {
-                              firstNames
-                                  .removeWhere((x) => x == user['firstName']);
-                            } else {
-                              firstNames.add(user['firstName']);
-                            }
-                          });
+                                  child: CircleAvatar(
+                                    radius: width * 0.067,
+                                    backgroundColor: Colors.white,
+                                    child: Text(
+                                      firstNames[index][0].toUpperCase(),
+                                      style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
+                                    ),
+                                  ),
+                                )
+,
+                                Text(firstNames[index])
+                              ],
+                            ),
+                          );
                         },
-                      );
-                    },
-                  );
-                },
+                      ),
+                    ),
+                  Divider(
+                    thickness: width * 0.00015,
+                    color: Colors.grey,
+                  ),
+                  Expanded(
+                    child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+                      stream: fetchUsers(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,color: Color.fromRGBO(21, 171, 97, 1),));
+                        }
+
+                        var users = snapshot.data!;
+                        if (users.isEmpty) return Center(child: Text("No users found"));
+
+                        return ListView.builder(
+                          itemCount: users.length,
+                          itemBuilder: (context, index) {
+                            var user = users[index];
+                            return ListTile(
+                              leading: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Color.fromRGBO(21, 171, 97, 1), // Border color
+                                        width: width*0.002, // Border width
+                                      ),
+                                    ),
+                                    child: CircleAvatar(
+                                      backgroundColor:Colors.white,
+                                      radius: width * 0.05,
+                                      child: Text(
+                                        user['firstName'][0].toUpperCase(),
+                                        style: TextStyle(color:  Color.fromRGBO(21, 171, 97, 1)),
+                                      ),
+                                    ),
+                                  )
+                                  ,
+                                  if (groupChatUsers.contains(user['uid']))
+                                    Positioned(
+                                      right: -2,
+                                      bottom: -2,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                        ),
+                                        child: Icon(
+                                          Icons.check_circle,
+                                          size: width * 0.035,
+                                          color: Color.fromRGBO(21, 171, 97, 1),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              title: Text(user['firstName']),
+                              onTap: () {
+                                setState(() {
+                                  if (groupChatUsers.contains(user['uid'])) {
+                                    groupChatUsers.remove(user['uid']);
+                                    firstNames.remove(user['firstName']);
+                                  } else {
+                                    groupChatUsers.add(user['uid']);
+                                    firstNames.add(user['firstName']);
+                                  }
+                                });
+                              },
+                              tileColor: groupChatUsers.contains(user['uid'])
+                                  ? Colors.grey.shade300
+                                  : Colors.transparent,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
+
+
+        ]
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -286,10 +279,10 @@ cursorColor: Colors.green.shade700,
 
           }
         },
-        backgroundColor: Colors.black,
+        backgroundColor:Color.fromRGBO(21, 171, 97, 1),
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.green.shade700,
+          color: Colors.white,
         ),
       ),
     );

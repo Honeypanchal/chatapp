@@ -22,7 +22,6 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
   @override
   void initState() {
     super.initState();
-
     _searchText.addListener(() {
       setState(() {
         searchQuery = _searchText.text.toLowerCase();
@@ -67,7 +66,6 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     Query query = groupsDB.where("participants", arrayContains: widget.currentUser.uid);
 
     if (searchQuery.isNotEmpty) {
-
       String searchLowerBound = searchQuery;
       String searchUpperBound = searchQuery + '\uf8ff';
 
@@ -80,6 +78,25 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     querySnapshot.docs as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
   }
 
+
+  Future<Map<String, String>> getLastMessage(String groupId) async {
+    var snapshot = await groupsDB
+        .doc(groupId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      var lastMessageData = snapshot.docs.first.data();
+      return {
+        'sender': lastMessageData['sender'] ?? 'Unknown',
+        'message': lastMessageData['message'] ?? ''
+      };
+    }
+    return {'sender': '', 'message': 'No messages yet'};
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -90,16 +107,16 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
       appBar: AppBar(
         leading: Padding(
           padding: EdgeInsets.only(left: width * 0.064),
-          child: Icon(Icons.groups_outlined, color: Colors.white),
+          child: Icon(Icons.groups_outlined, color:Colors.black),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Groups',
               style: TextStyle(
-                color: Colors.white,
+                color: Colors.black,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w500,
                 fontSize: width > 600 ? width * 0.05 : width * 0.06,
@@ -124,7 +141,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 borderRadius: BorderRadius.circular(width * 0.03),
               ),
               child: TextField(
-                cursorColor: Colors.green.shade700,
+                cursorColor: Color.fromRGBO(21, 171, 97, 1),
                 controller: _searchText,
                 style: TextStyle(
                   color: Colors.black,
@@ -153,7 +170,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
                     child: CircularProgressIndicator(
-                      color: Colors.green.shade700,
+                      color: Color.fromRGBO(21, 171, 97, 1),
                     ),
                   );
                 }
@@ -169,19 +186,36 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                   itemCount: groups.length,
                   itemBuilder: (context, index) {
                     var groupData = groups[index].data();
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.grey.shade100,
-                        child: Icon(Icons.group, color: Colors.green.shade700),
-                      ),
-                      title: Text(groupData["groupName"] ?? "Unnamed Group"),
-                      subtitle: Text("Members: ${groupData["participants"].length}"),
-                      onTap: () {
-                        Navigator.of(context).pushNamed('/groupchat',
-                            arguments: {
-                              'groupId': groupData['groupId'],
-                              "currentUser": widget.currentUser.uid
-                            });
+                    var groupId = groupData['groupId'];
+
+                    return FutureBuilder<Map<String, String>>(
+                      future: getLastMessage(groupId),
+                      builder: (context, lastMessageSnapshot) {
+                        String lastMessageText = "No messages yet";
+                        String sender = "";
+
+                        if (lastMessageSnapshot.hasData) {
+                          sender = lastMessageSnapshot.data!['sender']!;
+                          lastMessageText = lastMessageSnapshot.data!['message']!;
+                        }
+
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Color.fromRGBO(207, 214, 220, 1),
+                            child: Icon(Icons.group, color: Colors.white),
+                          ),
+                          title: Text(groupData["groupName"] ?? "Unnamed Group"),
+                          subtitle: sender.isNotEmpty
+                              ? Text('$sender: $lastMessageText')
+                              : Text(lastMessageText),
+                          onTap: () {
+                            Navigator.of(context).pushNamed('/groupchat',
+                                arguments: {
+                                  'groupId': groupId,
+                                  "currentUser": widget.currentUser.uid
+                                });
+                          },
+                        );
                       },
                     );
                   },
@@ -201,11 +235,11 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
             arguments: {'currentUser': widget.currentUser},
           );
         },
-        backgroundColor: Colors.black,
+        backgroundColor: Color.fromRGBO(21, 171, 97, 1),
         tooltip: 'Create New Group',
         child: Icon(
           Icons.group_add,
-          color: Colors.green.shade700,
+          color: Colors.white,
           size: width < 600 ? width * 0.08 : width * 0.09,
         ),
       ),

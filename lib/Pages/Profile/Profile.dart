@@ -80,17 +80,13 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery
-        .sizeOf(context)
-        .width;
-    final height = MediaQuery
-        .sizeOf(context)
-        .height;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+      automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         title: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -98,7 +94,7 @@ class _ProfileState extends State<Profile> {
             "Profile",
             style: TextStyle(
                 fontFamily: 'poppins',
-
+            
                 color: Colors.white,
                 fontWeight: FontWeight.bold),
           ),
@@ -227,16 +223,15 @@ class _ProfileState extends State<Profile> {
               ),
             ),
             ListTile(
-              onTap: () {
-                logOutUser().then((_) {
+              onTap: (){
+                logOutUser().then((_){
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => Firstpage()),
-                    // Navigate to login screen
-                        (Route<
-                        dynamic> route) => false, // Remove all previous routes from stack
+                    MaterialPageRoute(builder: (context) => Firstpage()), // Navigate to login screen
+                        (Route<dynamic> route) => false, // Remove all previous routes from stack
                   );
                 });
+
               },
 
               leading: Icon(
