@@ -109,7 +109,7 @@ class _ProfileState extends State<Profile> {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: Colors.green.shade400,
+                backgroundColor: Colors.black54,
                 child: Text(
                   firstName.isNotEmpty ? firstName[0].toUpperCase() : "",
                   style: TextStyle(

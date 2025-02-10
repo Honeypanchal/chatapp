@@ -575,7 +575,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
               autofocus: true,
               decoration: InputDecoration(
                   hintText: "Search messages",
-                  hintStyle: TextStyle(color: Colors.white)),
+                  hintStyle: TextStyle(color: Colors.black)),
               onChanged: (query) =>
                   setState(() => searchQuery = query),
             )
@@ -650,11 +650,11 @@ class _GroupchatpageState extends State<Groupchatpage> {
               ] else ...[
                 if (!isSearching)
                   IconButton(
-                      icon: const Icon(Icons.search, color: Colors.white),
+                      icon: const Icon(Icons.search, color: Colors.black),
                       onPressed: startSearch),
                 if (isSearching)
                   IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: const Icon(Icons.close, color: Colors.black),
                       onPressed: stopSearch),
               ],
             ],
@@ -783,8 +783,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                   if (isFavorite)
                                     Icon(
                                       Icons.star,
-                                      color: Colors.lightBlueAccent,
-                                      size: 18,
+                                      color:Colors.grey[300],
+                                      size: 14,
                                     ),
                                   Align(
                                     alignment: Alignment.bottomRight,
@@ -842,7 +842,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.black, width: 1.5),
+                        //border: Border.all(color: Colors.black, width: 1.5),
                       ),
                       child: Row(
                         children: [
@@ -855,7 +855,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                 ),
                               ),
                             ),
-                            child: Icon(Icons.poll, color: Color.fromARGB(255, 213, 252, 208)),
+                            child: Icon(Icons.poll, color: Colors.grey[500]),
                           ),
                           SizedBox(width: 10),
                           Expanded(
@@ -869,7 +869,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                           ),
                           GestureDetector(
                             onTap: sendMessage,
-                            child: Icon(Icons.send, color: Color.fromARGB(255, 213, 252, 208)),
+                            child: Icon(Icons.send, color: Colors.grey[500]),
                           ),
                         ],
                       ),
@@ -954,7 +954,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Color.fromARGB(255, 213, 252, 208),
+                  color: Colors.black26,
                   blurRadius: 4,
                   offset: Offset(2, 2),
                 )

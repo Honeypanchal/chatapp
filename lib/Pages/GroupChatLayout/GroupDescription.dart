@@ -173,7 +173,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         "Cancel",
                         style: TextStyle(
-                            fontFamily: 'Raleway', color: Colors.green.shade700),
+                            fontFamily: 'Raleway', color: Colors.grey),
                       )),
                   TextButton(
                       onPressed: () {
@@ -244,18 +244,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
-                cursorColor: Colors.green.shade700,
+                cursorColor: Colors.grey,
                 controller: descriptionController,
                 decoration: InputDecoration(
                   hintText: group['groupDescription'] ?? "Add group description",
                   border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                 ),
               ),
@@ -303,7 +303,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               Navigator.pop(context, enteredDescription);
                             }
                           },
-                          child: Text("Ok", style: TextStyle(color: Colors.green.shade700)),
+                          child: Text("Ok", style: TextStyle(color: Colors.green)),
                         ),
                       ),
                     ],
@@ -346,18 +346,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
               ),
               SizedBox(height: screenHeight * 0.015),
               TextFormField(
-                cursorColor: Colors.green.shade700,
+                cursorColor: Colors.grey,
                 controller: groupName,
                 decoration: InputDecoration(
                   hintText: group['groupName'] ?? "Change group name",
                   border: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                   focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.green.shade700),
+                    borderSide: BorderSide(color: Colors.grey),
                   ),
                 ),
               ),
@@ -407,7 +407,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                   enteredName); // Return the entered description
                             }
                           },
-                          child: Text("OK", style: TextStyle(color: Colors.green.shade700)),
+                          child: Text("OK", style: TextStyle(color: Colors.green)),
                         ),
                       ),
                     ],
@@ -434,8 +434,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Group Name edited succesfully"),
-          backgroundColor: Colors.blue.shade200,
+          content: Text("Group Name edited succesfully",selectionColor: Colors.white,style: TextStyle(color: Colors.white)),
+          backgroundColor: Color.fromRGBO(207, 214, 220, 1),
         ));
       } catch (e) {
         print(e.toString());
@@ -449,7 +449,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
     final height = MediaQuery.of(context).size.height;
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.black87,),
+        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,),
       );
     }
     return Scaffold(
@@ -458,7 +458,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pushNamed(
               '/groupchat',
@@ -528,7 +528,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             Center(
               child: CircleAvatar(
                 radius: width * 0.13,
-                backgroundColor: Colors.green.shade700,
+                backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                 child:
                     Icon(Icons.group, color: Colors.white, size: width * 0.09),
               ),
@@ -610,8 +610,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(SnackBar(
                                 content: Text(
-                                    "Group description edited succesfully"),
-                                backgroundColor: Colors.blue.shade200,
+                                    "Group description edited succesfully",selectionColor: Colors.white,style: TextStyle(color: Colors.white),),
+                                backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                               ));
                             } catch (e) {
                               print(e.toString());
@@ -622,7 +622,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         groupDescription,
                         style: TextStyle(
-                            color: Colors.grey[500], fontSize: width * 0.037),
+                            color: Color.fromRGBO(21, 171, 97, 1), fontSize: width * 0.037),
                       ),
                     ),
                     SizedBox(height: height * 0.005),
@@ -845,13 +845,13 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         style: TextStyle(fontSize: width * 0.042),
                       ),
                       Spacer(),
-                      Padding(
-                        padding: EdgeInsets.only(right: width * 0.052),
-                        child: Icon(
-                          Icons.search,
-                          size: width * 0.062,
-                        ),
-                      )
+                      // Padding(
+                      //   padding: EdgeInsets.only(right: width * 0.052),
+                      //   child: Icon(
+                      //     Icons.search,
+                      //     size: width * 0.062,
+                      //   ),
+                      // )
                     ],
                   ),
                   SizedBox(
@@ -888,7 +888,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                              backgroundColor: Colors.black87,
+                              backgroundColor:Color.fromRGBO(21, 171, 97, 1),
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
@@ -900,7 +900,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           ),
                         ),
                         if (isLoading || isLoadingDatabse)
-                          CircularProgressIndicator(color: Colors.green.shade700,)
+                          CircularProgressIndicator(color: Colors.grey,)
                         else ...[
                           ListView.builder(
                             shrinkWrap: true,
@@ -989,7 +989,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                 },
                                 contentPadding: EdgeInsets.zero,
                                 leading: CircleAvatar(
-                                  backgroundColor: Colors.black87,
+                                  backgroundColor: Color.fromRGBO(30, 170, 97, 1),
                                   child: Text(
                                     membersFirstNameList[index][0]
                                         .toUpperCase(),
@@ -1001,9 +1001,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                         group['participants'][index])
                                     ? Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.grey[400],
+                                            color: Color.fromRGBO(217,252,210,1),
                                             border: Border.all(
-                                                color: Colors.grey.shade400),
+                                                color: Color.fromRGBO(217,252,210,1)),
                                             borderRadius: BorderRadius.circular(
                                                 width * 0.01)),
                                         width: width * 0.12,
@@ -1013,7 +1013,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                             "Admin",
                                             style: TextStyle(
                                                 fontSize: width * 0.027,
-                                                color: Colors.white),
+                                                color: Color.fromRGBO(34, 89, 49, 1)),
                                           ),
                                         ),
                                       )
@@ -1090,7 +1090,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(width * 0.032),
           ),
-          child: Icon(icon, color: Colors.green.shade700),
+          child: Icon(icon, color:Color.fromRGBO(21, 171, 97, 1)),
         ),
         SizedBox(height: height * 0.01),
         Text(label),
@@ -1115,22 +1115,23 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFF6F1EB),
       appBar: AppBar(
         title: Text("Starred Messages"),
-        backgroundColor: Colors.grey, // WhatsApp-like color
+        backgroundColor: Colors.white,
+
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
             .collection('groups')
             .doc(widget.groupId)
             .collection('messages')
-            .where('favorite', isEqualTo: true) // Fetch only starred messages
-            .orderBy('timestamp') // Sort by latest messages
+            .where('favorite', isEqualTo: true)
+            .orderBy('timestamp')
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator()); // Show loading
+            return Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -1171,44 +1172,39 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 5,
-                      spreadRadius: 2,
-                    )
-                  ],
+
                 ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.teal[100],
-                    child: Icon(Icons.message, color: Colors.white),
-                  ),
-                  title: Text(
-                    messageText,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(senderName, style: TextStyle(color: Colors.grey)),
-                      Text(
-                        "${timestamp.hour}:${timestamp.minute}", // Show message time
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    Text(
+                      senderName,
+                      style: TextStyle(fontSize: 14, color: Colors.black87),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      messageText,
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(height: 5),
+                     Align(
+                       alignment: Alignment.bottomRight,
+                     child:Row(
+                       mainAxisAlignment: MainAxisAlignment.end,
+                       children: [
+                         Icon(
+                           Icons.star,
+                           color:Colors.yellow,
+                         ),
+                         SizedBox(width:3),
+
+                       Text(
+                        "${timestamp.hour}:${timestamp.minute}",
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
-                    ],
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.star, color: Colors.amber),
-                    onPressed: () async {
-                      await _firestore
-                          .collection('groups')
-                          .doc(widget.groupId)
-                          .collection('messages')
-                          .doc(message.id)
-                          .update({'favorite': false});
-                    },
-                  ),
+                    ])),
+                  ],
                 ),
               );
             },
@@ -1216,5 +1212,6 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
         },
       ),
     );
+
   }
 }
