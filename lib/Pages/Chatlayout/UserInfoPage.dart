@@ -15,25 +15,30 @@ class UserInfoPage extends StatelessWidget {
   String formatTimestamp(Timestamp? timestamp) {
     if (timestamp == null) return 'Not Read yet!';
     DateTime dateTime = timestamp.toDate();
-    return "${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} AM"; // HH:MM AM/PM format
+    return "${dateTime.hour}:${dateTime.minute.toString().padLeft(
+        2, '0')}"; // HH:MM AM/PM format
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,  // Set the background color of the entire screen
+      backgroundColor: Colors.black,
+      // Set the background color of the entire screen
       appBar: AppBar(
-        leading: Icon(Icons.arrow_back, color: Colors.white),
-        title: Text("Message info", style: TextStyle(color: Colors.white, fontFamily: 'Raleway')),
+        leading: InkWell(onTap: () {
+          Navigator.pop(context);
+        }, child: Icon(Icons.arrow_back, color: Colors.white)),
+        title: Text("Message info",
+            style: TextStyle(color: Colors.white, fontFamily: 'Raleway')),
         backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),  // Icon color in appBar
+        iconTheme: IconThemeData(color: Colors.white), // Icon color in appBar
       ),
-      body: SingleChildScrollView(  // Make the body scrollable
+      body: SingleChildScrollView( // Make the body scrollable
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              color: Colors.white,
+              color: Color(0XFFF6F1EB),
               padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -41,7 +46,7 @@ class UserInfoPage extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.green[700],
+                      color: Color(0XFFD5FCD0),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
@@ -49,12 +54,12 @@ class UserInfoPage extends StatelessWidget {
                       children: [
                         Text(
                           "${messageData['message']}",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                         SizedBox(height: 5),
                         Text(
                           formatTimestamp(deliveredAt),
-                          style: TextStyle(fontSize: 12, color: Colors.white70),
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -69,15 +74,18 @@ class UserInfoPage extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(Icons.done_all, color: Colors.green[700]),
+                    leading: Icon(Icons.done_all, color: Colors.blue),
                     title: Text("Read", style: TextStyle(color: Colors.white)),
-                    subtitle: Text(formatTimestamp(readAt), style: TextStyle(color: Colors.white70)),
+                    subtitle: Text(formatTimestamp(readAt),
+                        style: TextStyle(color: Colors.white70)),
                   ),
                   Divider(color: Colors.white24),
                   ListTile(
                     leading: Icon(Icons.done, color: Colors.grey),
-                    title: Text("Delivered", style: TextStyle(color: Colors.white)),
-                    subtitle: Text(formatTimestamp(deliveredAt), style: TextStyle(color: Colors.white70)),
+                    title: Text(
+                        "Delivered", style: TextStyle(color: Colors.white)),
+                    subtitle: Text(formatTimestamp(deliveredAt),
+                        style: TextStyle(color: Colors.white70)),
                   ),
                 ],
               ),
