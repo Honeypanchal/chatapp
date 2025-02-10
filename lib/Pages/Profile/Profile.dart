@@ -1,13 +1,17 @@
+import 'package:chatapp/Pages/helpers/MainNavigation.dart';
+import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/auth_services.dart';
+import '../Authentication/FirstPage.dart';
 
 class Profile extends StatefulWidget {
   final CustomClass currentUser;
-  const Profile({super.key,required this.currentUser});
+
+  const Profile({super.key, required this.currentUser});
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -23,7 +27,8 @@ class _ProfileState extends State<Profile> {
 
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/chatPage',arguments: {'currentUser':widget.currentUser});
+        Navigator.pushNamed(context, '/chatPage',
+            arguments: {'currentUser': widget.currentUser});
         break;
       case 1:
         Navigator.pushNamed(
@@ -36,34 +41,41 @@ class _ProfileState extends State<Profile> {
         Navigator.pushNamed(context, '/statusPage');
         break;
       case 3:
-        Navigator.pushNamed(context, '/profile',arguments: {'currentUser':widget.currentUser});
+        Navigator.pushNamed(context, '/profile',
+            arguments: {'currentUser': widget.currentUser});
         break;
     }
-    String name = "";
-    String email = "";
+  }
 
-      void fetchUserDate() async {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection("Users")
-            .doc(user.uid)
-            .get();
-        if (userDoc.exists) {
-          setState(() {
-            name = userDoc["name"] ?? "";
-            email = userDoc["email"] ?? "";
-          });
-        }
+  String firstName = "";
+  String email = "";
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  void fetchUserData() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(user.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          firstName = userDoc["firstName"] ?? "";
+          email = userDoc["email"] ?? "";
+
+          // Capitalize first letter of firstName
+          if (firstName.isNotEmpty) {
+            firstName = firstName[0].toUpperCase() + firstName.substring(1);
+          }
+        });
       }
     }
-    @override
-    void initState() {
-      super.initState();
-      fetchUserDate();
-    }
-
-
   }
 
   @override
@@ -71,87 +83,171 @@ class _ProfileState extends State<Profile> {
     final width = MediaQuery.sizeOf(context).width;
     final height = MediaQuery.sizeOf(context).height;
 
-
-
-      return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+      automaticallyImplyLeading: false,
+        backgroundColor: Colors.black,
+        title: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
             "Profile",
-            style: TextStyle(fontFamily: 'poppins', fontSize: width * 0.04),
+            style: TextStyle(
+                fontFamily: 'poppins',
+            
+                color: Colors.white,
+                fontWeight: FontWeight.bold),
           ),
-          elevation: 0,
         ),
-        body: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.green,
-                  child: Text(
-                    "J", // Replace with logic to get the first letter of the name
-                    style: TextStyle(
-                      fontSize: width * 0.05,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+        elevation: 0,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.green.shade400,
+                child: Text(
+                  firstName.isNotEmpty ? firstName[0].toUpperCase() : "",
+                  style: TextStyle(
+                    fontSize: width * 0.08,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: height * 0.04,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: width * 0.02),
+              height: height * 0.1,
+              width: width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.perm_identity,
+                      color: Colors.black45,
+                      size: width * 0.09,
                     ),
-                  ),
+                    SizedBox(
+                      width: width * 0.03,
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          "Name",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: width * 0.035,
+                              fontFamily: 'poppins',
+                              fontWeight: FontWeight.w700),
+                        ),
+                        SizedBox(
+                          height: height * 0.003,
+                        ),
+                        Text(
+                          firstName.isNotEmpty ? firstName : "",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Raleways',
+                              fontSize: width * 0.035),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: height * 0.015),
-              Center(
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    "Edit",
-                    style: TextStyle(color: Colors.green, fontSize: 16),
-                  ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: width * 0.02),
+              height: height * 0.08,
+              width: width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      color: Colors.black45,
+                      size: width * 0.09,
+                    ),
+                    SizedBox(
+                      width: width * 0.05,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Email",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: width * 0.035,
+                              fontFamily: 'poppins',
+                              fontWeight: FontWeight.w700),
+                        ),
+                        SizedBox(
+                          height: height * 0.005,
+                        ),
+                        Text(
+                          email.isNotEmpty ? email : "",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Raleways',
+                              fontSize: width * 0.035),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 30),
-              Text(
-                "Name",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+            ListTile(
+              onTap: (){
+                logOutUser().then((_){
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => Firstpage()), // Navigate to login screen
+                        (Route<dynamic> route) => false, // Remove all previous routes from stack
+                  );
+                });
+
+              },
+
+              leading: Icon(
+                Icons.delete,
+                color: Colors.red,
               ),
-              SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  "John Doe", // Replace with actual name data
-                  style: TextStyle(fontSize: 16),
-                ),
+              title: Text(
+                "Log out",
+                style: TextStyle(fontFamily: 'Raleway', color: Colors.red),
               ),
-              SizedBox(height: 20),
-              Text(
-                "Email Address",
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              SizedBox(height: 5),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  "john.doe@example.com", // Replace with actual email data
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
-      );
-
-
+      ),
+      bottomNavigationBar: MainNavigationPage(
+          currentIndex: _selectedIndex, onTap: _onItemTapped),
+    );
   }
 }

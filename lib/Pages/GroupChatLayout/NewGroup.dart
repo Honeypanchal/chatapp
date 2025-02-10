@@ -170,96 +170,75 @@ cursorColor: Colors.green.shade700,
             child: Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: width * 0.012, vertical: height * 0.012),
-              child: StreamBuilder<
-                  List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+              child:  StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
                 stream: fetchUsers(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (!snapshot.hasData)
                     return Center(child: CircularProgressIndicator());
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No users found.'));
-                  }
 
-                  final users = snapshot.data!;
+                  var users = snapshot.data!;
+                  if (users.isEmpty) return Center(child: Text("No users found"));
+
                   return ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
                     itemCount: users.length,
                     itemBuilder: (context, index) {
-                      var user = users[index].data();
-
+                      var user = users[index];
                       return ListTile(
-                        title: Text(user['firstName'] ?? 'No Name'),
-                        subtitle: Text(user['email'] ?? 'No Email'),
-                        leading: Container(
-                          padding: EdgeInsets.all(width * 0.002),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: groupChatUsers.any((x) => x == user['uid'])
-                                  ? Colors.green.shade700
-                                  : Colors.black,
-                              width: width * 0.002,
-                            ),
-                          ),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: width * 0.05,
-                                child: Text(
-                                  user['firstName'][0].toUpperCase(),
-                                  style: TextStyle(color: Colors.black),
-                                ),
+                        leading:Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: Colors.black,
+                              radius: width * 0.05,
+                              child: Text(
+                                user['firstName'][0].toUpperCase(),
+                                style: TextStyle(color: Colors.green.shade700),
                               ),
-                              if (groupChatUsers.contains(user['uid']))
-                                Positioned(
-                                  right: -2,
-                                  bottom: -2,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white,
-                                    ),
-                                    child: Icon(
-                                      Icons.check_circle,
-                                      size: width * 0.035,
-                                      color: Colors.green.shade700,
-                                    ),
+                            ),
+                            if (groupChatUsers.contains(user['uid']))
+                              Positioned(
+                                right: -2,
+                                bottom: -2,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: Icon(
+                                    Icons.check_circle,
+                                    size: width * 0.035,
+                                    color: Colors.green.shade700,
                                   ),
                                 ),
-                            ],
-                          ),
+                              ),
+                          ],
                         ),
+                        title: Text(user['firstName']),
                         onTap: () {
                           setState(() {
-                            bool exists =
-                                groupChatUsers.any((x) => x == user['uid']);
-
-                            if (exists) {
-                              groupChatUsers
-                                  .removeWhere((x) => x == user['uid']);
+                            if (groupChatUsers.contains(user['uid'])) {
+                              groupChatUsers.remove(user['uid']);
                             } else {
                               groupChatUsers.add(user['uid']);
                             }
                           });
                           setState(() {
-                            bool exists =
-                                firstNames.any((x) => x == user['firstName']);
-
-                            if (exists) {
-                              firstNames
-                                  .removeWhere((x) => x == user['firstName']);
+                            if (firstNames.contains(user['firstName'])) {
+                              firstNames.remove(user['firstName']);
                             } else {
                               firstNames.add(user['firstName']);
                             }
                           });
                         },
+                        tileColor:groupChatUsers.contains(user['uid']) ? Colors.grey.shade300
+                            : Colors.transparent,
                       );
                     },
                   );
                 },
-              ),
+              )
             ),
           ),
         ],

@@ -15,20 +15,25 @@ class UserInfoPage extends StatelessWidget {
   String formatTimestamp(Timestamp? timestamp) {
     if (timestamp == null) return 'Not Read yet!';
     DateTime dateTime = timestamp.toDate();
-    return "${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')} AM"; // HH:MM AM/PM format
+    return "${dateTime.hour}:${dateTime.minute.toString().padLeft(
+        2, '0')} AM"; // HH:MM AM/PM format
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,  // Set the background color of the entire screen
+      backgroundColor: Colors.black,
+      // Set the background color of the entire screen
       appBar: AppBar(
-        leading: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-        title: Text("Message info", style: TextStyle(color: Colors.white, fontFamily: 'Raleway')),
+        leading: InkWell(onTap: () {
+          Navigator.pop(context);
+        }, child: Icon(Icons.arrow_back, color: Colors.white)),
+        title: Text("Message info",
+            style: TextStyle(color: Colors.white, fontFamily: 'Raleway')),
         backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),  // Icon color in appBar
+        iconTheme: IconThemeData(color: Colors.white), // Icon color in appBar
       ),
-      body: SingleChildScrollView(  // Make the body scrollable
+      body: SingleChildScrollView( // Make the body scrollable
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -71,13 +76,16 @@ class UserInfoPage extends StatelessWidget {
                   ListTile(
                     leading: Icon(Icons.done_all, color: Colors.green[700]),
                     title: Text("Read", style: TextStyle(color: Colors.white)),
-                    subtitle: Text(formatTimestamp(readAt), style: TextStyle(color: Colors.white70)),
+                    subtitle: Text(formatTimestamp(readAt),
+                        style: TextStyle(color: Colors.white70)),
                   ),
                   Divider(color: Colors.white24),
                   ListTile(
                     leading: Icon(Icons.done, color: Colors.grey),
-                    title: Text("Delivered", style: TextStyle(color: Colors.white)),
-                    subtitle: Text(formatTimestamp(deliveredAt), style: TextStyle(color: Colors.white70)),
+                    title: Text(
+                        "Delivered", style: TextStyle(color: Colors.white)),
+                    subtitle: Text(formatTimestamp(deliveredAt),
+                        style: TextStyle(color: Colors.white70)),
                   ),
                 ],
               ),
@@ -88,4 +96,3 @@ class UserInfoPage extends StatelessWidget {
     );
   }
 }
-

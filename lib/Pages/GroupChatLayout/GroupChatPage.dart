@@ -544,7 +544,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFFF6F1EB),
       appBar: PreferredSize(
         preferredSize: Size(width, height * 0.072),
         child: GestureDetector(
@@ -565,11 +565,11 @@ class _GroupchatpageState extends State<Groupchatpage> {
                 },
                 icon: Icon(
                   Icons.arrow_back,
-                  color: Colors.white,
+                  color: Colors.black,
                 )),
             title: selectedMessages.isNotEmpty
                 ? Text("${selectedMessages.length} selected",
-                style: TextStyle(color: Colors.white))
+                style: TextStyle(color: Colors.black))
                 : isSearching
                 ? TextField(
               autofocus: true,
@@ -580,25 +580,25 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   setState(() => searchQuery = query),
             )
                 : Text(group['groupName'],
-                style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.black,
+                style: TextStyle(color: Colors.black)),
+            backgroundColor: Colors.white,
             actions: [
               if (selectedMessages.isNotEmpty) ...[
                 IconButton(
-                  icon: const Icon(Icons.push_pin, color: Colors.white),
+                  icon: const Icon(Icons.push_pin, color: Colors.black),
                   onPressed: pinMessages,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.star, color: Colors.white),
+                  icon: const Icon(Icons.star, color: Colors.black),
                   onPressed: favoriteMessages,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.white),
+                  icon: const Icon(Icons.delete, color: Colors.black),
                   onPressed: deleteMessages,
                 ),
                 // Display 3 dots when messages are selected
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert, color: Colors.white),
+                  icon: Icon(Icons.more_vert, color: Colors.black),
                   onSelected: (value) async {
                     String messageId = selectedMessages.first; // Using the first selected message as an example
                     if (value == 'reply') {
@@ -759,7 +759,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                               decoration: BoxDecoration(
-                                color: isMe ? Colors.black87 : Colors.grey[300],
+                                color: isMe ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Column(
@@ -772,7 +772,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                     child: Text(
                                       message['message'],
                                       style: TextStyle(
-                                        color: isMe ? Colors.white : Colors.black,
+                                        color: isMe ? Colors.black : Colors.black,
                                         backgroundColor: isSearched ? Colors.green : null,
                                       ),
                                       softWrap: true, // Allow text to wrap if too long
@@ -783,7 +783,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                   if (isFavorite)
                                     Icon(
                                       Icons.star,
-                                      color: Colors.yellow,
+                                      color: Colors.lightBlueAccent,
                                       size: 18,
                                     ),
                                   Align(
@@ -792,7 +792,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                       formatMessageTime(message['timestamp']),
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: isMe ? Colors.white : Colors.black,
+                                        color: isMe ? Colors.black: Colors.black,
                                       ),
                                     ),
                                   ),
@@ -855,7 +855,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                 ),
                               ),
                             ),
-                            child: Icon(Icons.poll, color: Colors.grey[500]),
+                            child: Icon(Icons.poll, color: Color.fromARGB(255, 213, 252, 208)),
                           ),
                           SizedBox(width: 10),
                           Expanded(
@@ -869,7 +869,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                           ),
                           GestureDetector(
                             onTap: sendMessage,
-                            child: Icon(Icons.send, color: Colors.grey[500]),
+                            child: Icon(Icons.send, color: Color.fromARGB(255, 213, 252, 208)),
                           ),
                         ],
                       ),
@@ -945,7 +945,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
             padding: EdgeInsets.all(12),
             width: MediaQuery.of(context).size.width * 0.75,
             decoration: BoxDecoration(
-              color: isSender ? Colors.black87 : Colors.grey.shade100,
+              color: isSender ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -954,7 +954,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black26,
+                  color: Color.fromARGB(255, 213, 252, 208),
                   blurRadius: 4,
                   offset: Offset(2, 2),
                 )
@@ -965,7 +965,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
               children: [
                 Text(
                   message['message'],
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isSender ? Colors.white : Colors.black),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isSender ? Colors.black : Colors.black),
                 ),
                 SizedBox(height: 8),
                 Column(
@@ -1033,7 +1033,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                       child: Center(
                           child:Text(
                         value ? "Hide Voters" : "Show Voters",
-                        style: TextStyle(color: isSender ? Colors.white : Colors.black),
+                        style: TextStyle(color: isSender ? Colors.black : Colors.black),
                       )
                       ),
                     );
@@ -1192,7 +1192,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                         contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         suffixIcon: index >= 2
                             ? IconButton(
-                          icon: Icon(Icons.remove_circle, color: Colors.green.shade700, size: 18),
+                          icon: Icon(Icons.remove_circle, color: Colors.green.shade200, size: 18),
                           onPressed: () {
                             setState(() {
                               optionControllers.removeAt(index);
@@ -1219,7 +1219,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                 },
                 icon: Icon(Icons.add, color: Colors.black87, size: 16),
                 label: Text("Add Option",
-                    style: TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: Color.fromARGB(255, 213, 252, 208), fontSize: 15, fontWeight: FontWeight.bold)),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1234,7 +1234,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                 TextButton(
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    backgroundColor: Colors.black87,
+                    backgroundColor: Color.fromARGB(255, 213, 252, 208),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     minimumSize: Size(0, 0),
@@ -1245,7 +1245,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    backgroundColor: Colors.black87,
+                    backgroundColor: Color.fromARGB(255, 213, 252, 208),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     minimumSize: Size(0, 0),

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chatapp/Pages/ChatLayout/ChatPage.dart';
-import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
-import 'package:chatapp/Pages/Profile/Profile.dart';
-import 'package:chatapp/Pages/statuspage.dart';
+
 
 class MainNavigationPage extends StatelessWidget {
   final int currentIndex;
@@ -38,10 +35,10 @@ class MainNavigationPage extends StatelessWidget {
             ),
           ],
           currentIndex: currentIndex,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.grey,
+          selectedItemColor: Colors.grey,
+          unselectedItemColor: Colors.white,
           onTap: onTap,
-          type: BottomNavigationBarType.fixed, // Ensures full background color
+          type: BottomNavigationBarType.fixed // Ensures full background color
         ));
   }
 }
