@@ -35,13 +35,13 @@ class _GroupPermissionsState extends State<GroupPermissions> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         title: Text(
           "Group permissions",
           style: TextStyle(
               fontFamily: 'Raleway',
               fontSize: width * 0.052,
-              color: Colors.white),
+              color: Colors.black),
         ),
         leading: IconButton(
             onPressed: () {
@@ -52,8 +52,8 @@ class _GroupPermissionsState extends State<GroupPermissions> {
               });
             },
             icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
+              Icons.arrow_back_ios,
+              color: Colors.black,
             )),
       ),
       body: SingleChildScrollView(
@@ -115,8 +115,8 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Color.fromRGBO(21, 171, 97, 1),
+                            focusColor: Color.fromRGBO(21, 171, 97, 1),
                             value: widget.groupSettings,
                             onChanged: (val) {
                               setState(() {
@@ -151,8 +151,8 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Color.fromRGBO(21, 171, 97, 1),
+                            focusColor: Color.fromRGBO(21, 171, 97, 1),
                             value: widget.sendMessages,
                             onChanged: (val) {
                               setState(() {
@@ -187,8 +187,8 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Color.fromRGBO(21, 171, 97, 1),
+                            focusColor:Color.fromRGBO(21, 171, 97, 1),
                             value: widget.addOtherMembers,
                             onChanged: (val) {
                               setState(() {

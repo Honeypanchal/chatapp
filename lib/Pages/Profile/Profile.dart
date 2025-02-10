@@ -86,7 +86,7 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+      automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         title: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -94,7 +94,7 @@ class _ProfileState extends State<Profile> {
             "Profile",
             style: TextStyle(
                 fontFamily: 'poppins',
-
+            
                 color: Colors.white,
                 fontWeight: FontWeight.bold),
           ),

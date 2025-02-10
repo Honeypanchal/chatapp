@@ -36,13 +36,13 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         title: Text(
           "Group permissions",
           style: TextStyle(
               fontFamily: 'Raleway',
               fontSize: width * 0.052,
-              color: Colors.white),
+              color: Colors.black),
         ),
         leading: IconButton(
             onPressed: () {
@@ -54,8 +54,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
               });
             },
             icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
+              Icons.arrow_back_ios,
+              color: Colors.black,
             )),
       ),
       body: SingleChildScrollView(
@@ -117,8 +117,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Color.fromRGBO(21, 171, 97, 1),
+                            focusColor: Color.fromRGBO(21, 171, 97, 1),
                             value: widget.groupSettings,
                             onChanged: (val) {
                               setState(() {
@@ -153,8 +153,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Color.fromRGBO(21, 171, 97, 1),
+                            focusColor: Color.fromRGBO(21, 171, 97, 1),
                             value: widget.sendMessages,
                             onChanged: (val) {
                               setState(() {
@@ -189,8 +189,8 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       child: Transform.scale(
                         scale: width * 0.002,
                         child: Switch(
-                            activeColor: Colors.green.shade700,
-                            focusColor: Colors.green.shade700,
+                            activeColor: Color.fromRGBO(21, 171, 97, 1),
+                            focusColor: Color.fromRGBO(21, 171, 97, 1),
                             value: widget.addOtherMembers,
                             onChanged: (val) {
                               setState(() {
@@ -355,18 +355,18 @@ class _GroupMembersState extends State<GroupMembers> {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         leading: IconButton(
             onPressed: () {
               Navigator.of(context).pop(widget.admins);
             },
             icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
+              Icons.arrow_back_ios,
+              color: Colors.black,
             )),
         title: Text(
           "Edit Admin",
-          style: TextStyle(color: Colors.white, fontFamily: 'Raleway'),
+          style: TextStyle(color: Colors.black, fontFamily: 'Raleway'),
         ),
       ),
       backgroundColor: Colors.white,
@@ -384,7 +384,7 @@ class _GroupMembersState extends State<GroupMembers> {
               if (isLoading)
                 CircularProgressIndicator(
                   backgroundColor: Colors.white,
-                  color: Colors.green.shade700,
+                  color: Colors.black,
                 ),
               ListView.builder(
                 shrinkWrap: true,
@@ -424,12 +424,21 @@ class _GroupMembersState extends State<GroupMembers> {
                     leading: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.black,
-                          radius: width * 0.05,
-                          child: Text(
-                            membersFirstNameList[index][0].toUpperCase(),
-                            style: TextStyle(color: Colors.green.shade700),
+                        Container(
+                    decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                      border: Border.all(
+                        color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
+                        width: width*0.002, // Set the border width
+                      ),
+                    ),
+                          child: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            radius: width * 0.05,
+                            child: Text(
+                              membersFirstNameList[index][0].toUpperCase(),
+                              style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
+                            ),
                           ),
                         ),
                         if (isCurrentUserAdmin(widget.groupMembers[index]))
@@ -444,7 +453,7 @@ class _GroupMembersState extends State<GroupMembers> {
                               child: Icon(
                                 Icons.check_circle,
                                 size: width * 0.035,
-                                color: Colors.green.shade700,
+                                color: Color.fromRGBO(21, 171, 97, 1),
                               ),
                             ),
                           ),
@@ -454,9 +463,9 @@ class _GroupMembersState extends State<GroupMembers> {
                     trailing: isCurrentUserAdmin(widget.groupMembers[index])
                         ? Container(
                             decoration: BoxDecoration(
-                                color: Colors.green.shade700,
+                                color: Color.fromRGBO(217,252,210,1),
                                 border:
-                                    Border.all(color: Colors.green.shade700),
+                                    Border.all(color:Color.fromRGBO(217,252,210,1)),
                                 borderRadius:
                                     BorderRadius.circular(width * 0.01)),
                             width: width * 0.12,
@@ -466,7 +475,7 @@ class _GroupMembersState extends State<GroupMembers> {
                                 "Admin",
                                 style: TextStyle(
                                     fontSize: width * 0.027,
-                                    color: Colors.white),
+                                    color: Color.fromRGBO(34, 89, 49, 1)),
                               ),
                             ),
                           )

@@ -44,6 +44,7 @@ dependencies:
 
   google_sign_in:
   flutter_chat_bubble:
+  flashy_tab_bar2: ^0.0.10
 #  image_picker:
 #  firebase_storage:
 

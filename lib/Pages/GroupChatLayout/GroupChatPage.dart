@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 
@@ -62,23 +63,52 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
   List<String> participants = [];
   List<String> membersFirstNameList = [];
+  bool isFetching = false; // To track function executio
 
   Future<void> membersFirstName() async {
-    print(group['participants']);
+    if (isFetching) return; // ✅ Prevent duplicate calls
+    isFetching = true;
 
-    setState(() {
-      participants = (group['participants'] as List<dynamic>)
+    try {
+      print("Fetching participants...");
+
+      if (group == null || !group.containsKey('participants')) {
+        print("Group data is null or missing participants.");
+        return;
+      }
+
+      List<String> newParticipants = (group['participants'] as List<dynamic>)
           .map((e) => e.toString())
           .toList();
-      print(participants[0]);
-    });
 
-    List<String> fetchedNames = await getUserNames(participants);
+      // ✅ Sort lists before comparing
+      newParticipants.sort();
+      participants.sort();
 
-    setState(() {
-      membersFirstNameList = fetchedNames;
-    });
+      if (listEquals(participants, newParticipants)) {
+        print("Participants unchanged, skipping fetch.");
+        return;
+      }
+
+      participants = List.from(newParticipants);
+      print("Participants changed, fetching names...");
+
+      List<String> fetchedNames = await getUserNames(participants);
+
+      if (mounted) {
+        setState(() {
+          membersFirstNameList = fetchedNames;
+        });
+      }
+    } catch (e) {
+      print("Error fetching member first names: $e");
+    } finally {
+      isFetching = false; // ✅ Reset flag after execution
+    }
   }
+
+
+
 
   final TextEditingController _messageController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -161,26 +191,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     }
   }
 
-  String formatTimestamp(Timestamp? timestamp) {
-    if (timestamp == null) return "";
-    DateTime messageDate = timestamp.toDate();
-    DateTime now = DateTime.now();
 
-    if (DateFormat('yyyy-MM-dd').format(messageDate) ==
-        DateFormat('yyyy-MM-dd').format(now)) {
-      return "Today";
-    } else if (DateFormat('yyyy-MM-dd').format(messageDate) ==
-        DateFormat('yyyy-MM-dd').format(now.subtract(Duration(days: 1)))) {
-      return "Yesterday";
-    } else {
-      return DateFormat('dd MMM yyyy').format(messageDate);
-    }
-  }
-
-  String formatTime(Timestamp? timestamp) {
-    if (timestamp == null) return "";
-    return DateFormat('hh:mm a').format(timestamp.toDate());
-  }
 
 
 //  Function to handle the reply
@@ -456,32 +467,65 @@ class _GroupchatpageState extends State<Groupchatpage> {
   late bool sendMessages;
 
   late bool addOtherMembers;
+  // void getCurrentUserDetails() async {
+  //   CustomClass? found = await getUserDetails(widget.currentUser);
+  //   if (found != null) {
+  //     setState(() {
+  //       user = found;
+  //     });
+  //   }
+  // }
   void getCurrentUserDetails() async {
     CustomClass? found = await getUserDetails(widget.currentUser);
-    if (found != null) {
+    if (found != null && mounted) {
       setState(() {
         user = found;
       });
     }
   }
+
+  // @override
+
+  // void initState() {
+  //   super.initState();
+  //   getCurrentUserDetails();
+  //   getGroup();
+  //   membersFirstName();
+  // }
   @override
   void initState() {
     super.initState();
     getCurrentUserDetails();
     getGroup();
+    membersFirstName();
+    listenToDatabaseUpdates();
   }
+
 
   StreamSubscription? _groupSubscription;
 
+
   void listenToDatabaseUpdates() {
-    final groupRef = FirebaseFirestore.instance.collection("groups").doc(
-        widget.groupId); // Corrected groupId reference
+    final groupRef = FirebaseFirestore.instance.collection("groups").doc(widget.groupId);
 
     _groupSubscription = groupRef.snapshots().listen((snapshot) async {
       print("Listening to changes...");
 
       if (snapshot.exists && mounted) {
         var updatedGroupData = snapshot.data() as Map<String, dynamic>;
+        List<String> newParticipants = (updatedGroupData['participants'] as List<dynamic>).map((e) => e.toString()).toList();
+
+        // ✅ Sort lists before comparing
+        newParticipants.sort();
+        participants.sort();
+
+        if (!listEquals(participants, newParticipants)) {
+          print("Participants changed, fetching names...");
+          participants = List.from(newParticipants);
+          await membersFirstName();
+        } else {
+          print("Participants unchanged, skipping fetch.");
+        }
 
         if (mounted) {
           setState(() {
@@ -489,17 +533,20 @@ class _GroupchatpageState extends State<Groupchatpage> {
             groupSettings = group['groupSettings'];
             sendMessages = group['sendMessages'];
             addOtherMembers = group['addOtherMembers'];
-            isLoading = false; // Stop loading
+            isLoading = false;
           });
         }
       }
     });
   }
 
+
   @override
   void dispose() {
-    _groupSubscription?.cancel(); // Stop listening when widget is removed
+    _groupSubscription?.cancel(); //  Stop listening when widget is removed
+    _groupSubscription = null; // Ensure it's set to null
     super.dispose();
+
   }
 
   Widget build(BuildContext context) {
@@ -633,7 +680,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
       body: Column(
         children: [
           Expanded(
-            child: StreamBuilder(
+            child:      StreamBuilder(
               stream: _firestore
                   .collection('groups')
                   .doc(group['groupId'])
@@ -642,11 +689,22 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+
                 var messages = snapshot.data!.docs;
 
                 Map<String, List<QueryDocumentSnapshot>> groupedMessages = {};
+
                 for (var message in messages) {
-                  String messageDate = formatDateForGrouping(message['timestamp']);
+                  Map<String, dynamic> messageData = message.data() as Map<String, dynamic>;
+
+                  // Check if 'timestamp' exists and is not null
+                  Timestamp? timestamp = messageData['timestamp'] as Timestamp?;
+
+                  // Use a fallback value to prevent errors (e.g., current time if timestamp is null)
+                  String messageDate = timestamp != null
+                      ? formatDateForGrouping(timestamp)
+                      : ''; // Fallback value
+
                   groupedMessages.putIfAbsent(messageDate, () => []).add(message);
                 }
 
@@ -657,8 +715,17 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     if (b == 'Today') return -1;
                     if (a == 'Yesterday') return -1;
                     if (b == 'Yesterday') return 1;
-                    return DateFormat('MMM dd').parse(a).compareTo(DateFormat('MMM dd').parse(b));
+
+                    // Ensure no empty or invalid date strings are passed to DateFormat.parse()
+                    if (a.isEmpty || b.isEmpty) return 0;
+
+                    try {
+                      return DateFormat('MMM dd').parse(a).compareTo(DateFormat('MMM dd').parse(b));
+                    } catch (e) {
+                      return 0; // Avoid crashing on parsing errors
+                    }
                   });
+
 
                 return ListView(
                   reverse: false, // Keeps the latest messages at the bottom
@@ -690,7 +757,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                             onLongPress: () {
                               handleMessageLongPress(message.id);
                             },
-                            child:Container(
+                            child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                               alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                               decoration: BoxDecoration(
@@ -708,7 +775,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                                       decoration: BoxDecoration(
-                                        color: isMe ? Colors.green.shade700 : Colors.grey[300],
+                                        color: isMe ? Colors.black87 : Colors.grey[300],
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Column(
@@ -716,7 +783,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                         mainAxisSize: MainAxisSize.min, // Ensures the container adjusts to content
                                         children: [
                                           // Make sure to use Flexible for long messages
-                                          Flexible(
+                                          Align(
+                                            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                             child: Text(
                                               message['message'],
                                               style: TextStyle(
@@ -751,7 +819,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                 ],
                               ),
                             ),
-
                           );
                         }).toList(),
                       ],
@@ -760,6 +827,10 @@ class _GroupchatpageState extends State<Groupchatpage> {
                 );
               },
             ),
+
+
+
+
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: width * 0.012, vertical: height * 0.01),
@@ -800,7 +871,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                 ),
                               ),
                             ),
-                            child: Icon(Icons.poll, color: Colors.green.shade400),
+                            child: Icon(Icons.poll, color: Colors.grey[500]),
                           ),
                           SizedBox(width: 10),
                           Expanded(
@@ -814,7 +885,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                           ),
                           GestureDetector(
                             onTap: sendMessage,
-                            child: Icon(Icons.send, color: Colors.green.shade400),
+                            child: Icon(Icons.send, color: Colors.grey[500]),
                           ),
                         ],
                       ),
@@ -831,42 +902,58 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
 
 
-  String formatMessageTime(Timestamp timestamp) {
-    return DateFormat('hh:mm a').format(timestamp.toDate());
-  }
 
-  String formatDateForGrouping(Timestamp timestamp) {
+  String formatMessageTime(Timestamp? timestamp) {
+    try {
+      if (timestamp == null) return 'Invalid Time'; // Handle null timestamps
+      return DateFormat('hh:mm a').format(timestamp.toDate());
+    } catch (e) {
+      return 'Invalid Time';  // Fallback for error handling
+    }
+  }
+  String formatDateForGrouping(Timestamp? timestamp) {
+    if (timestamp == null) return 'Unknown'; // Ensure no empty values
+
     final now = DateTime.now();
     final messageTime = timestamp.toDate();
 
     if (messageTime.year == now.year && messageTime.month == now.month && messageTime.day == now.day) {
       return 'Today';
-    } else if (messageTime.isBefore(now.subtract(Duration(days: 1)))) {
+    } else if (messageTime.year == now.year &&
+        messageTime.month == now.month &&
+        messageTime.day == now.day - 1) {
       return 'Yesterday';
     } else {
       return DateFormat('MMM dd').format(messageTime);
     }
   }
 
+
+
+
   //poll  display method
+
   Widget buildPollWidget(QueryDocumentSnapshot message, bool isSender) {
     Map<String, dynamic> pollOptions = Map<String, dynamic>.from(message['pollOptions'] ?? {});
-    bool showVotes = false;
+    ValueNotifier<bool> showVotes = ValueNotifier<bool>(false);
     Map<String, String> voterNames = {};
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        Future<void> fetchVoterNames(List<dynamic> voterUids) async {
-          List<String> fetchedNames = await getUserNames(voterUids.cast<String>());
-          if (fetchedNames.isNotEmpty) {
-            setState(() {
-              for (int i = 0; i < voterUids.length; i++) {
-                voterNames[voterUids[i]] = fetchedNames[i];
-              }
-            });
-          }
-        }
+    List<dynamic> allVoters = pollOptions.values.expand((voters) => voters).toSet().toList();
 
+    Future<void> fetchVoterNames(List<dynamic> voters) async {
+      try {
+        List<String> fetchedNames = await getUserNames(voters.cast<String>());
+        for (int i = 0; i < voters.length; i++) {
+          voterNames[voters[i]] = fetchedNames[i];
+        }
+      } catch (e) {
+        print("Error fetching voter names: $e");
+      }
+    }
+
+    return FutureBuilder(
+      future: fetchVoterNames(allVoters),
+      builder: (context, snapshot) {
         return Align(
           alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
@@ -874,11 +961,10 @@ class _GroupchatpageState extends State<Groupchatpage> {
             padding: EdgeInsets.all(12),
             width: MediaQuery.of(context).size.width * 0.75,
             decoration: BoxDecoration(
-              color: isSender ? Colors.green.shade300 : Colors.grey.shade100,
+              color: isSender ? Colors.black87 : Colors.grey.shade100,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
-
                 bottomLeft: isSender ? Radius.circular(12) : Radius.zero,
                 bottomRight: isSender ? Radius.zero : Radius.circular(12),
               ),
@@ -928,52 +1014,47 @@ class _GroupchatpageState extends State<Groupchatpage> {
                             ),
                           ),
                         ),
-                        if (showVotes && voters.isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.only(left: 10, top: 5),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: voters.map((uid) {
-                                String voterName = voterNames[uid] ?? "Fetching...";
-                                return Text("- $voterName", style: TextStyle(fontSize: 14, color: Colors.black87));
-                              }).toList(),
-                            ),
-                          ),
+                        ValueListenableBuilder(
+                          valueListenable: showVotes,
+                          builder: (context, value, child) {
+                            return Column(
+                              children: [
+                                if (value && voters.isNotEmpty)
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 10, top: 5),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: voters.map((uid) {
+                                        String voterName = voterNames[uid] ?? "Fetching...";
+                                        return Text("- $voterName", style: TextStyle(fontSize: 14, color: Colors.white));
+                                      }).toList(),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
                       ],
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 1),
-                Divider(
-                  thickness:1,
-                  color:Colors.grey,
-                ),
-                Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          showVotes = !showVotes;
-                        });
+                SizedBox(height: 5),
+                ValueListenableBuilder(
+                  valueListenable: showVotes,
+                  builder: (context, value, child) {
+                    return TextButton(
+                      onPressed: () {
+                        showVotes.value = !showVotes.value;
                       },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                        decoration: BoxDecoration(
-                          //color: isSender ? Colors.white : Colors.green.shade300,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            showVotes ? "Hide Votes" : "Show Votes",
-                            style: TextStyle(
-                              color: isSender ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                      child: Center(
+                          child:Text(
+                            value ? "Hide Voters" : "Show Voters",
+                            style: TextStyle(color: isSender ? Colors.white : Colors.black),
+                          )
                       ),
-                    )
-
-                )
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -981,7 +1062,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
       },
     );
   }
-
 
   Stream<List<String>> getReadReceipts(String messageId) {
     return _firestore
@@ -1058,11 +1138,16 @@ class _CreatePollPageState extends State<CreatePollPage> {
 
   void createPoll() {
     List<String> pollOptions = optionControllers
-        .where((controller) => controller.text.trim().isNotEmpty)
+        .where((controller) =>
+    controller.text
+        .trim()
+        .isNotEmpty)
         .map((controller) => controller.text.trim())
         .toList();
 
-    if (questionController.text.trim().isNotEmpty && pollOptions.length >= 2) {
+    if (questionController.text
+        .trim()
+        .isNotEmpty && pollOptions.length >= 2) {
       widget.sendMessage(
         isPoll: true,
         pollOptions: pollOptions,
@@ -1080,7 +1165,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
       appBar: AppBar(
         title: Text(
           "Create a Poll",
-          style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         iconTheme: IconThemeData(color: Colors.black),
@@ -1103,7 +1189,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 8),
               ),
             ),
             SizedBox(height: 8),
@@ -1125,10 +1212,13 @@ class _CreatePollPageState extends State<CreatePollPage> {
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
                         suffixIcon: index >= 2
                             ? IconButton(
-                          icon: Icon(Icons.remove_circle, color: Colors.red, size: 18),
+                          icon: Icon(
+                              Icons.remove_circle, color: Colors.green.shade700,
+                              size: 18),
                           onPressed: () {
                             setState(() {
                               optionControllers.removeAt(index);
@@ -1153,9 +1243,11 @@ class _CreatePollPageState extends State<CreatePollPage> {
                     });
                   }
                 },
-                icon: Icon(Icons.add, color: Color(0xFF128C7E), size: 16),
+                icon: Icon(Icons.add, color: Colors.black87, size: 16),
                 label: Text("Add Option",
-                    style: TextStyle(color: Colors.green.shade400, fontSize: 15, fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: Colors.black87,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold)),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1170,24 +1262,31 @@ class _CreatePollPageState extends State<CreatePollPage> {
                 TextButton(
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    backgroundColor: Colors.grey.shade300,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     minimumSize: Size(0, 0),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Cancel", style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text("Cancel", style: TextStyle(color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    backgroundColor: Colors.green.shade400,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     minimumSize: Size(0, 0),
                   ),
                   onPressed: createPoll,
-                  child: Text("Create Poll", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text("Create Poll", style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
