@@ -50,13 +50,13 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
 
     return AppBar(
       leading: Padding(
-        padding: EdgeInsets.only(left: width * 0.064),
+        padding: EdgeInsets.only(left:width>600? 0.00:  width * 0.064),
         child: GestureDetector(
           onTap: () => Navigator.pushNamed(context,'/groupDisplay',arguments: {'currentUser':widget.currentUser})
        ,   child: Icon(
             Icons.arrow_back_ios,
             color: Colors.black,
-            size: width > 600 ? width * 0.6 : width * 0.06,
+            size: width > 600 ? width * 0.02 : width * 0.06,
           ),
         ),
       ),
@@ -70,7 +70,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
               color: Colors.black,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
-              fontSize: width > 600 ? width * 0.05 : width * 0.06,
+              fontSize: width > 600 ? width * 0.02 : width * 0.06,
             ),
           ),
           Text(
@@ -78,7 +78,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
             style: TextStyle(
               color: Colors.black,
               fontFamily: 'Poppins',
-              fontSize: width > 600 ? width * 0.04 : width * 0.032,
+              fontSize: width > 600 ? width * 0.01 : width * 0.032,
             ),
           )
         ],
