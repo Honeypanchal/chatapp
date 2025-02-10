@@ -16,7 +16,8 @@ class GroupDisplayPage extends StatefulWidget {
 class _GroupDisplayPageState extends State<GroupDisplayPage> {
   int _selectedIndex = 1;
   TextEditingController _searchText = TextEditingController();
-  CollectionReference groupsDB = FirebaseFirestore.instance.collection("groups");
+  CollectionReference groupsDB =
+      FirebaseFirestore.instance.collection("groups");
   String searchQuery = "";
 
   @override
@@ -63,21 +64,21 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
   }
 
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchGroups() {
-    Query query = groupsDB.where("participants", arrayContains: widget.currentUser.uid);
+    Query query =
+        groupsDB.where("participants", arrayContains: widget.currentUser.uid);
 
     if (searchQuery.isNotEmpty) {
       String searchLowerBound = searchQuery;
-      String searchUpperBound = searchQuery + '\uf8ff';
+      String searchUpperBound = searchQuery + '\uf8fff';
 
       query = query
           .where("groupName", isGreaterThanOrEqualTo: searchLowerBound)
           .where("groupName", isLessThan: searchUpperBound);
     }
 
-    return query.snapshots().map((querySnapshot) =>
-    querySnapshot.docs as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
+    return query.snapshots().map((querySnapshot) => querySnapshot.docs
+        as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
   }
-
 
   Future<Map<String, String>> getLastMessage(String groupId) async {
     var snapshot = await groupsDB
@@ -106,8 +107,8 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: Padding(
-          padding: EdgeInsets.only(left: width * 0.064),
-          child: Icon(Icons.groups_outlined, color:Colors.black),
+          padding: EdgeInsets.only(left:width * 0.064),
+          child: width>600?null: Icon(Icons.groups_outlined, color: Colors.black,size:width*0.062,),
         ),
         backgroundColor: Colors.white,
         title: Column(
@@ -124,6 +125,36 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
             ),
           ],
         ),
+        actions: [
+          PopupMenuButton(
+            color: Colors.grey.shade200,
+            offset: Offset(0, height * 0.052),
+            elevation: 2,
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Text("Starred Messages"),
+                value: 0,
+              ),
+              PopupMenuItem(
+                child: Text("Create a Group"),
+                value: 1,
+              ),
+            ],
+            onSelected: (val) {
+              switch (val) {
+                case 0: //neha ka code
+                  break;
+                case 1:
+                  Navigator.pushNamed(
+                    context,
+                    '/newGroup',
+                    arguments: {'currentUser': widget.currentUser},
+                  );
+                  break;
+              }
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -150,7 +181,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 decoration: InputDecoration(
                   hintText: 'Search groups...',
                   contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                   prefixIcon: Icon(Icons.search, color: Colors.grey),
                   border: InputBorder.none,
                 ),
@@ -164,7 +195,8 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
           ),
           SizedBox(height: height * 0.025),
           Expanded(
-            child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
+            child: StreamBuilder<
+                List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
               stream: fetchGroups(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -196,7 +228,8 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
 
                         if (lastMessageSnapshot.hasData) {
                           sender = lastMessageSnapshot.data!['sender']!;
-                          lastMessageText = lastMessageSnapshot.data!['message']!;
+                          lastMessageText =
+                              lastMessageSnapshot.data!['message']!;
                         }
 
                         return ListTile(
@@ -204,7 +237,8 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                             backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                             child: Icon(Icons.group, color: Colors.white),
                           ),
-                          title: Text(groupData["groupName"] ?? "Unnamed Group"),
+                          title:
+                              Text(groupData["groupName"] ?? "Unnamed Group"),
                           subtitle: sender.isNotEmpty
                               ? Text('$sender: $lastMessageText')
                               : Text(lastMessageText),
@@ -240,7 +274,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
         child: Icon(
           Icons.group_add,
           color: Colors.white,
-          size: width < 600 ? width * 0.08 : width * 0.09,
+          size: width < 600 ? width * 0.08 : width * 0.02
         ),
       ),
     );

@@ -14,181 +14,36 @@ class UserListPage extends StatefulWidget {
 class _UserListPageState extends State<UserListPage> {
   final _database = FirebaseFirestore.instance.collection('Users');
   dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
-  List<Map<String, dynamic>> _selectedUsers = [];
+  List<Map<String, dynamic>> _allUsers = [];
+  List<Map<String, dynamic>> _filteredUsers = [];
+  final TextEditingController _searchController = TextEditingController();
+  bool _isLoading = false;
+
 
   @override
   void initState() {
     super.initState();
-    loadSelectedUsers();
-  }
-
-  // Load selected users from Firestore
-  Future<void> loadSelectedUsers() async {
-    DocumentSnapshot userDoc = await _database.doc(widget.currentUser.uid).get();
-    if (userDoc.exists && userDoc.data() != null) {
-      List<dynamic> savedUsers = userDoc.get("selectedUsers") ?? [];
-      setState(() {
-        _selectedUsers = List<Map<String, dynamic>>.from(savedUsers);
-      });
-    }
-  }
-
-  // Navigate to chat with selected user
-  void navigateToChat(Map<String, dynamic> user) {
-    String docId = widget.currentUser.uid.compareTo(user['uid']) < 0
-        ? "${widget.currentUser.uid}_${user['uid']}"
-        : "${user['uid']}_${widget.currentUser.uid}";
-
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => ChatLayout(
-        currentUser: widget.currentUser,
-        user: user,
-        databaseRef: chatsDB.doc(docId),
-      ),
-    ));
+    loadUsers();
+    _searchController.addListener(_filterUsers);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context); // This will navigate back to the previous screen
-          },
-        ),
-        backgroundColor: Colors.black,
-        title: Text(
-          'Select a User',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-        future: _database.get().then((snapshot) => snapshot.docs),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(color: Colors.black));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No users available."));
-          }
-
-          // Filter out the selected users from the available users
-          List<QueryDocumentSnapshot<Map<String, dynamic>>> availableUsers = snapshot.data!.where((doc) {
-            Map<String, dynamic> user = doc.data();
-            return !_selectedUsers.any((selectedUser) => selectedUser['uid'] == user['uid']);
-          }).toList();
-
-          return ListView.builder(
-            itemCount: availableUsers.length,
-            itemBuilder: (context, index) {
-              Map<String, dynamic> user = availableUsers[index].data();
-
-              return ListTile(
-                onTap: () async {
-                  // Get the selected user's data
-                  Map<String, dynamic> selectedUser = availableUsers[index].data();
-
-                  // Add the selected user to the current user's selected users list in Firestore
-                  DocumentReference userDoc = FirebaseFirestore.instance.collection('Users').doc(widget.currentUser.uid);
-                  await userDoc.update({
-                    'selectedUsers': FieldValue.arrayUnion([selectedUser])
-                  });
-
-                  // Navigate back and pass the selected user
-                  Navigator.pop(context, selectedUser);
-                },
-                leading: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      "${user['firstName'][0].toUpperCase()}",
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                ),
-                title: Text(
-                  "${user['firstName']} ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: 'Raleway',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
+  void dispose() {
+    _searchController.removeListener(_filterUsers);
+    _searchController.dispose();
+    super.dispose();
   }
-}
 
 
-
-/*import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/Pages/Chatlayout/chat_layout.dart';
-
-class UserListPage extends StatefulWidget {
-  final CustomClass currentUser;
-  UserListPage({required this.currentUser});
-
-  @override
-  _UserListPageState createState() => _UserListPageState();
-}
-class _UserListPageState extends State<UserListPage> {
-  final _database = FirebaseFirestore.instance.collection('Users');
-  dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
-  List<Map<String, dynamic>> _selectedUsers = []; // To store selected users
-
-  @override
-  void initState() {
-    super.initState();
-    loadSelectedUsers();
-  }
-  // Delete a user and reload the user list in UserListPage
-  deleteUserFromSelectedUsers(Map<String, dynamic> user) async {
-    DocumentReference userDoc = FirebaseFirestore.instance.collection('Users').doc(widget.currentUser.uid);
-
-    // Remove the user from the selectedUsers list
-    await userDoc.update({
-      'selectedUsers': FieldValue.arrayRemove([user])
-    });
-
-    // Update the local list
+  void _filterUsers() {
+    String query = _searchController.text.toLowerCase();
     setState(() {
-      _selectedUsers.removeWhere((selectedUser) => selectedUser['uid'] == user['uid']);
+      _filteredUsers = _allUsers
+          .where((user) => user['firstName'].toLowerCase().contains(query))
+          .toList();
     });
-
-    // Optionally, display a snackbar or feedback to the user
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${user['firstName']} removed")));
-
-    // Reload the list in UserListPage
-    loadSelectedUsers(); // Ensure this refreshes the UserListPage
   }
 
-
-  // Load selected users from Firestore
-  Future<void> loadSelectedUsers() async {
-    DocumentSnapshot userDoc = await _database.doc(widget.currentUser.uid).get();
-    if (userDoc.exists && userDoc.data() != null) {
-      List<dynamic> savedUsers = userDoc.get("selectedUsers") ?? [];
-      setState(() {
-        _selectedUsers = List<Map<String, dynamic>>.from(savedUsers);
-      });
-    }
-  }
-
-  // Navigate to chat with selected user
   void navigateToChat(Map<String, dynamic> user) {
     String docId = widget.currentUser.uid.compareTo(user['uid']) < 0
         ? "${widget.currentUser.uid}_${user['uid']}"
@@ -203,190 +58,112 @@ class _UserListPageState extends State<UserListPage> {
     ));
   }
 
+  Future<void> loadUsers() async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+
+    try {
+      QuerySnapshot querySnapshot = await _database.get();
+      List<Map<String, dynamic>> users = querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      setState(() {
+        _allUsers = users.where((user) => user['uid'] != widget.currentUser.uid).toList();
+        _filteredUsers = _allUsers;
+        _isLoading = false; // Stop loading after data is fetched
+      });
+    } catch (error) {
+      print("Error loading users: $error");
+      setState(() {
+        _isLoading = false; // Stop loading even if an error occurs
+      });
+    }
+  }
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); // This will navigate back to the previous screen
+            Navigator.pop(context);
           },
         ),
-        backgroundColor: Colors.black,
-        title: Text(
-          'Select a User',
-          style: TextStyle(color: Colors.white),
-        ),
+        backgroundColor: Colors.white,
+        title: Text('Select a User', style: TextStyle(color: Colors.black)),
       ),
-      body: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-        future: _database.get().then((snapshot) => snapshot.docs),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(color: Colors.black));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No users available."));
-          }
-
-          // Filter out the selected users from the available users
-          List<QueryDocumentSnapshot<Map<String, dynamic>>> availableUsers = snapshot.data!.where((doc) {
-            Map<String, dynamic> user = doc.data();
-            return !_selectedUsers.any((selectedUser) => selectedUser['uid'] == user['uid']);
-          }).toList();
-
-          return ListView.builder(
-            itemCount: availableUsers.length,
-            itemBuilder: (context, index) {
-              Map<String, dynamic> user = availableUsers[index].data();
-
-              return ListTile(
-                onTap: () async {
-                  // Get the selected user's data
-                  Map<String, dynamic> selectedUser = availableUsers[index].data();
-
-                  // Add the selected user to the current user's selected users list in Firestore
-                  DocumentReference userDoc = FirebaseFirestore.instance.collection('Users').doc(widget.currentUser.uid);
-                  await userDoc.update({
-                    'selectedUsers': FieldValue.arrayUnion([selectedUser])
-                  });
-
-                  // Navigate back and pass the selected user
-                  Navigator.pop(context, selectedUser);
-                },
-                leading: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(color: Colors.black))
+          : Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Container(
+              // height: height * 0.052,
+              width: width * 0.9,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(width * 0.03),
+              ),
+              child: TextField(
+                cursorColor: Color.fromRGBO(21, 171, 97, 1),
+                controller: _searchController,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Raleway',
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search users...',
+                  contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: _filteredUsers.isEmpty
+                ? Center(child: Text("No users available."))
+                : ListView.builder(
+              itemCount: _filteredUsers.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> user = _filteredUsers[index];
+                return ListTile(
+                  onTap: () {
+                    navigateToChat(user);
+                  },
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.grey[100],
                     child: Text(
                       "${user['firstName'][0].toUpperCase()}",
                       style: TextStyle(color: Colors.black),
                     ),
                   ),
-                ),
-                title: Text(
-                  "${user['firstName']} ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: 'Raleway',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}*/
-
-/*
-class _UserListPageState extends State<UserListPage> {
-  final _database = FirebaseFirestore.instance.collection('Users');
-  dynamic chatsDB = FirebaseFirestore.instance.collection("chats");
-
-  void navigateToChat(Map<String, dynamic> user) {
-    String docId = widget.currentUser.uid.compareTo(user['uid']) < 0
-        ? "${widget.currentUser.uid}_${user['uid']}"
-        : "${user['uid']}_${widget.currentUser.uid}";
-
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => ChatLayout(
-        currentUser: widget.currentUser,
-        user: user,
-        databaseRef: chatsDB.doc(docId),
-      ),
-    ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        leading:  IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context); // This will navigate back to the previous screen
-          },
-        ),
-        backgroundColor: Colors.black,
-        title: Text(
-          'Select a User',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: FutureBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-        future: _database.get().then((snapshot) => snapshot.docs),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(color: Colors.black));
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text("No users available."));
-          }
-
-          return ListView.builder(
-
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                // onTap: () => navigateToChat(snapshot.data![index].data()),
-                */
-/*onTap: () {
-                  // Navigate back and pass the selected user
-                  Navigator.pop(context, snapshot.data![index].data());
-                },*//*
-
-                onTap: () async {
-                  // Get the selected user's data
-                  Map<String, dynamic> selectedUser = snapshot.data![index].data();
-
-                  // Add the selected user to the current user's selected users list in Firestore
-                  DocumentReference userDoc = FirebaseFirestore.instance.collection('Users').doc(widget.currentUser.uid);
-
-                  await userDoc.update({
-                    'selectedUsers': FieldValue.arrayUnion([selectedUser])
-                  });
-
-                  // Navigate back and pass the selected user
-                  Navigator.pop(context, selectedUser);
-                },
-
-
-                leading: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                    borderRadius: BorderRadius.circular(100)
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      "${snapshot.data![index]['firstName'][0].toUpperCase()}",
-                      style: TextStyle(color: Colors.black),
+                  title: Text(
+                    "${user['firstName']} ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Raleway',
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
-                title: Text(
-                  "${snapshot.data![index]['firstName']} ",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: 'Raleway',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            },
-          );
-        },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
-}*/
+}
