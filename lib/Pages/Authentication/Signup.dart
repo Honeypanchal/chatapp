@@ -69,51 +69,13 @@ class _SignupPageState extends State<SignupPage> {
     final height = mediaQuery.size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 60),
           child: Column(
             children: [
-              /*Container(
-                  height: height * 0.5,
-                  width: width,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(0XFF5098FA),
-                        Color(0XFF526CF7),
-                        Color(0XFF533BF1),
-                        Color(0XFF5327EE),
-                        Color(0XFF5317EB),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                  child: SafeArea(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: height * 0.065),
-                          ClipOval(
-                            child: SizedBox.fromSize(
-                              size: Size.fromRadius(50),
-                              child: Image.asset(
-                                'assets/images/Icon_homepage.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),*/
-              /*Image.asset(
-                'assets/images/main3.png',
-                height: 200,
-                fit: BoxFit.cover,
-              ),*/
+
               Text(
                 'Sign Up For Free.',
                 style: TextStyle(
@@ -126,7 +88,7 @@ class _SignupPageState extends State<SignupPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 8.0, right: 20.0),
                 child: const Text(
-                  "join us for less than 1 minutes, with no cost.",
+                  "join us for less than 1 minutes",
                   style: TextStyle(fontSize: 13, color: Colors.grey),
                   textAlign: TextAlign.center,
                 ),
@@ -160,14 +122,20 @@ class _SignupPageState extends State<SignupPage> {
                           fontFamily: 'poppins'),
                     ),*/
                     TextFormField(
+
                       style:
                       TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _firstnameController,
                       decoration: InputDecoration(
+                          focusColor:Color.fromRGBO(21, 171, 97, 1),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1) )
+                          ),
                           hintText: 'your name',
                           hintStyle: const TextStyle(color: Colors.grey),
                           prefixIcon: const Icon(Icons.person_2_outlined),
                           border: const OutlineInputBorder(
+                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1)),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           )),
                       validator: (val) {
@@ -218,10 +186,16 @@ class _SignupPageState extends State<SignupPage> {
                       },
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.email_outlined),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
+                        ) ,
+                        focusColor: Color.fromRGBO(21, 171, 97, 1),
                         hintText: 'Email',
                         hintStyle: TextStyle(color: Colors.grey),
                         // label: Text('Email'),
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
+                        ),
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -251,8 +225,14 @@ class _SignupPageState extends State<SignupPage> {
                       decoration: InputDecoration(
                           fillColor: Colors.white38,
                           prefixIcon: Icon(Icons.vpn_key_outlined),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
+                          ),
                           hintText: "Password",
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
+                          ),
+                          focusColor:Color.fromRGBO(21, 171, 97, 1) ,
                           hintStyle: TextStyle(color: Colors.grey),
                           // helperText: "Password must contain special character",
                           helperStyle: TextStyle(color: Colors.green),
@@ -279,6 +259,7 @@ class _SignupPageState extends State<SignupPage> {
                               icon: Icon(
                                   color: Colors.grey,
                                   Icons.visibility_off_outlined))),
+
                       obscureText: !showPass,
                     ),
                     SizedBox(height: height * 0.030),
@@ -316,7 +297,13 @@ class _SignupPageState extends State<SignupPage> {
                       decoration: InputDecoration(
                           fillColor: Colors.white38,
                           prefixIcon: Icon(Icons.vpn_key_outlined),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
+                          ) ,
+                          focusColor: Color.fromRGBO(21, 171, 97, 1),
                           hintText: "Password",
                           hintStyle: TextStyle(color: Colors.grey),
                           // helperText: "Password must contain special character",
@@ -359,7 +346,7 @@ class _SignupPageState extends State<SignupPage> {
                   },
                   style: ElevatedButton.styleFrom(
                     // Color(0XFF185FED)
-                      backgroundColor: Colors.black,
+                      backgroundColor:   Color.fromRGBO(21, 171, 97, 1),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10))),
@@ -382,7 +369,7 @@ class _SignupPageState extends State<SignupPage> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                             side: BorderSide(
-                                color: Colors.black,
+                                color: Colors.grey,
                                 width: 2
                             ))),
                     onPressed: () async {
@@ -440,7 +427,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                     Text(
-                      "Login",
+                      "Sign in ",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: width * 0.040,

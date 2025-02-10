@@ -3,7 +3,7 @@
 import 'package:chatapp/Pages/ChatLayout/ChatPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/services/auth_services.dart';
-import 'package:chatapp/Pages/Authentication/FirstPage.dart';
+
 import 'package:flutter/material.dart';
 import 'package:chatapp/pages/Authentication/Signup.dart';
 
@@ -68,12 +68,13 @@ class _SigninPageState extends State<SigninPage> {
     final height = mediaQuery.size.height;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
             Image.asset(
-              'assets/images/main4.png',
-              fit: BoxFit.cover,
+              'assets/images/logo.png',
+
               height: 300,
             ),
             Text("Let's Sign In",
@@ -127,9 +128,15 @@ class _SigninPageState extends State<SigninPage> {
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.email_outlined),
                         hintText: 'Email',
+                        focusColor: Color.fromRGBO(21, 171, 97, 1),
                         hintStyle: TextStyle(color: Colors.grey),
                         // label: Text('Email'),
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
+                        ),
+                        focusedBorder:  OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
+                        )
                       ),
                       /*decoration: InputDecoration(
                         labelStyle: TextStyle(
@@ -178,8 +185,14 @@ class _SigninPageState extends State<SigninPage> {
                       decoration: InputDecoration(
                         fillColor: Colors.white38,
                         prefixIcon: Icon(Icons.vpn_key_outlined),
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
+                        ),
+                        focusColor: Color.fromRGBO(21, 171, 97, 1),
                         hintText: "Password",
+                        focusedBorder:  OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
+                        ),
                         hintStyle: TextStyle(color: Colors.grey),
                         // helperText: "Password must contain special character",
                         helperStyle: TextStyle(color: Colors.green),
@@ -222,7 +235,7 @@ class _SigninPageState extends State<SigninPage> {
                   _signin();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor:   Color.fromRGBO(21, 171, 97, 1),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),

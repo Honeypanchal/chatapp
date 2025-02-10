@@ -1,7 +1,6 @@
 import 'package:chatapp/Pages/Authentication/SigninPage.dart';
 import 'package:chatapp/Pages//Authentication/Signup.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 
 class Firstpage extends StatefulWidget {
@@ -12,55 +11,6 @@ class Firstpage extends StatefulWidget {
 }
 
 class _FirstpageState extends State<Firstpage>  {
-
-  // with WidgetsBindingObserver
-// -----------------------
-//   final FirebaseAuth _auth = FirebaseAuth.instance;
-//   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // ---------------------------
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance.addObserver(this);
-  //
-  //   // Update status to online when the app starts
-  //   _updateUserStatus(true);
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   // Ensure to remove the observer
-  //   WidgetsBinding.instance.removeObserver(this);
-  //
-  //   // Update status to offline when the app is disposed
-  //   _updateUserStatus(false);
-  //   super.dispose();
-  // }
-  //
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   // Detect app lifecycle changes
-  //   if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
-  //     // App is in background or closed
-  //     _updateUserStatus(false);
-  //   } else if (state == AppLifecycleState.resumed) {
-  //     // App is in foreground
-  //     _updateUserStatus(true);
-  //   }
-  // }
-  //
-  // Future<void> _updateUserStatus(bool isActive) async {
-  //   User? user = _auth.currentUser;
-  //   if (user != null) {
-  //     await _firestore.collection('Users').doc(user.uid).update({
-  //       "isActive": isActive,
-  //       "lastActive": DateTime.now().millisecondsSinceEpoch,
-  //     });
-  //   }
-  // }
-
-  // ---------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -89,11 +39,10 @@ class _FirstpageState extends State<Firstpage>  {
                     ),
                   ),
                   child: Center(
+
                     child: Image.asset(
-                      'assets/images/main1.png',
-                      height: height * (isWeb ? 0.5 : 0.6),
-                      width: width * (isWeb ? 0.3 : 0.90),
-                      fit: BoxFit.cover,
+                      'assets/images/logo.png',
+
                     ),
                   ),
                 ),
@@ -168,7 +117,7 @@ class _FirstpageState extends State<Firstpage>  {
                               height: height * 0.06,
                               width: width,
                               decoration: BoxDecoration(
-                                  color: Colors.black,
+                                  color: Color.fromRGBO(21, 171, 97, 1),
                                   border: Border.all(color: Color(0xFF9C9998)),
                                   borderRadius: BorderRadius.circular(width * 0.03)),
                               child: Center(
@@ -207,7 +156,7 @@ class _FirstpageState extends State<Firstpage>  {
                               width: width,
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                border: Border.all(color: Colors.black, width: 2),
+                                border: Border.all(color: Colors.grey, width: 2),
                                 borderRadius: BorderRadius.circular(width * 0.03),
                               ),
                               child: Center(
