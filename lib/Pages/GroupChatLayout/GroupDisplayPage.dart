@@ -106,10 +106,8 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: Padding(
-          padding: EdgeInsets.only(left:width * 0.064),
-          child: width>600?null: Icon(Icons.groups_outlined, color: Colors.black,size:width*0.062,),
-        ),
+
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +118,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 color: Colors.black,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w500,
-                fontSize: width > 600 ? width * 0.05 : width * 0.06,
+
               ),
             ),
           ],
@@ -132,12 +130,12 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
             elevation: 2,
             itemBuilder: (context) => [
               PopupMenuItem(
-                child: Text("Starred Messages"),
                 value: 0,
+                child: Text("Starred Messages"),
               ),
               PopupMenuItem(
-                child: Text("Create a Group"),
                 value: 1,
+                child: Text("Create a Group"),
               ),
             ],
             onSelected: (val) {
@@ -172,6 +170,9 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 borderRadius: BorderRadius.circular(width * 0.03),
               ),
               child: TextField(
+                autofocus: true,
+                enableSuggestions: false,
+                autocorrect: false,
                 cursorColor: Color.fromRGBO(21, 171, 97, 1),
                 controller: _searchText,
                 style: TextStyle(

@@ -34,6 +34,7 @@ class _NewGroupState extends State<NewGroup> {
           onPressed: () => setState(() => _showSearch = false),
         ),
         title: TextField(
+
 cursorColor:              Color.fromRGBO(21, 171, 97, 1),
           controller: _searchText,
           style: TextStyle(color: Colors.black),
@@ -45,6 +46,9 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
             border: InputBorder.none,
           ),
           autofocus: true,
+
+          enableSuggestions: false,
+          autocorrect: false,
         ),
       );
     }
@@ -71,7 +75,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
               color: Colors.black,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
-              fontSize: width > 600 ? width * 0.02 : width * 0.06,
+              fontSize:kIsWeb ? width * 0.02 : width * 0.06,
             ),
           ),
           Text(
@@ -79,7 +83,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
             style: TextStyle(
               color: Colors.black,
               fontFamily: 'Poppins',
-              fontSize: width > 600 ? width * 0.01 : width * 0.032,
+              fontSize: kIsWeb ? width * 0.01 : width * 0.032,
             ),
           )
         ],
@@ -191,7 +195,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                           itemBuilder: (context, index) {
                             var user = users[index];
                             return Padding(
-                              padding: kIsWeb? EdgeInsets.symmetric(vertical: height*0.002):EdgeInsets.zero,
+                              padding: kIsWeb? EdgeInsets.symmetric(vertical: height*0.004):EdgeInsets.zero,
                               child: ListTile(
 
                                 leading: Stack(

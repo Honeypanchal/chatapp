@@ -80,7 +80,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal:kIsWeb?width*0.015:  width * 0.032, vertical: height * 0.032),
+              horizontal: width * 0.032, vertical: height * 0.032),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -90,16 +90,20 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: CircleAvatar(
-                      radius:kIsWeb?width*0.025: width * 0.066,
-                      backgroundColor:Color.fromRGBO(21, 171, 97, 1),
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
-                        size: kIsWeb?width*0.027:width*0.06,
+                    flex: 1,
+                    child: Align(
+                      alignment:Alignment.centerLeft,child: CircleAvatar(
+                        radius:kIsWeb?width*0.027: width * 0.066,
+                        backgroundColor:Color.fromRGBO(21, 171, 97, 1),
+                        child: Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: kIsWeb?width*0.02:width*0.06,
+                        ),
                       ),
                     ),
                   ),
+                  if(!kIsWeb)
                   SizedBox(
                     width: width * 0.012,
                   ),
@@ -136,11 +140,11 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   ),
                 ],
               ),
-              SizedBox(height: kIsWeb?height*0.025:  height * 0.02),
+              SizedBox(height: kIsWeb?height*0.03:  height * 0.02),
               Divider(
                 height: height * 0.012,
                 color: Colors.grey.shade100,
-                thickness: kIsWeb?width*0.01:  width * 0.02,
+                thickness:width * 0.005,
               ),
               SizedBox(
                 height: height * 0.012,
@@ -163,7 +167,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             'Disappearing messages ',
                             style: TextStyle(
-                              fontSize: kIsWeb?width*0.027:  width * 0.042,
+                              fontSize: kIsWeb?width*0.02:  width * 0.042,
                               color: Colors.black87,
                             ),
                           ),
@@ -176,14 +180,14 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.timer,
                                 color: Colors.grey,
-                                size:kIsWeb?width*0.045:  width * 0.06,
+                                size:kIsWeb?width*0.03:  width * 0.06,
                               ))
                         ],
                       ),
                       Text(
                         'Off',
                         style: TextStyle(
-                          fontSize:kIsWeb?width*0.024: width * 0.03,
+                          fontSize:kIsWeb?width*0.019: width * 0.03,
                           color: Colors.black87,
                         ),
                       ),
@@ -195,7 +199,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             'Group Permissions',
                             style: TextStyle(
-                              fontSize: kIsWeb?width*0.027:width * 0.042,
+                              fontSize: kIsWeb?width*0.02:width * 0.042,
                               color: Colors.black87,
                             ),
                           ),
@@ -227,7 +231,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.settings,
                                 color: Colors.grey,
-                                size:kIsWeb?width*0.045: width * 0.06,
+                                size:kIsWeb?width*0.03: width * 0.06,
                               ))
                         ],
                       ),
@@ -251,7 +255,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                     Text(
                       'Members : ${widget.members.length}',
                       style: TextStyle(
-                        fontSize: kIsWeb?width*0.027: width * 0.035,
+                        fontSize: kIsWeb?width*0.02: width * 0.035,
                         color: Colors.black,
                       ),
                     ),
@@ -273,7 +277,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           CircleAvatar(
 
                             backgroundColor:Color.fromRGBO(207, 214, 220, 1),
-                            radius: kIsWeb?width*0.07 :  width * 0.1,
+                            radius: kIsWeb?width*0.05 :  width * 0.1,
                             child: Icon(
                               Icons.person,
                               color: Colors.white,
@@ -283,7 +287,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             membersFirstNameList[index],
                             style: TextStyle(
-                              fontSize:kIsWeb?width*0.027: width * 0.04,
+                              fontSize:kIsWeb?width*0.02: width * 0.04,
                               color: Colors.black,
                             ),
                           ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/users_services.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 class UpdateGroupPermissions extends StatefulWidget {
   bool groupSettings;
 
@@ -41,7 +41,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
           "Group permissions",
           style: TextStyle(
               fontFamily: 'Raleway',
-              fontSize: width * 0.052,
+
               color: Colors.black),
         ),
         leading: IconButton(
@@ -77,7 +77,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                     child: Text(
                       "Members can : ",
                       style: TextStyle(
-                        fontSize: width * 0.042,
+                        fontSize:kIsWeb?width*0.015:   width * 0.042,
                       ),
                     )),
                 SizedBox(
@@ -91,7 +91,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.edit_outlined,
-                          size: width * 0.054,
+                          size: kIsWeb?width*0.015: width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
@@ -100,14 +100,14 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                         children: [
                           Text(
                             "Edit group settings",
-                            style: TextStyle(fontSize: width * 0.04),
+                            style: TextStyle(fontSize: kIsWeb?width*0.015:width * 0.04),
                           ),
                           Container(
                             width: width * 0.6,
                             child: Text(
                               "This includes the name, icon , description , disappearing message timer, and the ability to pin , keep or unkeep messages ",
                               style: TextStyle(
-                                  fontSize: width * 0.03, color: Colors.grey),
+                                  fontSize: kIsWeb?width*0.01: width * 0.03, color: Colors.grey),
                             ),
                           ),
                         ],
@@ -115,7 +115,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                     ),
                     Expanded(
                       child: Transform.scale(
-                        scale: width * 0.002,
+                        scale: kIsWeb?width*0.0005:  width * 0.002,
                         child: Switch(
                             activeColor: Color.fromRGBO(21, 171, 97, 1),
                             focusColor: Color.fromRGBO(21, 171, 97, 1),
@@ -140,18 +140,18 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.message,
-                          size: width * 0.054,
+                          size:  kIsWeb?width*0.015:width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
                       child: Text(
                         "Send messages",
-                        style: TextStyle(fontSize: width * 0.04),
+                        style: TextStyle(fontSize:kIsWeb?width*0.015: width * 0.04),
                       ),
                     ),
                     Expanded(
                       child: Transform.scale(
-                        scale: width * 0.002,
+                        scale:kIsWeb?width*0.0005: width * 0.002,
                         child: Switch(
                             activeColor: Color.fromRGBO(21, 171, 97, 1),
                             focusColor: Color.fromRGBO(21, 171, 97, 1),
@@ -176,18 +176,18 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.group_add_outlined,
-                          size: width * 0.054,
+                          size: kIsWeb?width*0.015: width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
                       child: Text(
                         "Add Other members",
-                        style: TextStyle(fontSize: width * 0.04),
+                        style: TextStyle(fontSize:kIsWeb?width*0.015: width * 0.04),
                       ),
                     ),
                     Expanded(
                       child: Transform.scale(
-                        scale: width * 0.002,
+                        scale:kIsWeb?width*0.0005: width * 0.002,
                         child: Switch(
                             activeColor: Color.fromRGBO(21, 171, 97, 1),
                             focusColor: Color.fromRGBO(21, 171, 97, 1),
@@ -210,7 +210,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                     child: Text(
                       "Admins can  : ",
                       style: TextStyle(
-                        fontSize: width * 0.042,
+                        fontSize: kIsWeb?width*0.015: width * 0.042,
                       ),
                     )),
                 SizedBox(
@@ -224,7 +224,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.perm_identity_sharp,
-                          size: width * 0.054,
+                          size:  kIsWeb?width*0.015:width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
@@ -234,14 +234,14 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                         children: [
                           Text(
                             "Approve new members",
-                            style: TextStyle(fontSize: width * 0.04),
+                            style: TextStyle(fontSize: kIsWeb?width*0.015:width * 0.04),
                           ),
                           Container(
                             width: width * 0.47,
                             child: Text(
                               "When turned on , admins must approve anyone who wants to join the group .",
                               style: TextStyle(
-                                  fontSize: width * 0.03, color: Colors.grey),
+                                  fontSize:kIsWeb?width*0.01: width * 0.03, color: Colors.grey),
                             ),
                           ),
                         ],
@@ -250,7 +250,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                     Expanded(
                         flex: 1,
                         child: Transform.scale(
-                            scale: width * 0.002,
+                            scale: kIsWeb?width*0.0005:width * 0.002,
                             child: Switch(value: false, onChanged: (val) {})))
                   ],
                 ),
@@ -262,35 +262,38 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                     child: Text(
                       "Group admins : ",
                       style: TextStyle(
-                        fontSize: width * 0.042,
+                        fontSize:kIsWeb?width*0.015:  width * 0.042,
                       ),
                     )),
-                ListTile(
-                  onTap: () async {
-                    var result = widget.admins = await Navigator.of(context)
-                        .push(MaterialPageRoute(
-                            builder: (context) => GroupMembers(
-                                groupMembers: widget.members,
-                                admins: widget.admins,
-                                currentUser: widget.currentUser,createdBy: widget.createdBy,)));
-                    if (result != null) {
-                      setState(() {
-                        widget.admins = result;
-                        print(
-                            '${widget.admins.length} is the length of admins');
-                      });
-                    }
-                  },
-                  leading: Icon(
-                    Icons.group_add_outlined,
-                    size: width * 0.054,
-                  ),
-                  title: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: width * 0.012, vertical: height * 0.012),
-                    child: Padding(
-                      padding: EdgeInsets.only(left: width * 0.012),
-                      child: Text("Edit group admins"),
+                Padding(
+                  padding:  EdgeInsets.only(left:width*0.07),
+                  child: ListTile(
+                    onTap: () async {
+                      var result = widget.admins = await Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: (context) => GroupMembers(
+                                  groupMembers: widget.members,
+                                  admins: widget.admins,
+                                  currentUser: widget.currentUser,createdBy: widget.createdBy,)));
+                      if (result != null) {
+                        setState(() {
+                          widget.admins = result;
+                          print(
+                              '${widget.admins.length} is the length of admins');
+                        });
+                      }
+                    },
+                    leading: Icon(
+                      Icons.group_add_outlined,
+                      size: kIsWeb?width*0.015: width * 0.054,
+                    ),
+                    title: Padding(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: width * 0.012, vertical: height * 0.012),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: kIsWeb?width*0.032: width * 0.012),
+                        child: Text("Edit group admins"),
+                      ),
                     ),
                   ),
                 )
@@ -387,99 +390,103 @@ class _GroupMembersState extends State<GroupMembers> {
                   color: Colors.black,
                 ),
               ListView.builder(
+                padding: kIsWeb?EdgeInsets.symmetric(vertical: height*0.012):EdgeInsets.zero,
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: membersFirstNameList.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    onTap: () {
-                      if (!widget.admins.contains(widget.groupMembers[index])) {
-                        setState(() {
-                          widget.admins.add(widget.groupMembers[index]);
-                        });
-                      } else {
-                        setState(() {
-                          if (widget.currentUser ==
-                              widget.groupMembers[index]) {
-                          } else {
-                            if (widget.createdBy ==
+                  return Padding(
+                    padding: kIsWeb? EdgeInsets.symmetric(vertical: height*0.004):EdgeInsets.zero,
+                    child: ListTile(
+                      onTap: () {
+                        if (!widget.admins.contains(widget.groupMembers[index])) {
+                          setState(() {
+                            widget.admins.add(widget.groupMembers[index]);
+                          });
+                        } else {
+                          setState(() {
+                            if (widget.currentUser ==
                                 widget.groupMembers[index]) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                content: Text(
-                                    "You cant remove them as the admin as theyve created the group"),
-                                backgroundColor: Colors.red.shade200,
-                              ));
-                              ;
-                            }else
-                              {   widget.admins.remove(widget.groupMembers[index]);}
+                            } else {
+                              if (widget.createdBy ==
+                                  widget.groupMembers[index]) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(
+                                      "You cant remove them as the admin as theyve created the group"),
+                                  backgroundColor: Colors.red.shade200,
+                                ));
+                                ;
+                              }else
+                                {   widget.admins.remove(widget.groupMembers[index]);}
 
 
 
-                          }
-                        });
-                      }
-                    },
-                    contentPadding: EdgeInsets.zero,
-                    leading: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                    decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                      border: Border.all(
-                        color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
-                        width: width*0.002, // Set the border width
-                      ),
-                    ),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: width * 0.05,
-                            child: Text(
-                              membersFirstNameList[index][0].toUpperCase(),
-                              style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
-                            ),
-                          ),
+                            }
+                          });
+                        }
+                      },
+                      contentPadding: EdgeInsets.zero,
+                      leading: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                      decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                        border: Border.all(
+                          color:Color.fromRGBO(21, 171, 97, 1),
+                          width: kIsWeb? width*0.001:width*0.002,
                         ),
-                        if (isCurrentUserAdmin(widget.groupMembers[index]))
-                          Positioned(
-                            right: -2,
-                            bottom: -2,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white,
-                              ),
-                              child: Icon(
-                                Icons.check_circle,
-                                size: width * 0.035,
-                                color: Color.fromRGBO(21, 171, 97, 1),
+                      ),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              radius:width * 0.05,
+                              child: Text(
+                                membersFirstNameList[index][0].toUpperCase(),
+                                style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
                               ),
                             ),
                           ),
-                      ],
-                    ),
-                    title: Text(membersFirstNameList[index]),
-                    trailing: isCurrentUserAdmin(widget.groupMembers[index])
-                        ? Container(
-                            decoration: BoxDecoration(
-                                color: Color.fromRGBO(217,252,210,1),
-                                border:
-                                    Border.all(color:Color.fromRGBO(217,252,210,1)),
-                                borderRadius:
-                                    BorderRadius.circular(width * 0.01)),
-                            width: width * 0.12,
-                            height: height * 0.017,
-                            child: Center(
-                              child: Text(
-                                "Admin",
-                                style: TextStyle(
-                                    fontSize: width * 0.027,
-                                    color: Color.fromRGBO(34, 89, 49, 1)),
+                          if (isCurrentUserAdmin(widget.groupMembers[index]))
+                            Positioned(
+                              right: kIsWeb?35:-2,
+                              bottom: -2,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
+                                child: Icon(
+                                  Icons.check_circle,
+                                  size: kIsWeb?width*0.016:width * 0.035,
+                                  color: Color.fromRGBO(21, 171, 97, 1),
+                                ),
                               ),
                             ),
-                          )
-                        : null,
+                        ],
+                      ),
+                      title: Text(membersFirstNameList[index]),
+                      trailing: isCurrentUserAdmin(widget.groupMembers[index])
+                          ? Container(
+                              decoration: BoxDecoration(
+                                  color: Color.fromRGBO(217,252,210,1),
+                                  border:
+                                      Border.all(color:Color.fromRGBO(217,252,210,1)),
+                                  borderRadius:
+                                      BorderRadius.circular(width * 0.01)),
+                              width:kIsWeb?width*0.05:  width * 0.12,
+                              height: height * 0.017,
+                              child: Center(
+                                child: Text(
+                                  "Admin",
+                                  style: TextStyle(
+                                      fontSize:kIsWeb?width*0.0055: width * 0.027,
+                                      color: Color.fromRGBO(34, 89, 49, 1)),
+                                ),
+                              ),
+                            )
+                          : null,
+                    ),
                   );
                 },
               ),

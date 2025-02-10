@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 
 class GroupPermissions extends StatefulWidget {
@@ -40,7 +40,7 @@ class _GroupPermissionsState extends State<GroupPermissions> {
           "Group permissions",
           style: TextStyle(
               fontFamily: 'Raleway',
-              fontSize: width * 0.052,
+
               color: Colors.black),
         ),
         leading: IconButton(
@@ -75,7 +75,7 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                     child: Text(
                       "Members can : ",
                       style: TextStyle(
-                        fontSize: width * 0.042,
+                        fontSize: kIsWeb?width*0.015:width * 0.042,
                       ),
                     )),
                 SizedBox(
@@ -89,7 +89,7 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.edit_outlined,
-                          size: width * 0.054,
+                          size:kIsWeb?width*0.015: width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
@@ -98,14 +98,14 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                         children: [
                           Text(
                             "Edit group settings",
-                            style: TextStyle(fontSize: width * 0.04),
+                            style: TextStyle(fontSize:kIsWeb?width*0.015: width * 0.04),
                           ),
                           Container(
                             width: width * 0.6,
                             child: Text(
                               "This includes the name, icon , description , disappearing message timer, and the ability to pin , keep or unkeep messages ",
                               style: TextStyle(
-                                  fontSize: width * 0.03, color: Colors.grey),
+                                  fontSize: kIsWeb?width*0.01: width * 0.03, color: Colors.grey),
                             ),
                           ),
                         ],
@@ -113,7 +113,7 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                     ),
                     Expanded(
                       child: Transform.scale(
-                        scale: width * 0.002,
+                        scale: kIsWeb?width*0.0005:width * 0.002,
                         child: Switch(
                             activeColor: Color.fromRGBO(21, 171, 97, 1),
                             focusColor: Color.fromRGBO(21, 171, 97, 1),
@@ -138,18 +138,18 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.message,
-                          size: width * 0.054,
+                          size:kIsWeb?width*0.015: width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
                       child: Text(
                         "Send messages",
-                        style: TextStyle(fontSize: width * 0.04),
+                        style: TextStyle(fontSize:kIsWeb?width*0.015: width * 0.04),
                       ),
                     ),
                     Expanded(
                       child: Transform.scale(
-                        scale: width * 0.002,
+                        scale:kIsWeb?width*0.0005: width * 0.002,
                         child: Switch(
                             activeColor: Color.fromRGBO(21, 171, 97, 1),
                             focusColor: Color.fromRGBO(21, 171, 97, 1),
@@ -174,18 +174,18 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.group_add_outlined,
-                          size: width * 0.054,
+                          size: kIsWeb?width*0.015:width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
                       child: Text(
                         "Add Other members",
-                        style: TextStyle(fontSize: width * 0.04),
+                        style: TextStyle(fontSize:kIsWeb?width*0.015: width * 0.04),
                       ),
                     ),
                     Expanded(
                       child: Transform.scale(
-                        scale: width * 0.002,
+                        scale: kIsWeb?width*0.0005:width * 0.002,
                         child: Switch(
                             activeColor: Color.fromRGBO(21, 171, 97, 1),
                             focusColor:Color.fromRGBO(21, 171, 97, 1),
@@ -208,7 +208,7 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                     child: Text(
                       "Admins can  : ",
                       style: TextStyle(
-                        fontSize: width * 0.042,
+                        fontSize: kIsWeb?width*0.015:width * 0.042,
                       ),
                     )),
                 SizedBox(
@@ -222,7 +222,7 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                         flex: 1,
                         child: Icon(
                           Icons.perm_identity_sharp,
-                          size: width * 0.054,
+                          size:kIsWeb?width*0.015: width * 0.054,
                         )),
                     Expanded(
                       flex: 3,
@@ -232,14 +232,14 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                         children: [
                           Text(
                             "Approve new members",
-                            style: TextStyle(fontSize: width * 0.04),
+                            style: TextStyle(fontSize: kIsWeb?width*0.015:width * 0.04),
                           ),
                           Container(
                             width: width * 0.47,
                             child: Text(
                               "When turned on , admins must approve anyone who wants to join the group .",
                               style: TextStyle(
-                                  fontSize: width * 0.03, color: Colors.grey),
+                                  fontSize: kIsWeb?width*0.01: width * 0.03, color: Colors.grey),
                             ),
                           ),
                         ],
@@ -248,7 +248,7 @@ class _GroupPermissionsState extends State<GroupPermissions> {
                     Expanded(
                         flex: 1,
                         child: Transform.scale(
-                            scale: width * 0.002,
+                            scale:kIsWeb?width*0.0005: width * 0.002,
                             child: Switch(value: false, onChanged: (val) {})))
                   ],
                 ),
