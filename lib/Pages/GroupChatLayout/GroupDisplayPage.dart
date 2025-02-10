@@ -69,7 +69,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
 
     if (searchQuery.isNotEmpty) {
       String searchLowerBound = searchQuery;
-      String searchUpperBound = searchQuery + '\uf8ff';
+      String searchUpperBound = searchQuery + '\uf8fff';
 
       query = query
           .where("groupName", isGreaterThanOrEqualTo: searchLowerBound)
