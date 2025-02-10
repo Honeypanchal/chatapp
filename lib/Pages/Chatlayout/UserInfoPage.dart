@@ -16,7 +16,7 @@ class UserInfoPage extends StatelessWidget {
     if (timestamp == null) return 'Not Read yet!';
     DateTime dateTime = timestamp.toDate();
     return "${dateTime.hour}:${dateTime.minute.toString().padLeft(
-        2, '0')} AM"; // HH:MM AM/PM format
+        2, '0')}"; // HH:MM AM/PM format
   }
 
   @override
@@ -38,7 +38,7 @@ class UserInfoPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              color: Colors.white,
+              color: Color(0XFFF6F1EB),
               padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -46,7 +46,7 @@ class UserInfoPage extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.green[700],
+                      color: Color(0XFFD5FCD0),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
@@ -54,12 +54,12 @@ class UserInfoPage extends StatelessWidget {
                       children: [
                         Text(
                           "${messageData['message']}",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                         SizedBox(height: 5),
                         Text(
                           formatTimestamp(deliveredAt),
-                          style: TextStyle(fontSize: 12, color: Colors.white70),
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -74,7 +74,7 @@ class UserInfoPage extends StatelessWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: Icon(Icons.done_all, color: Colors.green[700]),
+                    leading: Icon(Icons.done_all, color: Colors.blue),
                     title: Text("Read", style: TextStyle(color: Colors.white)),
                     subtitle: Text(formatTimestamp(readAt),
                         style: TextStyle(color: Colors.white70)),
@@ -96,3 +96,4 @@ class UserInfoPage extends StatelessWidget {
     );
   }
 }
+
