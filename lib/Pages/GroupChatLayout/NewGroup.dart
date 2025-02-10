@@ -144,12 +144,24 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                                 horizontal: width * 0.02, vertical: height * 0.012),
                             child: Column(
                               children: [
-                                CircleAvatar(
-                                  radius: width * 0.067,
-                                  backgroundColor:Color.fromRGBO(21, 171, 97, 1),
-                                  child: Text(firstNames[index][0].toUpperCase(),
-                                      style: TextStyle(color: Colors.white)),
-                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
+                                      width: width*0.002, // Set the border width
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: width * 0.067,
+                                    backgroundColor: Colors.white,
+                                    child: Text(
+                                      firstNames[index][0].toUpperCase(),
+                                      style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
+                                    ),
+                                  ),
+                                )
+,
                                 Text(firstNames[index])
                               ],
                             ),
@@ -180,14 +192,24 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                               leading: Stack(
                                 clipBehavior: Clip.none,
                                 children: [
-                                  CircleAvatar(
-                                    backgroundColor:Color.fromRGBO(21, 171, 97, 1),
-                                    radius: width * 0.05,
-                                    child: Text(
-                                      user['firstName'][0].toUpperCase(),
-                                      style: TextStyle(color: Colors.white),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Color.fromRGBO(21, 171, 97, 1), // Border color
+                                        width: width*0.002, // Border width
+                                      ),
                                     ),
-                                  ),
+                                    child: CircleAvatar(
+                                      backgroundColor:Colors.white,
+                                      radius: width * 0.05,
+                                      child: Text(
+                                        user['firstName'][0].toUpperCase(),
+                                        style: TextStyle(color:  Color.fromRGBO(21, 171, 97, 1)),
+                                      ),
+                                    ),
+                                  )
+                                  ,
                                   if (groupChatUsers.contains(user['uid']))
                                     Positioned(
                                       right: -2,

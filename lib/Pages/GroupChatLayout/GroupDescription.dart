@@ -434,8 +434,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Group Name edited succesfully"),
-          backgroundColor: Colors.blue.shade200,
+          content: Text("Group Name edited succesfully",selectionColor: Colors.white,style: TextStyle(color: Colors.white)),
+          backgroundColor: Color.fromRGBO(207, 214, 220, 1),
         ));
       } catch (e) {
         print(e.toString());
@@ -458,7 +458,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pushNamed(
               '/groupchat',
@@ -528,7 +528,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             Center(
               child: CircleAvatar(
                 radius: width * 0.13,
-                backgroundColor: Colors.black,
+                backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                 child:
                     Icon(Icons.group, color: Colors.white, size: width * 0.09),
               ),
@@ -610,8 +610,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(SnackBar(
                                 content: Text(
-                                    "Group description edited succesfully"),
-                                backgroundColor: Colors.blue.shade200,
+                                    "Group description edited succesfully",selectionColor: Colors.white,style: TextStyle(color: Colors.white),),
+                                backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                               ));
                             } catch (e) {
                               print(e.toString());
@@ -622,7 +622,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         groupDescription,
                         style: TextStyle(
-                            color: Colors.black, fontSize: width * 0.037),
+                            color: Color.fromRGBO(21, 171, 97, 1), fontSize: width * 0.037),
                       ),
                     ),
                     SizedBox(height: height * 0.005),
@@ -878,7 +878,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                              backgroundColor: Colors.black,
+                              backgroundColor:Color.fromRGBO(21, 171, 97, 1),
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
@@ -979,7 +979,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                 },
                                 contentPadding: EdgeInsets.zero,
                                 leading: CircleAvatar(
-                                  backgroundColor: Colors.black,
+                                  backgroundColor: Color.fromRGBO(30, 170, 97, 1),
                                   child: Text(
                                     membersFirstNameList[index][0]
                                         .toUpperCase(),
@@ -991,9 +991,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                         group['participants'][index])
                                     ? Container(
                                         decoration: BoxDecoration(
-                                            color: Colors.black,
+                                            color: Color.fromRGBO(217,252,210,1),
                                             border: Border.all(
-                                                color: Colors.black),
+                                                color: Color.fromRGBO(217,252,210,1)),
                                             borderRadius: BorderRadius.circular(
                                                 width * 0.01)),
                                         width: width * 0.12,
@@ -1003,7 +1003,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                             "Admin",
                                             style: TextStyle(
                                                 fontSize: width * 0.027,
-                                                color: Colors.white),
+                                                color: Color.fromRGBO(34, 89, 49, 1)),
                                           ),
                                         ),
                                       )
@@ -1080,7 +1080,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(width * 0.032),
           ),
-          child: Icon(icon, color: Colors.black),
+          child: Icon(icon, color:Color.fromRGBO(21, 171, 97, 1)),
         ),
         SizedBox(height: height * 0.01),
         Text(label),

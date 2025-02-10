@@ -64,7 +64,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
       appBar: AppBar(
         title: Text(
           'New  Group',
-          style: TextStyle(fontFamily: 'Raleway', color: Colors.white),
+          style: TextStyle(fontFamily: 'Raleway', color: Colors.black),
         ),
         leading: IconButton(
             onPressed: () {
@@ -72,10 +72,10 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   arguments: {'currentUser': widget.createdBy});
             },
             icon: Icon(
-              Icons.arrow_back,
-              color: Colors.white,
+              Icons.arrow_back_ios,
+              color: Colors.black,
             )),
-        backgroundColor: Colors.black, // WhatsApp color
+        backgroundColor:Colors.white,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -92,7 +92,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   Expanded(
                     child: CircleAvatar(
                       radius: width * 0.066,
-                      backgroundColor: Colors.black,
+                      backgroundColor:Color.fromRGBO(21, 171, 97, 1),
                       child: Icon(
                         Icons.camera_alt,
                         color: Colors.white,
@@ -174,7 +174,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               },
                               icon: Icon(
                                 Icons.timer,
-                                color: Colors.black,
+                                color: Colors.grey,
                                 size: width * 0.06,
                               ))
                         ],
@@ -225,7 +225,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               },
                               icon: Icon(
                                 Icons.settings,
-                                color: Colors.black,
+                                color: Colors.grey,
                                 size: width * 0.06,
                               ))
                         ],
@@ -270,11 +270,11 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            backgroundColor: Colors.black12,
+                            backgroundColor:Color.fromRGBO(207, 214, 220, 1),
                             radius: width * 0.1,
                             child: Icon(
                               Icons.person,
-                              color: Colors.grey,
+                              color: Colors.white,
                             ),
                           ),
                           SizedBox(height: height * 0.01),
@@ -360,10 +360,10 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
             }
           }
         },
-        backgroundColor: Colors.black,
+        backgroundColor:Color.fromRGBO(21, 171, 97, 1),
         child: Icon(
           Icons.arrow_forward,
-          color: Colors.grey,
+          color: Colors.white,
         ),
       ),
     );

@@ -64,16 +64,16 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         title: _isSearching
             ? TextField(
           cursorColor: Colors.grey,
                 controller: _searchText,
                 autofocus: true,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   hintText: "Search users...",
-                  hintStyle: TextStyle(color: Colors.white54),
+                  hintStyle: TextStyle(color: Colors.black),
                   border:UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey)
                   ),
@@ -91,16 +91,16 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
               children: [
                 Text(
                     "Add Members",
-                    style: TextStyle(color: Colors.white, fontFamily: 'Raleway',fontSize: width*0.043),
+                    style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: width*0.043),
                   ),
                 Text(
                   "${newMembers.length} new members added ",
-                  style: TextStyle(color: Colors.white, fontFamily: 'Raleway',fontSize: width*0.032),
+                  style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: width*0.032),
                 ),
               ],
             ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () {
             if (_isSearching) {
               setState(() {
@@ -115,7 +115,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         actions: [
           if (!_isSearching)
             IconButton(
-              icon: Icon(Icons.search, color: Colors.white),
+              icon: Icon(Icons.search, color: Colors.black),
               onPressed: () {
                 setState(() {
                   _isSearching = true;
@@ -142,12 +142,21 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                       padding: EdgeInsets.symmetric(horizontal: width * 0.02), // Adjust spacing
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            radius: width * 0.07,
-                            backgroundColor: Colors.black,
-                            child: Text(
-                            newMembersName[index][0].toUpperCase(),
-                             style: TextStyle( color: Colors.grey),
+                          Container(
+                      decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                        border: Border.all(
+                          color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
+                          width: width*0.002, // Set the border width
+                        ),
+                      ),
+                            child: CircleAvatar(
+                              radius: width * 0.07,
+                              backgroundColor: Colors.white,
+                              child: Text(
+                              newMembersName[index][0].toUpperCase(),
+                               style: TextStyle( color: Color.fromRGBO(21, 171, 97, 1)),
+                              ),
                             ),
                           ),
                           Text(newMembersName[index])
@@ -187,12 +196,21 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                         leading:Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            CircleAvatar(
-                              backgroundColor: Colors.black,
-                              radius: width * 0.05,
-                              child: Text(
-                               user['firstName'][0].toUpperCase(),
-                                style: TextStyle(color: Colors.grey),
+                            Container(
+                        decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                          border: Border.all(
+                            color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
+                            width: width*0.002, // Set the border width
+                          ),
+                        ),
+                              child: CircleAvatar(
+                                backgroundColor: Colors.white,
+                                radius: width * 0.05,
+                                child: Text(
+                                 user['firstName'][0].toUpperCase(),
+                                  style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
+                                ),
                               ),
                             ),
                             if (newMembers.contains(user['uid']))
@@ -207,7 +225,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                                   child: Icon(
                                     Icons.check_circle,
                                     size: width * 0.035,
-                                    color: Colors.grey,
+                                    color: Color.fromRGBO(21, 171, 97, 1),
                                   ),
                                 ),
                               ),
@@ -259,10 +277,10 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
     }
 
         },
-        backgroundColor: Colors.black,
+        backgroundColor: Color.fromRGBO(21, 171, 97, 1),
         child: Icon(
           Icons.check,
-          color: Colors.grey,
+          color: Colors.white,
         ),
       ),
     );

@@ -201,7 +201,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
 
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Colors.grey.shade300,
+                            backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                             child: Icon(Icons.group, color: Colors.white),
                           ),
                           title: Text(groupData["groupName"] ?? "Unnamed Group"),
