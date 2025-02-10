@@ -896,7 +896,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           ),
                         ),
                         if (isLoading || isLoadingDatabse)
-                          CircularProgressIndicator(color: Colors.grey,)
+                          CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,)
                         else ...[
                           ListView.builder(
                            
@@ -1129,7 +1129,7 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,));
           }
 
           if (snapshot.hasError) {

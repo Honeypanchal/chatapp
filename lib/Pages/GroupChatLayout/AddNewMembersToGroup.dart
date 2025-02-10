@@ -181,8 +181,9 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
               child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
                 stream: fetchUsers(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData)
-                    return Center(child: CircularProgressIndicator());
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,));
+                  }
         
                   var users = snapshot.data!;
                   if (users.isEmpty) return Center(child: Text("No users found"));

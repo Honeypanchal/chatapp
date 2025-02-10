@@ -266,7 +266,7 @@ class _UpdateGroupPermissionsState extends State<UpdateGroupPermissions> {
                       ),
                     )),
                 Padding(
-                  padding:  EdgeInsets.only(left:width*0.07),
+                  padding: kIsWeb?   EdgeInsets.only(left:width*0.07): EdgeInsets.only(left:width*0.03),
                   child: ListTile(
                     onTap: () async {
                       var result = widget.admins = await Navigator.of(context)
@@ -386,8 +386,7 @@ class _GroupMembersState extends State<GroupMembers> {
               ),
               if (isLoading)
                 CircularProgressIndicator(
-                  backgroundColor: Colors.white,
-                  color: Colors.black,
+                  backgroundColor: Colors.white,color: Colors.grey,
                 ),
               ListView.builder(
                 padding: kIsWeb?EdgeInsets.symmetric(vertical: height*0.012):EdgeInsets.zero,
