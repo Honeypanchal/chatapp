@@ -17,10 +17,10 @@ class StatusService {
 
     String username = userDoc['firstName'] ?? "Unknown";
 
-    DocumentReference statusRef = _firestore.collection('Status').doc(); // Generates unique ID
-
+    DocumentReference statusRef = _firestore.collection('Status').doc();
     Status status = Status(
       uid: statusRef.id,
+      userId: userId,
       username: username,
       text: text,
       backgroundColor: backgroundColor,
@@ -103,6 +103,14 @@ class StatusService {
       }
     }
   }
+  Future<void> deleteStatus(String statusId) async {
+    try {
+      await FirebaseFirestore.instance.collection('Status').doc(statusId).delete();
+    } catch (e) {
+      print("Error deleting status: $e");
+    }
+  }
+
 
 
   void debugFetchStatuses() async {

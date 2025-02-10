@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/auth_services.dart';
+import '../Authentication/FirstPage.dart';
+
 class Profile extends StatefulWidget {
   final CustomClass currentUser;
+
   const Profile({super.key, required this.currentUser});
 
   @override
@@ -14,8 +18,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-
-  int _selectedIndex=3;
+  int _selectedIndex = 3;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -43,6 +46,7 @@ class _ProfileState extends State<Profile> {
         break;
     }
   }
+
   String firstName = "";
   String email = "";
 
@@ -55,8 +59,10 @@ class _ProfileState extends State<Profile> {
   void fetchUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      DocumentSnapshot userDoc =
-      await FirebaseFirestore.instance.collection("Users").doc(user.uid).get();
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(user.uid)
+          .get();
 
       if (userDoc.exists) {
         setState(() {
@@ -74,8 +80,12 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final height = MediaQuery.sizeOf(context).height;
+    final width = MediaQuery
+        .sizeOf(context)
+        .width;
+    final height = MediaQuery
+        .sizeOf(context)
+        .height;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -86,7 +96,11 @@ class _ProfileState extends State<Profile> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             "Profile",
-            style: TextStyle(fontFamily: 'poppins', fontSize: width * 0.04,color: Colors.white,fontWeight: FontWeight.bold),
+            style: TextStyle(
+                fontFamily: 'poppins',
+
+                color: Colors.white,
+                fontWeight: FontWeight.bold),
           ),
         ),
         elevation: 0,
@@ -99,7 +113,7 @@ class _ProfileState extends State<Profile> {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: Colors.green.shade400,
+                backgroundColor: Colors.black54,
                 child: Text(
                   firstName.isNotEmpty ? firstName[0].toUpperCase() : "",
                   style: TextStyle(
@@ -110,71 +124,135 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
-
-            SizedBox(height: height*0.04,),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: width*0.02),
-              height:height*0.1,
-              width: width,
-              decoration: BoxDecoration(color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8,right: 8,top: 5),
-                child: Row(
-                  children: [
-                    Icon(Icons.perm_identity,color: Colors.black26,size: width*0.08,),
-                    SizedBox(width: width*0.03,),
-                    Column(
-                      children: [Text("Name",style: TextStyle(color: Colors.black,fontSize: width*0.035,fontFamily: 'poppins',fontWeight: FontWeight.w700),
-                      ),
-                        SizedBox(height: height*0.005,),
-                        Text(firstName.isNotEmpty ? firstName :"",style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w600,fontFamily: 'Raleways',fontSize: width*0.035),
-                        ),
-
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
+            SizedBox(
+              height: height * 0.04,
             ),
-            SizedBox(height: height*0.02,),
             Container(
-              margin: EdgeInsets.symmetric(horizontal: width*0.02),
-              height:height*0.1,
+              margin: EdgeInsets.symmetric(horizontal: width * 0.02),
+              height: height * 0.1,
               width: width,
-              decoration: BoxDecoration(color: Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Padding(
-                padding: const EdgeInsets.only(left: 8,right: 8,top: 5),
+                padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-                    Icon(Icons.email_outlined,color: Colors.black26,size: width*0.07,),
-                    SizedBox(width: width*0.05,),
+                    Icon(
+                      Icons.perm_identity,
+                      color: Colors.black45,
+                      size: width * 0.09,
+                    ),
+                    SizedBox(
+                      width: width * 0.03,
+                    ),
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [Text("Email",
-                        style: TextStyle(color: Colors.black,fontSize: width*0.035,fontFamily: 'poppins',fontWeight: FontWeight.w700),
-                      ),
-                        SizedBox(height: height*0.005,),
-                        Text(email.isNotEmpty ? email
-                            :"",style: TextStyle(color: Colors.grey,fontWeight: FontWeight.w600,fontFamily: 'Raleways',fontSize: width*0.035),
+                      children: [
+                        Text(
+                          "Name",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: width * 0.035,
+                              fontFamily: 'poppins',
+                              fontWeight: FontWeight.w700),
                         ),
-
+                        SizedBox(
+                          height: height * 0.003,
+                        ),
+                        Text(
+                          firstName.isNotEmpty ? firstName : "",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Raleways',
+                              fontSize: width * 0.035),
+                        ),
                       ],
                     ),
                   ],
                 ),
               ),
-
             ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: width * 0.02),
+              height: height * 0.08,
+              width: width,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.email_outlined,
+                      color: Colors.black45,
+                      size: width * 0.09,
+                    ),
+                    SizedBox(
+                      width: width * 0.05,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Email",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: width * 0.035,
+                              fontFamily: 'poppins',
+                              fontWeight: FontWeight.w700),
+                        ),
+                        SizedBox(
+                          height: height * 0.005,
+                        ),
+                        Text(
+                          email.isNotEmpty ? email : "",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Raleways',
+                              fontSize: width * 0.035),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                logOutUser().then((_) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => Firstpage()),
+                    // Navigate to login screen
+                        (Route<
+                        dynamic> route) => false, // Remove all previous routes from stack
+                  );
+                });
+              },
+
+              leading: Icon(
+                Icons.delete,
+                color: Colors.red,
+              ),
+              title: Text(
+                "Log out",
+                style: TextStyle(fontFamily: 'Raleway', color: Colors.red),
+              ),
+            )
           ],
         ),
       ),
+      bottomNavigationBar: MainNavigationPage(
+          currentIndex: _selectedIndex, onTap: _onItemTapped),
     );
   }
 }

@@ -197,19 +197,22 @@ class _ChatLayoutState extends State<ChatLayout> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(255, 246, 241, 235),
       appBar: PreferredSize(
         preferredSize: Size(width, height * 0.072),
         child: AppBar(
+
+
           leading: IconButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
             icon: Icon(
               Icons.arrow_back,
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
+
           title: isAppBarForSelectedMessages
               ? Text("${selectedMessages.length} selected", style: TextStyle(color: Colors.white),)
               : GestureDetector(
@@ -224,10 +227,10 @@ class _ChatLayoutState extends State<ChatLayout> {
             },
             child: Text(
               widget.user['firstName'],
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.black),
             ),
           ),
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.white,
           actions: [
             if (isAppBarForSelectedMessages) ...[
               // Pin button
@@ -445,7 +448,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                           ),
 
                         Container(
-                          // alignment: isCurrentUser ? Alignment.topRight : Alignment.topLeft,
+
                           margin: EdgeInsets.symmetric(
                             horizontal: width * 0.02,
                             vertical: height * 0.01,
@@ -453,8 +456,9 @@ class _ChatLayoutState extends State<ChatLayout> {
                           padding: const EdgeInsets.all(12.0),
                           decoration: BoxDecoration(
                             color: isCurrentUser
-                                ? Colors.green.shade400
-                                : Colors.grey.shade300,
+                                ?Color.fromARGB(255, 213, 252, 208)
+                                : Colors.white,
+
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(16),
                               topRight: Radius.circular(16),
@@ -463,14 +467,15 @@ class _ChatLayoutState extends State<ChatLayout> {
                             ),
                           ),
                           constraints: BoxConstraints(
-                            minWidth: 50, // Minimum width to ensure the bubble isn't too small
-                            maxWidth: width * 0.6, // Dynamically adjusts, but max width is 60% of the screen
-                          ),
+                            minWidth: 50,
+                            maxWidth: width * 0.6,
+                            ),
+
                           child: Text(
                             messages[index]['message'],
                             style: TextStyle(
                               fontFamily: 'Raleway',
-                              color: isCurrentUser ? Colors.white : Colors.black87,
+                              color: isCurrentUser ? Colors.black : Colors.black87,
                             ),
                           ),
                         ),
@@ -582,13 +587,13 @@ class _ChatLayoutState extends State<ChatLayout> {
           //       ),
           //     ))
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(right: 10,bottom: 10,left: 10),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.black, width: 1.5),
+                borderRadius: BorderRadius.circular(15),
+                // border: Border.all(color: Colors.grey, width: 1),
               ),
               child: Row(
                 children: [
@@ -601,7 +606,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                     //     ),
                     //   ),
                     // ),
-                    child: Icon(Icons.poll, color: Colors.green.shade400),
+                    child: Icon(Icons.poll, color: Colors.grey,size: width*0.07,),
                   ),
                   SizedBox(width: 10),
                   Expanded(
@@ -609,6 +614,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                       controller: message,
                       decoration: InputDecoration(
                         hintText: "Type a message",
+                        hintStyle: TextStyle(color: Colors.grey),
                         border: InputBorder.none,
                       ),
 
@@ -624,7 +630,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                       // ----------
                       message.clear();
                     },
-                    child: Icon(Icons.send, color: Colors.green.shade400),
+                    child: Icon(Icons.send, color: Colors.grey),
                   ),
                 ],
               ),
