@@ -12,8 +12,8 @@ class MainNavigationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         decoration: BoxDecoration(
-          color: Colors.white, // Set background color for the container
-          border: Border.all(color: Colors.white),
+          color: Colors.white,
+            border: Border.all(color: Colors.white),
         ),
         child: FlashyTabBar(
           backgroundColor: Colors.white,

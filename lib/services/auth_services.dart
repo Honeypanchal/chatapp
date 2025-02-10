@@ -53,6 +53,7 @@ Future<CustomClass?> signUpUser(
 }
 
 Future<CustomClass?> signInUser(String email, String password) async {
+
   try {
     UserCredential user = await _auth.signInWithEmailAndPassword(
       email: email,
@@ -87,6 +88,7 @@ Future<CustomClass?> signInUser(String email, String password) async {
   }
   return null;
 }
+
 
 Future<CustomClass?> signInWithGoogle() async {
   try {

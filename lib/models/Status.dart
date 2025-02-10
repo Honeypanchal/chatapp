@@ -2,17 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Status {
   final String uid;
+  final String userId;
   final String username;
   final String text;
   final String backgroundColor;
   final String textStyle;
   final Timestamp timestamp;
   final List<String> viewedBy;
-  final List<Map<String, String>> statusReplies; // New field to store replies
-  final bool isViewed; // Used to categorize statuses
+  final List<Map<String, String>> statusReplies;
+  final bool isViewed;
 
   Status({
     required this.uid,
+    required this.userId,
     required this.username,
     required this.text,
     required this.backgroundColor,
@@ -20,13 +22,13 @@ class Status {
     required this.timestamp,
     required this.viewedBy,
     this.statusReplies= const[],
-    this.isViewed = false, // Default value
-  });
-
+    this.isViewed = false,
+    });
   factory Status.fromMap(Map<String, dynamic> data) {
 
     return Status(
       uid: data['uid'] ?? "",
+      userId: data['userId']?? "" ,
       username: data['username'] ?? "Unknown",
       text: data['text'] ?? "",
       backgroundColor: data['backgroundColor'] ?? "#FFFFFF",
@@ -49,6 +51,7 @@ class Status {
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
+      'userId':userId,
       'username': username,
       'text': text,
       'backgroundColor': backgroundColor,
@@ -62,6 +65,7 @@ class Status {
   Status copyWith({bool? isViewed}) {
     return Status(
       uid: uid,
+      userId: userId,
       username: username,
       text: text,
       backgroundColor: backgroundColor,
