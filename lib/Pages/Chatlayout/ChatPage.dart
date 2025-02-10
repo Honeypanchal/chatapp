@@ -153,10 +153,10 @@ class _ChatPageState extends State<ChatPage> {
             padding: EdgeInsets.all(8.0),
             child: Container(
               // height: height * 0.052,
-              width: width * 0.9,
+              width: width > 600 ? width * 1 : width * 0.9,
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(width * 0.03),
+                borderRadius: BorderRadius.circular(width > 600 ? width * 0.013 :width * 0.03),
               ),
               child: TextField(
                 cursorColor: Color.fromRGBO(21, 171, 97, 1),
@@ -310,9 +310,10 @@ class _ChatPageState extends State<ChatPage> {
         child: Icon(
           Icons.add,
           color: Colors.white,
-          size: width < 600 ? width * 0.08 : width * 0.09,
+          size: width > 600 ? width * 0.025 : width * 0.09,
         ),
       ),
+
       bottomNavigationBar: MainNavigationPage(
           currentIndex: _selectedIndex, onTap: _onItemTapped),
     );

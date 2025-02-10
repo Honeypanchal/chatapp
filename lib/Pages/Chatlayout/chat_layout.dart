@@ -693,7 +693,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          child: Icon(Icons.poll, color: Colors.grey),
+                          child: Icon(Icons.camera_alt, color: Colors.grey),
                         ),
                         SizedBox(width: 10),
                         Expanded(
