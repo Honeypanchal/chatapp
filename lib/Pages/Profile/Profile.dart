@@ -87,7 +87,7 @@ class _ProfileState extends State<Profile> {
       backgroundColor: Colors.white,
       appBar: AppBar(
       automaticallyImplyLeading: false,
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.white,
         title: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
@@ -95,7 +95,7 @@ class _ProfileState extends State<Profile> {
             style: TextStyle(
                 fontFamily: 'poppins',
             
-                color: Colors.white,
+                color: Colors.black,
                 fontWeight: FontWeight.bold),
           ),
         ),
@@ -109,15 +109,8 @@ class _ProfileState extends State<Profile> {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: Colors.black54,
-                child: Text(
-                  firstName.isNotEmpty ? firstName[0].toUpperCase() : "",
-                  style: TextStyle(
-                    fontSize: width * 0.08,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                backgroundColor: Colors.grey.shade300,
+             child: Icon(Icons.person,color: Colors.white,size: width*0.2,),
               ),
             ),
             SizedBox(

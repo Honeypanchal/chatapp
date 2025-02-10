@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:chatapp/Pages/ChatLayout/ChatPage.dart';
+import 'dart:io' as io;
 import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
 import 'package:chatapp/Pages/Profile/Profile.dart';
 import 'package:chatapp/Pages/helpers/MainNavigation.dart';
@@ -12,8 +13,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/CustomClass.dart';
 import '../models/Status.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../services/auth_services.dart';
+import 'package:flutter/foundation.dart';
 
 class StatusPage extends StatefulWidget {
   @override
@@ -92,19 +95,22 @@ class _StatusPageState extends State<StatusPage> {
     final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Color.fromARGB (255, 246, 241, 235),
+      backgroundColor: Colors.white,
       appBar: AppBar(
+
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Text(
           'Status',
           style: TextStyle(
-              color: Colors.black,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w600,
-              fontSize: width * 0.06),
+            color: Colors.black,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w500,
+            fontSize: MediaQuery.of(context).size.width > 600 ? width * 0.02: width * 0.06,
+          ),
         ),
-      ),
+        ),
+
       body: StreamBuilder<List<Status>>(
         stream: _statusService.getStatuses(),
         builder: (context, snapshot) {
@@ -146,12 +152,16 @@ class _StatusPageState extends State<StatusPage> {
               if (notSeenStatuses.isNotEmpty) ...[
                 Padding(
                   padding:
-                      EdgeInsets.only(top: height * 0.015, left: width * 0.06),
+                  EdgeInsets.only(
+
+                    left: MediaQuery.of(context).size.width > 600 ? width * 0.01 : width * 0.06,
+                  ),
+
                   child: Text(
                     "Recently Added",
                     style: TextStyle(
-                      fontSize: width * 0.045, // Reduce font size a little
-                      fontWeight: FontWeight.bold,
+                      fontSize: width > 600 ? width * 0.01 : width * 0.06,
+                      fontWeight: FontWeight.w500,
                       color: Colors.grey,
                     ),
                   ),
@@ -159,17 +169,18 @@ class _StatusPageState extends State<StatusPage> {
                 _buildStatusCategory("", notSeenStatuses, false),
               ] else
                 SizedBox.shrink(),
-              // Prevent empty space when there are no unseen statuses
 
               if (seenStatuses.isNotEmpty) ...[
                 Padding(
                   padding:
-                      EdgeInsets.only(left: width * 0.06, top: height * 0.015),
+                  EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width > 600 ? width * 0.01 : width * 0.06,
+                  ),
                   child: Text(
                     "Viewed Status",
                     style: TextStyle(
-                      fontSize: width * 0.045,
-                      fontWeight: FontWeight.w900,
+                      fontSize: width > 600 ? width * 0.01 : width * 0.06,
+                      fontWeight: FontWeight.w500,
                       color: Colors.grey,
                     ),
                   ),
@@ -188,12 +199,12 @@ class _StatusPageState extends State<StatusPage> {
             MaterialPageRoute(builder: (context) => const EnterStatus()),
           );
         },
-        backgroundColor: Colors.black,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+          backgroundColor: Color.fromRGBO(21, 171, 97, 1),
+        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         child: Icon(
           Icons.add,
           color: Colors.white,
-          size: width * 0.08,
+          size: width > 600 ? width * 0.025 : width * 0.1,
         ),
       ),
       bottomNavigationBar: MainNavigationPage(
@@ -210,11 +221,14 @@ class _StatusPageState extends State<StatusPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8),
+
+          padding: const EdgeInsets.only(
+              left: 8, right: 8),
           child: Text(title,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         ),
         ListView.builder(
+
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: groupedStatuses.keys.length,
@@ -228,6 +242,8 @@ class _StatusPageState extends State<StatusPage> {
                 isMyStatus ? "My Status" : userStatus[0].username;
 
             return ListTile(
+
+
               leading: Container(
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -238,7 +254,7 @@ class _StatusPageState extends State<StatusPage> {
                   backgroundColor:Color.fromARGB(255,232,244,234),
                   child: Text(
                     userStatus[0].username[0].toUpperCase(),
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.green.shade800),
 
                   ),
                 ),
@@ -322,25 +338,38 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
     Status status = widget.statuses[currentIndex];
 
     showModalBottomSheet(
+      isScrollControlled: true,
       backgroundColor: Colors.white,
       context: context,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
+        final width=MediaQuery.sizeOf(context).width;
+        final height=MediaQuery.sizeOf(context).height;
         return Container(
-          width: MediaQuery.of(context).size.width,
+          width: double.infinity,
           height: MediaQuery.of(context).size.height * 0.3,
-          padding: EdgeInsets.all(15),
+            padding: EdgeInsets.only(
+              top: height*0.03,
+              left:MediaQuery.sizeOf(context).width>600 ? width*0.02:width*0.06,
+              right: MediaQuery.sizeOf(context).width * 0.06,
+            ),
+
+
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "Status Replies",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    //fontSize: MediaQuery.sizeOf(context).width*0.04,
+                    fontSize: width < 600 ? width * 0.03 : width * 0.02,
+                    fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: MediaQuery.sizeOf(context).height*0.02),
               status.statusReplies.isEmpty
-                  ? Center(child: Text("No replies available"))
+                  ? Center(child: Text("No replies yet..."))
                   : Expanded(
                       child: ListView.builder(
                         itemCount: status.statusReplies.length,
@@ -351,12 +380,15 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                           String replyText = reply['replyText'] ?? "No reply";
 
                           return ListTile(
+                            contentPadding: EdgeInsets.zero,
                             leading: CircleAvatar(
-                              backgroundColor: Colors.grey.shade300,
+                              backgroundColor:Color.fromARGB(255,232,244,234),
                               child: Text(
                                 replyBy[0].toUpperCase(),
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.green.shade800,
+                                  fontFamily: 'poppins',
+                                  fontWeight: FontWeight.w700
                                 ),
                               ),
                             ),
@@ -465,14 +497,14 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     child: Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,
-                      size: width * 0.06,
+                      size: width > 600 ? width *0.02 : width*0.06,
                     ),
                     onTap: () {
                       Navigator.pop(context);
                     },
                   ),
                   SizedBox(
-                    width: width * 0.015,
+                    width: width>600 ? width*0.006 : width*0.01
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -480,45 +512,51 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     ),
                     child: CircleAvatar(
                       backgroundColor: Colors.black26,
-                      radius: 15,
+                      radius: width>600 ?  width*0.018 : width*0.025,
                       child: Text(
                         widget.statuses[0].username[0].toUpperCase(),
                         style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'poppins',
-                            fontSize: width * 0.04),
+                            fontSize: width>600 ? width*0.02: width*0.04 ),
+
                       ),
                     ),
                   ),
                   SizedBox(
-                    width: width * 0.03,
+                    width:width> 600 ? width*0.015 : width*0.03
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        widget.statuses[0].username,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'poppins',
-                            fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(
-                        height: height * 0.01,
-                      ),
-                      Text(
-                        DateFormat("HH:mm")
-                            .format(widget.statuses[0].timestamp.toDate()),
-                        style: TextStyle(
-                            color: Colors.white, fontSize: width * 0.03),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.only(top: 13),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.statuses[0].username,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'poppins',
+                              fontSize: width>600 ? width*0.015: width*0.03,
+                              fontWeight: FontWeight.w600),
+                        ),
+
+                        Text(
+                          DateFormat("HH:mm")
+                              .format(widget.statuses[0].timestamp.toDate()),
+                          style: TextStyle(
+                              color: Colors.white,
+                            fontSize: width>600 ? width*0.015: width*0.03,),
+                        ),
+                      ],
+                    ),
                   ),
                   Spacer(),
                   if (widget.statuses[currentIndex].userId ==
                       FirebaseAuth.instance.currentUser!.uid)
                     Container(
-                      height: height * 0.1,
-                      width: width * 0.1,
+                       height: width>600 ? height*0.05: height*0.1,
+                      width: width>600 ? height*0.05: height*0.1,
+
                       decoration: BoxDecoration(
                           shape: BoxShape.circle, color: Colors.black26),
                       child: IconButton(
@@ -530,7 +568,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                           icon: Icon(
                             Icons.delete,
                             color: Colors.red,
-                            size: width * 0.05,
+                            size: width> 600 ? width*0.012:width*0.05,
                           )),
                     ),
                 ],
@@ -702,33 +740,18 @@ class _EnterStatusState extends State<EnterStatus> {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal: width * 0.04,
+                horizontal:width>600 ? width*0.05:width*0.02,
                 vertical: height * 0.025,
               ),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      height: height * 0.15,
-                      width: width * 0.15,
-                      decoration: BoxDecoration(
-                        color: Colors.black26,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: width * 0.1,
-                      ),
-                    ),
-                  ),
+
                   Spacer(),
                   GestureDetector(
                     onTap: _changeTextStyle,
                     child: Container(
                       height: height * 0.15,
-                      width: width * 0.15,
+                      width: width > 600 ? width*0.035 : width*0.015 ,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         shape: BoxShape.circle,
@@ -736,7 +759,7 @@ class _EnterStatusState extends State<EnterStatus> {
                       child: Icon(
                         Icons.text_fields_rounded,
                         color: Colors.white,
-                        size: width * 0.1,
+                        size: width>600 ? width*0.02 : width*0.04,
                       ),
                     ),
                   ),
@@ -747,7 +770,7 @@ class _EnterStatusState extends State<EnterStatus> {
                     onTap: _changeColor,
                     child: Container(
                       height: height * 0.15,
-                      width: width * 0.15,
+                      width: width > 600 ? width*0.035 : width*0.015 ,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         shape: BoxShape.circle,
@@ -755,7 +778,7 @@ class _EnterStatusState extends State<EnterStatus> {
                       child: Icon(
                         Icons.color_lens_sharp,
                         color: Colors.white,
-                        size: width * 0.1,
+                        size: width>600 ? width*0.02 : width*0.04,
                       ),
                     ),
                   ),
@@ -783,13 +806,14 @@ class _EnterStatusState extends State<EnterStatus> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+
         onPressed: _uploadTextStatus,
         backgroundColor: Colors.black26,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         child: Icon(
           Icons.send,
           color: Colors.white,
-          size: width * 0.07,
+          size: width>600 ? width*0.015 : width*0.04,
         ),
       ),
     );

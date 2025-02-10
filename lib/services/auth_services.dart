@@ -89,14 +89,7 @@ Future<CustomClass?> signInUser(String email, String password) async {
   return null;
 }
 
-Future<void> logOutUser() async {
-  try {
-    await FirebaseAuth.instance.signOut();
 
-  } catch (e) {
-    print(e.toString());
-  }
-}
 Future<CustomClass?> signInWithGoogle() async {
   try {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
