@@ -574,7 +574,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             SizedBox(height: height * 0.012),
             Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.057, vertical: height * 0.017),
+                  horizontal:kIsWeb?width*0.04:   width * 0.057, vertical: height * 0.017),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Column(
