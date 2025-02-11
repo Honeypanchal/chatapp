@@ -853,7 +853,7 @@ class _EnterStatusState extends State<EnterStatus> {
         child: Icon(
           Icons.send,
           color: Colors.white,
-          size: width > 600 ? width * 0.015 : width * 0.05,
+          size: width > 600 ? width * 0.015 : width * 0.065,
         ),
       ),
     );
