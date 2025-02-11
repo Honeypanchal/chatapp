@@ -1,5 +1,4 @@
-import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
-import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -20,7 +19,7 @@ class _NewGroupState extends State<NewGroup> {
   CollectionReference groupsDB =
       FirebaseFirestore.instance.collection("groups");
   bool _showSearch = false;
-  TextEditingController _searchText = TextEditingController();
+  final TextEditingController _searchText = TextEditingController();
   List<String> firstNames = [];
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
@@ -29,9 +28,12 @@ class _NewGroupState extends State<NewGroup> {
     if (_showSearch) {
       return AppBar(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => setState(() => _showSearch = false),
+        leading: Padding(
+          padding: EdgeInsets.only(left:kIsWeb?width*0.032:  width * 0.064),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+            onPressed: () => setState(() => _showSearch = false),
+          ),
         ),
         title: TextField(
 
@@ -55,7 +57,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
 
     return AppBar(
       leading: Padding(
-        padding: EdgeInsets.only(left:kIsWeb? 0.00:  width * 0.064),
+        padding: EdgeInsets.only(left:kIsWeb?width*0.032:  width * 0.064),
         child: GestureDetector(
           onTap: () => Navigator.pushNamed(context,'/groupDisplay',arguments: {'currentUser':widget.currentUser})
        ,   child: Icon(
@@ -89,11 +91,15 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
         ],
       ),
       actions: [
-        IconButton(
-          icon: Icon(Icons.search, color: Colors.black),
-          onPressed: () => setState(() => _showSearch = true),
+        Padding(
+          padding:   EdgeInsets.only(right:kIsWeb?width*0.032:0),
+          child: IconButton(
+            icon: Icon(Icons.search, color: Colors.black),
+            onPressed: () => setState(() => _showSearch = true),
+          ),
         ),
       ],
+
     );
   }
   Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchUsers() {
@@ -134,19 +140,20 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
             flex: 6,
             child: Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: width * 0.012, vertical: height * 0.012),
+                  horizontal:  width * 0.012, vertical: height * 0.012),
               child: Column(
                 children: [
                   if (groupChatUsers.isNotEmpty && firstNames.isNotEmpty)
                     SizedBox(
-                      height: kIsWeb?height*0.16:  height * 0.12,
+                      height: kIsWeb?height*0.13:  height * 0.12,
                       child: ListView.builder(
+                        padding: kIsWeb? EdgeInsets.symmetric(horizontal:width*0.012 ):EdgeInsets.zero,
                         scrollDirection: Axis.horizontal,
                         itemCount: firstNames.length,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: EdgeInsets.symmetric(
-                                horizontal: width * 0.02, vertical: height * 0.012),
+                                horizontal:kIsWeb?width*0.01:   width * 0.02, vertical: height * 0.012),
                             child: Column(
                               children: [
                                 Container(
@@ -154,11 +161,11 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                                     shape: BoxShape.circle,
                                     border: Border.all(
                                       color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
-                                      width: width*0.002, // Set the border width
+                                      width: kIsWeb?width*0.001: width*0.002, // Set the border width
                                     ),
                                   ),
                                   child: CircleAvatar(
-                                    radius: kIsWeb?width*0.022:  width * 0.067,
+                                    radius: kIsWeb?width*0.019:  width * 0.067,
                                     backgroundColor: Colors.white,
                                     child: Text(
                                       firstNames[index][0].toUpperCase(),
@@ -211,7 +218,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                                       ),
                                       child: CircleAvatar(
                                         backgroundColor:Colors.white,
-                                        radius: width * 0.05,
+                                        radius: kIsWeb?width*0.019:  width * 0.067,
                                         child: Text(
                                           user['firstName'][0].toUpperCase(),
                                           style: TextStyle(color:  Color.fromRGBO(21, 171, 97, 1)),
@@ -221,7 +228,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                                     ,
                                     if (groupChatUsers.contains(user['uid']))
                                       Positioned(
-                                        right:kIsWeb?35: -2,
+                                        right:kIsWeb?0: -2,
                                         bottom: -2,
                                         child: Container(
                                           decoration: BoxDecoration(

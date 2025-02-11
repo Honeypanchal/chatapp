@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/models/CustomClass.dart';
 
@@ -161,17 +162,13 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.only(
-              left: width * 0.01,
-              right: width * 0.01,
-              top: height * 0.018,
-            ),
+            padding: EdgeInsets.all(8.0),
             child: Container(
-              height: height * 0.052,
-              width: width * 0.9,
+
+              width: kIsWeb?width: width * 0.9,
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(width * 0.03),
+                borderRadius: BorderRadius.circular(kIsWeb ? width * 0.013 :width * 0.03),
               ),
               child: TextField(
                 autofocus: true,
