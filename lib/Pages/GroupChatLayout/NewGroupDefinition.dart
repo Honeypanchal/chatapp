@@ -4,7 +4,7 @@ import 'package:chatapp/models/Group.dart';
 import 'package:chatapp/services/users_services.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/services/groupChat_services.dart';
-import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class NewGroupDefinition extends StatefulWidget {
   final List<String> members;
@@ -90,20 +90,25 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: CircleAvatar(
-                      radius: width * 0.066,
-                      backgroundColor:Color.fromRGBO(21, 171, 97, 1),
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
+                    flex: 1,
+                    child: Align(
+                      alignment:Alignment.centerLeft,child: CircleAvatar(
+                        radius:kIsWeb?width*0.027: width * 0.066,
+                        backgroundColor:Color.fromRGBO(21, 171, 97, 1),
+                        child: Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: kIsWeb?width*0.02:width*0.06,
+                        ),
                       ),
                     ),
                   ),
+                  if(!kIsWeb)
                   SizedBox(
                     width: width * 0.012,
                   ),
                   Expanded(
-                    flex: 4,
+                    flex: 3,
                     child: TextFormField(
                       cursorColor: Colors.grey,
                       controller: _groupName,
@@ -120,7 +125,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           ),
                           hintText: 'Group Name'),
                       style: TextStyle(
-                        fontSize: width * 0.05,
+                        fontSize:kIsWeb?width*0.02:  width * 0.05,
                         fontFamily: 'Raleway',
                         color: Colors.black,
                       ),
@@ -135,11 +140,11 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   ),
                 ],
               ),
-              SizedBox(height: height * 0.02),
+              SizedBox(height: kIsWeb?height*0.03:  height * 0.02),
               Divider(
                 height: height * 0.012,
                 color: Colors.grey.shade100,
-                thickness: width * 0.02,
+                thickness:width * 0.005,
               ),
               SizedBox(
                 height: height * 0.012,
@@ -162,7 +167,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             'Disappearing messages ',
                             style: TextStyle(
-                              fontSize: width * 0.042,
+                              fontSize: kIsWeb?width*0.02:  width * 0.042,
                               color: Colors.black87,
                             ),
                           ),
@@ -175,14 +180,14 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.timer,
                                 color: Colors.grey,
-                                size: width * 0.06,
+                                size:kIsWeb?width*0.03:  width * 0.06,
                               ))
                         ],
                       ),
                       Text(
                         'Off',
                         style: TextStyle(
-                          fontSize: width * 0.03,
+                          fontSize:kIsWeb?width*0.019: width * 0.03,
                           color: Colors.black87,
                         ),
                       ),
@@ -194,7 +199,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             'Group Permissions',
                             style: TextStyle(
-                              fontSize: width * 0.042,
+                              fontSize: kIsWeb?width*0.02:width * 0.042,
                               color: Colors.black87,
                             ),
                           ),
@@ -226,7 +231,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.settings,
                                 color: Colors.grey,
-                                size: width * 0.06,
+                                size:kIsWeb?width*0.03: width * 0.06,
                               ))
                         ],
                       ),
@@ -250,7 +255,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                     Text(
                       'Members : ${widget.members.length}',
                       style: TextStyle(
-                        fontSize: width * 0.035,
+                        fontSize: kIsWeb?width*0.02: width * 0.035,
                         color: Colors.black,
                       ),
                     ),
@@ -270,8 +275,9 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                       child: Column(
                         children: [
                           CircleAvatar(
+
                             backgroundColor:Color.fromRGBO(207, 214, 220, 1),
-                            radius: width * 0.1,
+                            radius: kIsWeb?width*0.05 :  width * 0.1,
                             child: Icon(
                               Icons.person,
                               color: Colors.white,
@@ -281,7 +287,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             membersFirstNameList[index],
                             style: TextStyle(
-                              fontSize: width * 0.04,
+                              fontSize:kIsWeb?width*0.02: width * 0.04,
                               color: Colors.black,
                             ),
                           ),

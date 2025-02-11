@@ -82,7 +82,10 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(),
+              CircularProgressIndicator(
+                backgroundColor: Colors.white,
+                color: Colors.grey,
+              ),
               SizedBox(height: 20),
               Text(
                 "Redirecting you to your chats...",
