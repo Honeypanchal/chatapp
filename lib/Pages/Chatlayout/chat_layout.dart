@@ -312,9 +312,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                       .contains(message.id)); // Find index dynamically
                   String messageId = selectedMessages
                       .first; // Using the first selected message as an example
-                  if (value == 'reply') {
-                    // Handle reply action
-                  } else if (value == 'edit') {
+                  if (value == 'edit') {
                     // Handle edit action
 
                     final TextEditingController editController =
@@ -425,13 +423,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                 },
                 itemBuilder: (context) => [
                   PopupMenuItem(
-                    value: 'reply',
-                    child: ListTile(
-                      leading: Icon(Icons.reply),
-                      title: Text("Reply"),
-                    ),
-                  ),
-                  PopupMenuItem(
                     value: 'edit',
                     child: ListTile(
                       leading: Icon(Icons.edit),
@@ -453,6 +444,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                     ),
                   ),
                 ],
+                offset: Offset(30, 58),
               ),
             ],
           ],
@@ -466,11 +458,8 @@ class _ChatLayoutState extends State<ChatLayout> {
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 5),
-
-
                     child: messages.isNotEmpty
-                        ?
-                    ListView.builder(
+                        ? ListView.builder(
                             controller: scrollController,
                             itemCount: messages.length,
                             itemBuilder: (context, index) {
@@ -493,7 +482,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                                   ? messageData['edited']
                                   : false;
 
-
                               return GestureDetector(
                                 onLongPress: () {
                                   toggleMessageSelection(messageId);
@@ -513,15 +501,24 @@ class _ChatLayoutState extends State<ChatLayout> {
                                   children: [
                                     if (repliedMessage != null)
                                       Container(
-
                                         margin: EdgeInsets.only(
-                                            left: isCurrentUser ? width>600 ? width * 0.05 :width * 0.2
-                                                                : width>600 ? width * 0.01:width * 0.04,
+                                          left: isCurrentUser
+                                              ? width > 600
+                                                  ? width * 0.05
+                                                  : width * 0.2
+                                              : width > 600
+                                                  ? width * 0.01
+                                                  : width * 0.04,
                                           // Adjust left margin for current user
-                                            right: isCurrentUser ? width>600 ? width * 0.01:width * 0.04
-                                                                  : width>600 ? width * 0.05 :width * 0.2,
+                                          right: isCurrentUser
+                                              ? width > 600
+                                                  ? width * 0.01
+                                                  : width * 0.04
+                                              : width > 600
+                                                  ? width * 0.05
+                                                  : width * 0.2,
                                           // Adjust right margin for others
-                                            // vertical: 4,
+                                          // vertical: 4,
                                         ),
                                         padding: const EdgeInsets.all(8),
                                         decoration: BoxDecoration(
@@ -555,43 +552,61 @@ class _ChatLayoutState extends State<ChatLayout> {
                                       ),
 
                                     Container(
-                                      color: selectedMessages.contains(messageId)
-                                          ? Colors.grey.shade300
-                                          : Colors.transparent, // Full-screen background color
+                                      color:
+                                          selectedMessages.contains(messageId)
+                                              ? Colors.grey.shade300
+                                              : Colors.transparent,
+                                      // Full-screen background color
                                       child: Align(
                                         alignment: isCurrentUser
                                             ? Alignment.centerRight
-                                            : Alignment.centerLeft, // Align container to user position
+                                            : Alignment.centerLeft,
+                                        // Align container to user position
                                         child: Container(
-                                          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                          margin: EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 5),
                                           padding: EdgeInsets.all(12),
                                           decoration: BoxDecoration(
                                             color: isCurrentUser
                                                 ? Color(0XFFD5FCD0)
-                                                : Colors.white, // Container-specific color
-                                            borderRadius: BorderRadius.circular(16),
+                                                : Colors
+                                                    .white, // Container-specific color
+                                            borderRadius:
+                                                BorderRadius.circular(16),
                                           ),
                                           constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context).size.width * 0.75, // Max 75% of screen width
+                                            maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.75, // Max 75% of screen width
                                           ),
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
                                               Text(
                                                 messages[index]['message'],
                                                 style: TextStyle(
                                                   fontSize: 15,
-                                                  color: isCurrentUser ? Colors.black : Colors.black,
+                                                  color: isCurrentUser
+                                                      ? Colors.black
+                                                      : Colors.black,
                                                 ),
                                               ),
                                               SizedBox(height: 5),
                                               Row(
-                                                mainAxisSize: MainAxisSize.min, // Width adjusts to content
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                mainAxisSize: MainAxisSize.min,
+                                                // Width adjusts to content
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Text(
                                                     DateFormat.Hm().format(
-                                                      (messages[index]['timestamp'] as Timestamp).toDate(),
+                                                      (messages[index]
+                                                                  ['timestamp']
+                                                              as Timestamp)
+                                                          .toDate(),
                                                     ),
                                                     style: TextStyle(
                                                       fontSize: 9,
@@ -600,9 +615,13 @@ class _ChatLayoutState extends State<ChatLayout> {
                                                   ),
                                                   SizedBox(width: 3),
                                                   Icon(
-                                                    seenStatus ? Icons.done_all : Icons.check,
+                                                    seenStatus
+                                                        ? Icons.done_all
+                                                        : Icons.check,
                                                     size: 16,
-                                                    color: seenStatus ? Colors.blue : Colors.grey,
+                                                    color: seenStatus
+                                                        ? Colors.blue
+                                                        : Colors.grey,
                                                   ),
                                                 ],
                                               ),
@@ -610,16 +629,16 @@ class _ChatLayoutState extends State<ChatLayout> {
                                           ),
                                         ),
                                       ),
-
                                     ),
-
 
                                     SizedBox(height: 1), // Small gap
 
                                     if (x) // Only show for sent messages
                                       Padding(
                                         padding: EdgeInsets.only(
-                                            right: width * 0.03),
+                                            right: width > 600
+                                                ? width * 0.01
+                                                : width * 0.03),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
@@ -709,12 +728,14 @@ class _ChatLayoutState extends State<ChatLayout> {
                             setState(() {
                               messages = [];
                             });
-                            if(message.text.isNotEmpty){
-                            await sendMessage(message.text.trim());}
-                            else{
+                            if (message.text.isNotEmpty) {
+                              await sendMessage(message.text.trim());
+                            } else {
                               final snackbar = SnackBar(
-                                  content: const Text('Not send empty message'));
-                              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                                  content:
+                                      const Text('Not send empty message'));
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackbar);
                               setState(() {
                                 selectedMessages
                                     .clear(); // Clear selected messages after delete
@@ -736,8 +757,6 @@ class _ChatLayoutState extends State<ChatLayout> {
     );
   }
 }
-
-
 
 // container
 /*Container(

@@ -92,7 +92,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
       ),
       actions: [
         Padding(
-          padding:   EdgeInsets.only(right:kIsWeb?width*0.032:0),
+          padding:   EdgeInsets.only(right:kIsWeb?width*0.022:0),
           child: IconButton(
             icon: Icon(Icons.search, color: Colors.black),
             onPressed: () => setState(() => _showSearch = true),

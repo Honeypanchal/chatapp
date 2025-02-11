@@ -1,12 +1,10 @@
-
-
 import 'package:chatapp/Pages/ChatLayout/ChatPage.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/services/auth_services.dart';
 
 import 'package:flutter/material.dart';
 import 'package:chatapp/pages/Authentication/Signup.dart';
-
+import 'package:flutter/foundation.dart' ;
 
 class SigninPage extends StatefulWidget {
   @override
@@ -52,7 +50,7 @@ class _SigninPageState extends State<SigninPage> {
             content: Text(
               e.toString(),
               style:
-              TextStyle(fontWeight: FontWeight.w300, fontFamily: 'poppins'),
+                  TextStyle(fontWeight: FontWeight.w300, fontFamily: 'poppins'),
             ),
             backgroundColor: Colors.red,
           ),
@@ -72,29 +70,25 @@ class _SigninPageState extends State<SigninPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            SizedBox(
+              height: 100,
+            ),
             Image.asset(
               'assets/images/logo.png',
-
-              height: 300,
+              height: kIsWeb ? 150 : 300,
             ),
             Text("Let's Sign In",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: width * 0.08,)),
-            /*Text(
-              'LOGIN',
-              style: TextStyle(
-                fontSize: width * 0.05,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-            ),*/
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: kIsWeb ? width * 0.03 : width * 0.08,
+                )),
             SizedBox(
-              height: height * 0.013,
+              height: height > 600 ? height * 0.018 : height * 0.013,
             ),
             Form(
               key: _formKey,
               child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 8.0, bottom: 10.0, left: 20.0, right: 20.0),
+                padding: kIsWeb? EdgeInsets.only(top: 8.0, bottom: 10.0, left: 250.0, right: 250.0):EdgeInsets.only(top: 8.0, bottom: 10.0, left: 20.0, right: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -103,7 +97,8 @@ class _SigninPageState extends State<SigninPage> {
                       child: Text(
                         'Email Address',
                         style: TextStyle(
-                            fontSize: width * 0.033,
+                            fontSize:
+                                kIsWeb ? width * 0.017 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Poppins'),
                         textAlign: TextAlign.left,
@@ -112,32 +107,22 @@ class _SigninPageState extends State<SigninPage> {
                     SizedBox(
                       height: height * 0.008,
                     ),
-                    /*Text(
-                      'EMAIL',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: width * 0.03,
-                        color: Colors.blueAccent,
-                        fontFamily: 'poppins'
-                      ),
-                    ),*/
                     TextFormField(
-                      style: TextStyle(
-                          color: Colors.black, fontFamily: 'Raleway'),
+                      style:
+                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _emailController,
                       decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.email_outlined),
-                        hintText: 'Email',
-                        focusColor: Color.fromRGBO(21, 171, 97, 1),
-                        hintStyle: TextStyle(color: Colors.grey),
-                        // label: Text('Email'),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
-                        ),
-                        focusedBorder:  OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
-                        )
-                      ),
+                          prefixIcon: Icon(Icons.email_outlined),
+                          hintText: 'Email',
+                          focusColor: Color.fromRGBO(21, 171, 97, 1),
+                          hintStyle: TextStyle(color: Colors.grey),
+                          // label: Text('Email'),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(21, 171, 97, 1))),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(21, 171, 97, 1)))),
                       /*decoration: InputDecoration(
                         labelStyle: TextStyle(
                             fontFamily: 'Raleway',
@@ -160,7 +145,8 @@ class _SigninPageState extends State<SigninPage> {
                       child: Text(
                         'Password',
                         style: TextStyle(
-                            fontSize: width * 0.033,
+                            fontSize:
+                                kIsWeb ? width * 0.017 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -179,20 +165,20 @@ class _SigninPageState extends State<SigninPage> {
                       ),
                     ),*/
                     TextFormField(
-                      style: TextStyle(
-                          color: Colors.black, fontFamily: 'Raleway'),
+                      style:
+                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _passwordController,
                       decoration: InputDecoration(
                         fillColor: Colors.white38,
                         prefixIcon: Icon(Icons.vpn_key_outlined),
                         border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
-                        ),
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(21, 171, 97, 1))),
                         focusColor: Color.fromRGBO(21, 171, 97, 1),
                         hintText: "Password",
-                        focusedBorder:  OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromRGBO(21, 171, 97, 1))
-                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(21, 171, 97, 1))),
                         hintStyle: TextStyle(color: Colors.grey),
                         // helperText: "Password must contain special character",
                         helperStyle: TextStyle(color: Colors.green),
@@ -206,11 +192,11 @@ class _SigninPageState extends State<SigninPage> {
                             },
                             icon: showPass
                                 ? Icon(Icons.visibility_outlined,
-                                color: Colors.grey)
+                                    color: Colors.grey)
                                 : Icon(
-                              Icons.visibility_off_outlined,
-                              color: Colors.black,
-                            )),
+                                    Icons.visibility_off_outlined,
+                                    color: Colors.black,
+                                  )),
                       ),
                       obscureText: !showPass,
                       validator: (value) {
@@ -227,25 +213,31 @@ class _SigninPageState extends State<SigninPage> {
             SizedBox(
               height: height * 0.035,
             ),
-            SizedBox(
-              height: height * 0.070,
-              width: width * 0.9,
-              child: ElevatedButton(
-                onPressed: () {
-                  _signin();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:   Color.fromRGBO(21, 171, 97, 1),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+            Padding(
+              padding: kIsWeb?  EdgeInsets.only(left: 250.0, right: 250.0):EdgeInsets.only(left: 20.0, right: 20.0),
+              child: SizedBox(
+                height: height * 0.070,
+                width: kIsWeb ? width : width * 0.9,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _signin();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromRGBO(21, 171, 97, 1),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: Text(
+                    'Sign In',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: kIsWeb ? width * 0.020 : width * 0.045,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-                child: Text('Sign In',style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  fontSize: width * 0.045,
-                  color: Colors.white,
-                ),),
               ),
             ),
             SizedBox(height: height * 0.013),
@@ -262,7 +254,7 @@ class _SigninPageState extends State<SigninPage> {
                     "Don't have an account? ",
                     style: TextStyle(
                       // fontWeight: FontWeight.w600,
-                      fontSize: width * 0.035,
+                      fontSize: kIsWeb ? width * 0.011 : width * 0.035,
                       color: Colors.grey,
                     ),
                   ),
@@ -270,7 +262,7 @@ class _SigninPageState extends State<SigninPage> {
                     "Sign Up",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: width * 0.032,
+                      fontSize: kIsWeb ? width * 0.013 : width * 0.032,
                       color: Colors.black,
                     ),
                   ),
@@ -283,7 +275,7 @@ class _SigninPageState extends State<SigninPage> {
             Text(
               'FORGOT PASSWORD?',
               style: TextStyle(
-                fontSize: width * 0.030,
+                fontSize: kIsWeb ? width * 0.010 : width * 0.030,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -296,7 +288,6 @@ class _SigninPageState extends State<SigninPage> {
                 color: Colors.grey,
               ),
             ),*/
-
           ],
         ),
       ),

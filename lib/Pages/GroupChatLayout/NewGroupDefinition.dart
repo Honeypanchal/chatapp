@@ -1,4 +1,4 @@
-import 'package:chatapp/Pages/GroupChatLayout/GroupPermissions.dart';
+
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/models/Group.dart';
 import 'package:chatapp/services/users_services.dart';
@@ -71,9 +71,12 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               Navigator.pushNamed(context, "/newGroup",
                   arguments: {'currentUser': widget.createdBy});
             },
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
+            icon: Padding(
+              padding:kIsWeb?EdgeInsets.only(left:width*0.032)  : EdgeInsets.zero,
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+              ),
             )),
         backgroundColor:Colors.white,
       ),
@@ -85,61 +88,50 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Group Name Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Align(
-                      alignment:Alignment.centerLeft,child: CircleAvatar(
-                        radius:kIsWeb?width*0.027: width * 0.066,
-                        backgroundColor:Color.fromRGBO(21, 171, 97, 1),
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: kIsWeb?width*0.02:width*0.06,
-                        ),
-                      ),
-                    ),
-                  ),
-                  if(!kIsWeb)
-                  SizedBox(
-                    width: width * 0.012,
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: TextFormField(
-                      cursorColor: Colors.grey,
-                      controller: _groupName,
-                      decoration: InputDecoration(
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 2.0), // Color when focused
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.grey,
-                                width: 1.0), // Color when not focused
-                          ),
-                          hintText: 'Group Name'),
-                      style: TextStyle(
-                        fontSize:kIsWeb?width*0.02:  width * 0.05,
-                        fontFamily: 'Raleway',
-                        color: Colors.black,
-                      ),
-                      validator: (val) {
-                        if (val!.isEmpty) {
-                          return 'Enter Group Name';
-                        } else {
-                          return null;
-                        }
-                      },
-                    ),
-                  ),
-                ],
+            Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center, // Align items properly
+            children: [
+              CircleAvatar(
+                radius: kIsWeb ? width * 0.027 : width * 0.066,
+                backgroundColor: Color.fromRGBO(21, 171, 97, 1),
+                child: Icon(
+                  Icons.camera_alt,
+                  color: Colors.white,
+                  size: kIsWeb ? width * 0.02 : width * 0.06,
+                ),
               ),
+             SizedBox(width: width * 0.012), // Add spacing only on mobile
+              Expanded(
+                child: TextFormField(
+                  cursorColor: Colors.grey,
+                  controller: _groupName,
+                  decoration: InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey, width: 2.0),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                    ),
+                    hintText: 'Group Name',
+                  ),
+                  style: TextStyle(
+                    fontSize: kIsWeb ? width * 0.02 : width * 0.05,
+                    fontFamily: 'Raleway',
+                    color: Colors.black,
+                  ),
+                  validator: (val) {
+                    if (val!.isEmpty) {
+                      return 'Enter Group Name';
+                    } else {
+                      return null;
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+
               SizedBox(height: kIsWeb?height*0.03:  height * 0.02),
               Divider(
                 height: height * 0.012,
@@ -152,7 +144,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               // Permissions Section
               Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.032, vertical: height * 0.012),
+                    horizontal:kIsWeb? width*0.012:   width * 0.032, vertical: height * 0.012),
                 child: Container(
                   width: width,
                   decoration: BoxDecoration(
@@ -180,7 +172,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.timer,
                                 color: Colors.grey,
-                                size:kIsWeb?width*0.03:  width * 0.06,
+                                size:kIsWeb?width*0.025:  width * 0.06,
                               ))
                         ],
                       ),
@@ -231,7 +223,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.settings,
                                 color: Colors.grey,
-                                size:kIsWeb?width*0.03: width * 0.06,
+                                size:kIsWeb?width*0.025: width * 0.06,
                               ))
                         ],
                       ),
@@ -248,7 +240,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
               // Member Count Section
               Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.032, vertical: height * 0.012),
+                    horizontal:kIsWeb?width*0.012:   width * 0.032, vertical: height * 0.012),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -277,7 +269,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           CircleAvatar(
 
                             backgroundColor:Color.fromRGBO(207, 214, 220, 1),
-                            radius: kIsWeb?width*0.05 :  width * 0.1,
+                            radius: kIsWeb?width*0.027 :  width * 0.1,
                             child: Icon(
                               Icons.person,
                               color: Colors.white,
