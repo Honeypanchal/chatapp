@@ -564,7 +564,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                       arguments: {'currentUser': user});
                 },
                 icon: Icon(
-                  Icons.arrow_back,
+                  Icons.arrow_back_ios,
                   color: Colors.black,
                 )),
             title: selectedMessages.isNotEmpty
@@ -574,6 +574,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                 ? TextField(
               autofocus: true,
               decoration: InputDecoration(
+                  focusColor: Colors.green,
+
                   hintText: "Search messages",
                   hintStyle: TextStyle(color: Colors.black)),
               onChanged: (query) =>
@@ -598,6 +600,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                 ),
                 // Display 3 dots when messages are selected
                 PopupMenuButton<String>(
+                  color: Colors.white,
                   icon: Icon(Icons.more_vert, color: Colors.black),
                   onSelected: (value) async {
                     String messageId = selectedMessages.first; // Using the first selected message as an example
@@ -618,6 +621,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   },
                   itemBuilder: (context) => [
                     PopupMenuItem(
+
                       value: 'reply',
                       child: ListTile(
                         leading: Icon(Icons.reply),
@@ -785,6 +789,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                       },
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                        margin: EdgeInsets.only(left:5,right:5),
                                         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                         decoration: BoxDecoration(
                                           color: isSelected ? Colors.grey[300] : Colors.transparent,
@@ -801,6 +806,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                                 : IntrinsicWidth(
                                               child: Container(
                                                 padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+
+                                                margin: EdgeInsets.only(left:5,right:5),
                                                 decoration: BoxDecoration(
                                                   color: isMe ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
                                                   borderRadius: BorderRadius.circular(10),
@@ -944,6 +951,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                               controller: _messageController,
                               decoration: InputDecoration(
                                 hintText: "Type a message",
+                                focusColor: Colors.green,
+
                                 border: InputBorder.none,
                               ),
                             ),
@@ -1048,7 +1057,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
         return Align(
           alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
-            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             padding: EdgeInsets.all(12),
             width: MediaQuery.of(context).size.width * 0.75,
             decoration: BoxDecoration(
@@ -1281,9 +1290,12 @@ class _CreatePollPageState extends State<CreatePollPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
+
               controller: questionController,
               style: TextStyle(color: Colors.black, fontSize: 14),
               decoration: InputDecoration(
+                focusColor: Colors.green,
+
                 hintText: "Ask a question...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 filled: true,
@@ -1311,6 +1323,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
                         hintStyle: TextStyle(color: Colors.grey.shade600),
                         filled: true,
                         fillColor: Colors.grey.shade100,
+                        focusColor: Colors.green,
+
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
