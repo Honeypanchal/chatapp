@@ -1146,6 +1146,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     );
                   },
                 ),
+
                 Align(
                   alignment: Alignment.bottomRight,  // Align timestamp to the bottom right
                   child: Padding(
