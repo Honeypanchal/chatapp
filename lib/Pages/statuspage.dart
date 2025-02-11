@@ -97,7 +97,6 @@ class _StatusPageState extends State<StatusPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Text(
@@ -106,11 +105,12 @@ class _StatusPageState extends State<StatusPage> {
             color: Colors.black,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w500,
-            fontSize: MediaQuery.of(context).size.width > 600 ? width * 0.02: width * 0.06,
+            fontSize: MediaQuery.of(context).size.width > 600
+                ? width * 0.02
+                : width * 0.06,
           ),
         ),
-        ),
-
+      ),
       body: StreamBuilder<List<Status>>(
         stream: _statusService.getStatuses(),
         builder: (context, snapshot) {
@@ -151,44 +151,43 @@ class _StatusPageState extends State<StatusPage> {
             children: [
               if (notSeenStatuses.isNotEmpty) ...[
                 Padding(
-                  padding:
-                  EdgeInsets.only(
-
-                    left: MediaQuery.of(context).size.width > 600 ? width * 0.01 : width * 0.06,
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width > 600
+                        ? width * 0.01
+                        : width * 0.06,
                   ),
-
                   child: Text(
                     "Recently Added",
                     style: TextStyle(
                       fontSize: width > 600 ? width * 0.01 : width * 0.05,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey,
+                      color: Colors.black,
                     ),
                   ),
                 ),
                 _buildStatusCategory("", notSeenStatuses, false),
               ] else
                 SizedBox.shrink(),
-
               if (seenStatuses.isNotEmpty) ...[
                 Padding(
-                  padding:
-                  EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width > 600 ? width * 0.01 : width * 0.06,
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width > 600
+                        ? width * 0.01
+                        : width * 0.06,
                   ),
                   child: Text(
                     "Viewed Status",
                     style: TextStyle(
                       fontSize: width > 600 ? width * 0.01 : width * 0.05,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey,
+                      color: Colors.black,
                     ),
                   ),
                 ),
                 _buildStatusCategory("", seenStatuses, true),
               ] else
                 SizedBox.shrink(),
-              ],
+            ],
           );
         },
       ),
@@ -199,7 +198,7 @@ class _StatusPageState extends State<StatusPage> {
             MaterialPageRoute(builder: (context) => const EnterStatus()),
           );
         },
-          backgroundColor: Color.fromRGBO(21, 171, 97, 1),
+        backgroundColor: Color.fromRGBO(21, 171, 97, 1),
         // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         child: Icon(
           Icons.add,
@@ -221,14 +220,11 @@ class _StatusPageState extends State<StatusPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-
-          padding: const EdgeInsets.only(
-              left: 8, right: 8),
+          padding: const EdgeInsets.only(left: 8, right: 8),
           child: Text(title,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         ),
         ListView.builder(
-
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: groupedStatuses.keys.length,
@@ -242,8 +238,6 @@ class _StatusPageState extends State<StatusPage> {
                 isMyStatus ? "My Status" : userStatus[0].username;
 
             return ListTile(
-
-
               leading: Container(
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -251,11 +245,10 @@ class _StatusPageState extends State<StatusPage> {
                         color: isSeen ? Colors.grey : Colors.green.shade600,
                         width: 2)),
                 child: CircleAvatar(
-                  backgroundColor:Color.fromARGB(255,232,244,234),
+                  backgroundColor: Color.fromARGB(255, 232, 244, 234),
                   child: Text(
                     userStatus[0].username[0].toUpperCase(),
                     style: TextStyle(color: Colors.green.shade800),
-
                   ),
                 ),
               ),
@@ -289,7 +282,7 @@ class _StatusPageState extends State<StatusPage> {
                   MaterialPageRoute(
                     builder: (context) => ViewStatusScreen(
                       statuses: userStatus,
-                     ),
+                    ),
                   ),
                 );
                 setState(() {});
@@ -345,18 +338,18 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        final width=MediaQuery.sizeOf(context).width;
-        final height=MediaQuery.sizeOf(context).height;
+        final width = MediaQuery.sizeOf(context).width;
+        final height = MediaQuery.sizeOf(context).height;
         return Container(
           width: double.infinity,
           height: MediaQuery.of(context).size.height * 0.3,
-            padding: EdgeInsets.only(
-              top: height*0.03,
-              left:MediaQuery.sizeOf(context).width>600 ? width*0.02:width*0.06,
-              right: MediaQuery.sizeOf(context).width * 0.06,
-            ),
-
-
+          padding: EdgeInsets.only(
+            top: height * 0.03,
+            left: MediaQuery.sizeOf(context).width > 600
+                ? width * 0.02
+                : width * 0.06,
+            right: MediaQuery.sizeOf(context).width * 0.06,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -366,7 +359,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     fontSize: width > 600 ? width * 0.01 : width * 0.03,
                     fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: MediaQuery.sizeOf(context).height*0.02),
+              SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
               status.statusReplies.isEmpty
                   ? Center(child: Text("No replies yet..."))
                   : Expanded(
@@ -381,14 +374,14 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                           return ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: CircleAvatar(
-                              backgroundColor:Color.fromARGB(255,232,244,234),
+                              backgroundColor:
+                                  Color.fromARGB(255, 232, 244, 234),
                               child: Text(
                                 replyBy[0].toUpperCase(),
                                 style: TextStyle(
-                                  color: Colors.green.shade800,
-                                  fontFamily: 'poppins',
-                                  fontWeight: FontWeight.w700
-                                ),
+                                    color: Colors.green.shade800,
+                                    fontFamily: 'poppins',
+                                    fontWeight: FontWeight.w700),
                               ),
                             ),
                             title: Text(
@@ -496,35 +489,31 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     child: Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,
-                      size: width > 600 ? width *0.02 : width*0.06,
+                      size: width > 600 ? width * 0.02 : width * 0.06,
                     ),
                     onTap: () {
                       Navigator.pop(context);
                     },
                   ),
-                  SizedBox(
-                    width: width>600 ? width*0.006 : width*0.01
-                  ),
+                  SizedBox(width: width > 600 ? width * 0.006 : width * 0.01),
                   Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                     ),
                     child: CircleAvatar(
                       backgroundColor: Colors.black26,
-                      radius: width>600 ?  width*0.018 : width*0.04,
+                      radius: width > 600 ? width * 0.018 : width * 0.04,
                       child: Text(
                         widget.statuses[0].username[0].toUpperCase(),
                         style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'poppins',
-                            fontSize: width>600 ? width*0.02: width*0.04 ),
-
+                            fontSize:
+                                width > 600 ? width * 0.02 : width * 0.04),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width:width> 600 ? width*0.015 : width*0.03
-                  ),
+                  SizedBox(width: width > 600 ? width * 0.015 : width * 0.03),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
@@ -535,16 +524,18 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                           style: TextStyle(
                               color: Colors.white,
                               fontFamily: 'poppins',
-                              fontSize: width>600 ? width*0.015: width*0.035,
+                              fontSize:
+                                  width > 600 ? width * 0.015 : width * 0.035,
                               fontWeight: FontWeight.w500),
                         ),
-
                         Text(
                           DateFormat("HH:mm")
                               .format(widget.statuses[0].timestamp.toDate()),
                           style: TextStyle(
-                              color: Colors.white,
-                            fontSize: width>600 ? width*0.015: width*0.03,),
+                            color: Colors.white,
+                            fontSize:
+                                width > 600 ? width * 0.015 : width * 0.03,
+                          ),
                         ),
                       ],
                     ),
@@ -553,43 +544,55 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                   if (widget.statuses[currentIndex].userId ==
                       FirebaseAuth.instance.currentUser!.uid)
                     Container(
-                       height: width>600 ? height*0.05: height*0.05,
-                      width: width>600 ? height*0.05: height*0.05,
-
+                      height: width > 600 ? height * 0.05 : height * 0.05,
+                      width: width > 600 ? height * 0.05 : height * 0.05,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle, color: Colors.black26),
                       child: IconButton(
-                          onPressed: ()
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    content: Text(
+                                      'Are you sure you want to delete status?',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                      fontSize: width>600? width*0.017 : width*0.05),
+                                    ),
+                                    actions: [Column(
+                                      children: [
 
-                        {
-                          showDialog(context: context,
-                              builder: (context){
-                            return AlertDialog(
-                              title: Text('Delete Status',textAlign: TextAlign.center,),
-                              content:Text('Are your sure to delete status?',textAlign: TextAlign.center,),
-                              actions: [TextButton(onPressed: (){
-                                Navigator.pop(context);
-                              },
-                                  child:Text('cancel',style: TextStyle(color: Colors.grey),
-                                  ),
-                              ),
-                              TextButton(onPressed: ()async{
-                                await _statusService.deleteStatus(widget.statuses[currentIndex].uid);
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-
-
-                              },
-                                  child: Text('Delete',style: TextStyle(color: Colors.red),))],
-
-                            );
-                              });
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          'cancel',
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ),
+                                      TextButton(
+                                          onPressed: () async {
+                                            await _statusService.deleteStatus(
+                                                widget.statuses[currentIndex]
+                                                    .uid);
+                                            Navigator.pop(context);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            'Delete',
+                                            style: TextStyle(color: Colors.red),
+                                          ))
+                                    ],)]
+                                  );
+                                });
                           },
-
                           icon: Icon(
                             Icons.delete,
                             color: Colors.red,
-                            size: width> 600 ? width*0.012:width*0.04,
+                            size: width > 600 ? width * 0.012 : width * 0.04,
                           )),
                     ),
                 ],
@@ -761,18 +764,18 @@ class _EnterStatusState extends State<EnterStatus> {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal:width>600 ? width*0.02:width*0.02,
+                horizontal: width > 600 ? width * 0.02 : width * 0.06,
                 vertical: height * 0.02,
               ),
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       Navigator.pop(context);
                     },
                     child: Container(
                       height: height * 0.15,
-                      width: width > 600 ? width*0.035 : width*0.1,
+                      width: width > 600 ? width * 0.035 : width * 0.12,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         shape: BoxShape.circle,
@@ -780,17 +783,16 @@ class _EnterStatusState extends State<EnterStatus> {
                       child: Icon(
                         Icons.close,
                         color: Colors.white,
-                        size: width>600 ? width*0.02 : width*0.065,
+                        size: width > 600 ? width * 0.02 : width * 0.07,
                       ),
                     ),
                   ),
-
                   Spacer(),
                   GestureDetector(
                     onTap: _changeTextStyle,
                     child: Container(
                       height: height * 0.15,
-                      width: width > 600 ? width*0.035 : width*0.1,
+                      width: width > 600 ? width * 0.035 : width * 0.12,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         shape: BoxShape.circle,
@@ -798,7 +800,7 @@ class _EnterStatusState extends State<EnterStatus> {
                       child: Icon(
                         Icons.text_fields_rounded,
                         color: Colors.white,
-                        size: width>600 ? width*0.02 : width*0.065,
+                        size: width > 600 ? width * 0.02 : width * 0.07,
                       ),
                     ),
                   ),
@@ -809,7 +811,7 @@ class _EnterStatusState extends State<EnterStatus> {
                     onTap: _changeColor,
                     child: Container(
                       height: height * 0.15,
-                      width: width > 600 ? width*0.035 : width*0.1,
+                      width: width > 600 ? width * 0.035 : width * 0.12,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         shape: BoxShape.circle,
@@ -817,7 +819,7 @@ class _EnterStatusState extends State<EnterStatus> {
                       child: Icon(
                         Icons.color_lens_sharp,
                         color: Colors.white,
-                        size: width>600 ? width*0.02 : width*0.065,
+                        size: width > 600 ? width * 0.02 : width * 0.07,
                       ),
                     ),
                   ),
@@ -844,15 +846,14 @@ class _EnterStatusState extends State<EnterStatus> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.small(
-
+      floatingActionButton: FloatingActionButton(
         onPressed: _uploadTextStatus,
         backgroundColor: Colors.black26,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         child: Icon(
           Icons.send,
           color: Colors.white,
-          size: width>600 ? width*0.015 : width*0.05,
+          size: width > 600 ? width * 0.015 : width * 0.05,
         ),
       ),
     );
