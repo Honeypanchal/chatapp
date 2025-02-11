@@ -515,8 +515,12 @@ class _ChatLayoutState extends State<ChatLayout> {
                                       Container(
 
                                         margin: EdgeInsets.only(
-                                            left: isCurrentUser ? width * 0.2 : width * 0.04, // Adjust left margin for current user
-                                            right: isCurrentUser ? width * 0.04 : width * 0.2, // Adjust right margin for others
+                                            left: isCurrentUser ? width>600 ? width * 0.05 :width * 0.2
+                                                                : width>600 ? width * 0.01:width * 0.04,
+                                          // Adjust left margin for current user
+                                            right: isCurrentUser ? width>600 ? width * 0.01:width * 0.04
+                                                                  : width>600 ? width * 0.05 :width * 0.2,
+                                          // Adjust right margin for others
                                             // vertical: 4,
                                         ),
                                         padding: const EdgeInsets.all(8),
@@ -550,71 +554,65 @@ class _ChatLayoutState extends State<ChatLayout> {
                                         ),
                                       ),
 
-
                                     Container(
-                                      margin: EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 5),
-                                      padding: EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: isCurrentUser
-                                            ? Color(0XFFD5FCD0)
-                                            : Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      constraints: BoxConstraints(
-                                        maxWidth:
-                                            MediaQuery.of(context).size.width *
-                                                0.75, // Max 75% of screen width
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            messages[index]['message'],
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: isCurrentUser
-                                                  ? Colors.black
-                                                  : Colors.black,
-                                            ),
+                                      color: selectedMessages.contains(messageId)
+                                          ? Colors.grey.shade300
+                                          : Colors.transparent, // Full-screen background color
+                                      child: Align(
+                                        alignment: isCurrentUser
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft, // Align container to user position
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                          padding: EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: isCurrentUser
+                                                ? Color(0XFFD5FCD0)
+                                                : Colors.white, // Container-specific color
+                                            borderRadius: BorderRadius.circular(16),
                                           ),
-                                          SizedBox(height: 5),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            // Width adjusts to content
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                          constraints: BoxConstraints(
+                                            maxWidth: MediaQuery.of(context).size.width * 0.75, // Max 75% of screen width
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.end,
                                             children: [
                                               Text(
-                                                DateFormat.Hm().format(
-                                                  (messages[index]['timestamp']
-                                                          as Timestamp)
-                                                      .toDate(),
-                                                ),
+                                                messages[index]['message'],
                                                 style: TextStyle(
-                                                    fontSize: 9,
-                                                    color: isCurrentUser
-                                                        ? Colors.grey
-                                                        : Colors.grey),
+                                                  fontSize: 15,
+                                                  color: isCurrentUser ? Colors.black : Colors.black,
+                                                ),
                                               ),
-                                              SizedBox(
-                                                width: 3,
-                                              ),
-                                              Icon(
-                                                seenStatus
-                                                    ? Icons.done_all
-                                                    : Icons.check,
-                                                size: 16,
-                                                color: seenStatus
-                                                    ? Colors.blue
-                                                    : Colors.grey,
+                                              SizedBox(height: 5),
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min, // Width adjusts to content
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    DateFormat.Hm().format(
+                                                      (messages[index]['timestamp'] as Timestamp).toDate(),
+                                                    ),
+                                                    style: TextStyle(
+                                                      fontSize: 9,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 3),
+                                                  Icon(
+                                                    seenStatus ? Icons.done_all : Icons.check,
+                                                    size: 16,
+                                                    color: seenStatus ? Colors.blue : Colors.grey,
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
-                                        ],
+                                        ),
                                       ),
+
                                     ),
+
 
                                     SizedBox(height: 1), // Small gap
 
@@ -693,7 +691,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                     child: Row(
                       children: [
                         GestureDetector(
-                          child: Icon(Icons.poll, color: Colors.grey),
+                          child: Icon(Icons.camera_alt, color: Colors.grey),
                         ),
                         SizedBox(width: 10),
                         Expanded(

@@ -1,11 +1,7 @@
 import 'dart:async';
 
-import 'package:chatapp/Pages/GroupChatLayout/GroupChatPage.dart';
-
-import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
 import 'package:chatapp/models/CustomClass.dart';
 
-import 'package:chatapp/pages/GroupChatLayout/AddNewMembersToGroup.dart';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,7 +10,7 @@ import 'package:chatapp/services/users_services.dart';
 import 'package:chatapp/services/groupChat_services.dart';
 
 import '../../services/auth_services.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 class GroupDescription extends StatefulWidget {
   final String groupId;
   final String currentUser;
@@ -240,9 +236,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
             children: [
               Text(
                 "Group Description",
-                style: TextStyle(fontSize: screenWidth * 0.05),
+                style: TextStyle(fontSize:kIsWeb?screenWidth*0.02:  screenWidth * 0.05),
               ),
-              SizedBox(height: screenHeight * 0.015),
+              SizedBox(height:kIsWeb?screenHeight*0.009:  screenHeight * 0.015),
               TextFormField(
                 cursorColor: Colors.grey,
                 controller: descriptionController,
@@ -262,7 +258,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
               SizedBox(height: screenHeight * 0.02),
               Text(
                 "The group description is visible to members of this group and people invited to this group.",
-                style: TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+                style: TextStyle(fontSize:kIsWeb?screenWidth*0.01:  screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
               Column(
@@ -342,9 +338,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
             children: [
               Text(
                 "Group Name",
-                style: TextStyle(fontSize: screenWidth * 0.05),
+                style: TextStyle(fontSize: kIsWeb?screenWidth*0.02: screenWidth * 0.05),
               ),
-              SizedBox(height: screenHeight * 0.015),
+              SizedBox(height:kIsWeb?screenHeight*0.009:  screenHeight * 0.015),
               TextFormField(
                 cursorColor: Colors.grey,
                 controller: groupName,
@@ -365,7 +361,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
               Text(
                 "The group Name is visible to members of this group and people invited to this group.",
                 style:
-                    TextStyle(fontSize: screenWidth * 0.04, color: Colors.grey),
+                    TextStyle(fontSize: kIsWeb?screenWidth*0.01: screenWidth * 0.04, color: Colors.grey),
               ),
               Spacer(),
               Column(mainAxisSize: MainAxisSize.min,
@@ -500,7 +496,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
 
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("You are not an admin of this group.",
+                    content: Text("You are not the admin of this group.",
                         style: TextStyle(
                             color: Colors.white, fontFamily: 'Raleway')),
                     backgroundColor: Colors.red.shade200,
@@ -509,7 +505,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
               } else if (value == 1) {
                 if (!isCurrentUserAdmin(widget.currentUser)) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("You are not an admin",
+                    content: Text("You are not the admin",
                         style: TextStyle(
                             color: Colors.white, fontFamily: 'Raleway')),
                     backgroundColor: Colors.red.shade200,
@@ -527,16 +523,16 @@ class _GroupDescriptionState extends State<GroupDescription> {
           children: [
             Center(
               child: CircleAvatar(
-                radius: width * 0.13,
+                radius: kIsWeb?width*0.05: width * 0.13,
                 backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                 child:
-                    Icon(Icons.group, color: Colors.white, size: width * 0.09),
+                    Icon(Icons.group, color: Colors.white, size:kIsWeb?width*0.04: width * 0.09),
               ),
             ),
             SizedBox(height: height * 0.012),
-            Text(group['groupName'], style: TextStyle(fontSize: width * 0.055)),
+            Text(group['groupName'], style: TextStyle(fontSize: kIsWeb?width*0.02: width * 0.055)),
             Text('Group · ${group['participants'].length} members',
-                style: TextStyle(color: Colors.grey, fontSize: width * 0.042)),
+                style: TextStyle(color: Colors.grey, fontSize: kIsWeb?width*0.02:width * 0.042)),
             SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -559,7 +555,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text("You are not an admin of this group.",
+                          content: Text("You are not the admin of this group.",
                               style: TextStyle(
                                   color: Colors.white, fontFamily: 'Raleway')),
                           backgroundColor: Colors.red.shade200,
@@ -589,7 +585,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       onTap: () async {
                         if (!isCurrentUserAdmin(widget.currentUser)) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("You are not an admin",
+                            content: Text("You are not the admin",
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontFamily: 'Raleway')),
@@ -622,7 +618,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         groupDescription,
                         style: TextStyle(
-                            color: Color.fromRGBO(21, 171, 97, 1), fontSize: width * 0.037),
+                            color: Color.fromRGBO(21, 171, 97, 1), fontSize:kIsWeb?width*0.02: width * 0.037),
                       ),
                     ),
                     SizedBox(height: height * 0.005),
@@ -641,40 +637,40 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.notifications_none,
-                size: width * 0.06,
+                size: kIsWeb? width*0.02: width * 0.06,
               ),
               title: Text(
                 'Notifications',
-                style: TextStyle(fontSize: width * 0.045),
+                style: TextStyle(fontSize:kIsWeb?width*0.017:  width * 0.045),
               ),
               trailing: Icon(
                 Icons.chevron_right,
-                size: width * 0.07,
+                size: kIsWeb? width*0.02: width * 0.07,
               ),
             ),
             ListTile(
               leading: Icon(
                 Icons.image_outlined,
-                size: width * 0.06,
+                size: kIsWeb? width*0.02: width * 0.06,
               ),
               title: Text('Media visibility',
-                  style: TextStyle(fontSize: width * 0.045)),
+                  style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045)),
               trailing: Icon(
                 Icons.chevron_right,
-                size: width * 0.07,
+                size:kIsWeb? width*0.02:  width * 0.07,
               ),
             ),
             ListTile(
               leading: Icon(
                 Icons.star_border,
-                size: width * 0.06,
+                size: kIsWeb? width*0.02: width * 0.06,
                 color: Colors.black,
               ),
               title: Text(
                 'Starred Messages',
-                style: TextStyle(fontSize: width * 0.045),
+                style: TextStyle(fontSize:kIsWeb?width*0.017: width * 0.045),
               ),
-              trailing: Icon(Icons.arrow_forward_ios, size: width * 0.04, color: Colors.black),
+              trailing: Icon(Icons.arrow_forward_ios, size: kIsWeb? width*0.016: width * 0.04, color: Colors.black),
               onTap: () {
                 Navigator.push(
                   context,
@@ -692,7 +688,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.lock_outline,
-                size: width * 0.06,
+                size:kIsWeb?width*0.02:  width * 0.06,
               ),
               title: Padding(
                 padding: EdgeInsets.symmetric(horizontal: width * 0.012),
@@ -702,14 +698,14 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   children: [
                     Text(
                       'Encryption',
-                      style: TextStyle(fontSize: width * 0.045),
+                      style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045),
                     ),
                     Container(
                         width: width * 0.6,
                         child: Text(
                             "Messages and calls are end-to-end encrypted.",
                             style: TextStyle(
-                                fontSize: width * 0.035, color: Colors.grey)))
+                                fontSize: kIsWeb?width*0.014:width * 0.035, color: Colors.grey)))
                   ],
                 ),
               ),
@@ -717,7 +713,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.timer_outlined,
-                size: width * 0.06,
+                size: kIsWeb?width*0.02:width * 0.06,
               ),
               title: Padding(
                 padding: EdgeInsets.symmetric(horizontal: width * 0.012),
@@ -726,10 +722,10 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Disappearing messages',
-                        style: TextStyle(fontSize: width * 0.045)),
+                        style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045)),
                     Text("off",
                         style: TextStyle(
-                            fontSize: width * 0.035, color: Colors.grey))
+                            fontSize:kIsWeb?width*0.014: width * 0.035, color: Colors.grey))
                   ],
                 ),
               ),
@@ -737,7 +733,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.mail_lock_outlined,
-                size: width * 0.06,
+                size:kIsWeb?width*0.02: width * 0.06,
               ),
               title: Padding(
                 padding: EdgeInsets.symmetric(horizontal: width * 0.012),
@@ -746,15 +742,15 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Chat lock',
-                        style: TextStyle(fontSize: width * 0.045)),
+                        style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045)),
                     Text("Lock and hide this chat on this device",
                         style: TextStyle(
-                            fontSize: width * 0.035, color: Colors.grey))
+                            fontSize: kIsWeb?width*0.014:width * 0.035, color: Colors.grey))
                   ],
                 ),
               ),
               trailing: Transform.scale(
-                  scale: width * 0.002,
+                  scale: kIsWeb?width*0.0004:  width * 0.002,
                   child: Switch(
                     value: false,
                     onChanged: (val) {},
@@ -800,11 +796,11 @@ class _GroupDescriptionState extends State<GroupDescription> {
 
                       for (String members in group['participants']) {
                         if (admins.contains(members)) {
-                          print('$members is an admin');
+                          print('$members is the admin');
                           updateAdminStatusForCurrentUser(
                               members, group['groupId'], true);
                         } else {
-                          print('$members is  not an admin');
+                          print('$members is  not the admin');
                           updateAdminStatusForCurrentUser(
                               members, group['groupId'], false);
                         }
@@ -817,12 +813,12 @@ class _GroupDescriptionState extends State<GroupDescription> {
                 },
                 leading: Icon(
                   Icons.settings,
-                  size: width * 0.06,
+                  size: kIsWeb?width*0.02:  width * 0.06,
                 ),
                 title: Padding(
                   padding: EdgeInsets.symmetric(horizontal: width * 0.012),
                   child: Text('Group permissions',
-                      style: TextStyle(fontSize: width * 0.045)),
+                      style: TextStyle(fontSize:kIsWeb?width*0.017:  width * 0.045)),
                 ),
               )
             ],
@@ -842,7 +838,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                     children: [
                       Text(
                         "${group['participants'].length} members ",
-                        style: TextStyle(fontSize: width * 0.042),
+                        style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.042),
                       ),
                       Spacer(),
                       // Padding(
@@ -862,7 +858,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                     child: Column(
                       children: [
                         ListTile(
-                          //Adding new members to the group after checking if the user is an admin and the permissions
+                          //Adding new members to the group after checking if the user is the admin and the permissions
                           onTap: () {
                             print('$addOtherMembers');
                             if (addOtherMembers ||
@@ -878,7 +874,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(SnackBar(
                                 content: Text(
-                                    "You are not an admin of this group.",
+                                    "You are not the admin of this group.",
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontFamily: 'Raleway')),
@@ -892,22 +888,24 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
-                                size: width * 0.052,
+                                size: kIsWeb?width*0.02:width * 0.052,
                               )),
                           title: Text(
                             "Add members",
-                            style: TextStyle(fontSize: width * 0.045),
+                            style: TextStyle(fontSize:kIsWeb?width*0.017:  width * 0.045),
                           ),
                         ),
                         if (isLoading || isLoadingDatabse)
-                          CircularProgressIndicator(color: Colors.grey,)
+                          CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,)
                         else ...[
                           ListView.builder(
+                           
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
                             itemCount: group['participants'].length,
                             itemBuilder: (context, index) {
                               return ListTile(
+
                                 onLongPress: () {
                                   if(widget.currentUser==group['participants'][index]) {
 
@@ -1006,13 +1004,13 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                                 color: Color.fromRGBO(217,252,210,1)),
                                             borderRadius: BorderRadius.circular(
                                                 width * 0.01)),
-                                        width: width * 0.12,
+                                        width: kIsWeb?width*0.05:  width * 0.12,
                                         height: height * 0.017,
                                         child: Center(
                                           child: Text(
                                             "Admin",
                                             style: TextStyle(
-                                                fontSize: width * 0.027,
+                                                fontSize:kIsWeb?width*0.0055:  width * 0.027,
                                                 color: Color.fromRGBO(34, 89, 49, 1)),
                                           ),
                                         ),
@@ -1036,20 +1034,20 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.favorite_outline,
-                size: width * 0.06,
+                size:kIsWeb?width*0.02:  width * 0.06,
               ),
               title: Text(
                 'Add to Favourites',
-                style: TextStyle(fontSize: width * 0.045),
+                style: TextStyle(fontSize: kIsWeb?width*0.017: width * 0.045),
               ),
             ),
             ListTile(
               leading: Icon(
                 Icons.people_outline,
-                size: width * 0.06,
+                size: kIsWeb?width*0.02:width * 0.06,
               ),
               title: Text('Add to list',
-                  style: TextStyle(fontSize: width * 0.045)),
+                  style: TextStyle(fontSize: kIsWeb?width*0.017: width * 0.045)),
             ),
             ListTile(
               onTap: () {
@@ -1057,20 +1055,20 @@ class _GroupDescriptionState extends State<GroupDescription> {
               },
               leading: Icon(
                 Icons.exit_to_app,
-                size: width * 0.06,
+                size: kIsWeb?width*0.02:width * 0.06,
                 color: Colors.red,
               ),
               title: Text('Exit group',
-                  style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
+                  style: TextStyle(color: Colors.red, fontSize: kIsWeb?width*0.017: width * 0.045)),
             ),
             ListTile(
               leading: Icon(
                 Icons.thumb_down_alt_outlined,
-                size: width * 0.06,
+                size: kIsWeb?width*0.02:width * 0.06,
                 color: Colors.red,
               ),
               title: Text('Report group',
-                  style: TextStyle(color: Colors.red, fontSize: width * 0.045)),
+                  style: TextStyle(color: Colors.red, fontSize: kIsWeb?width*0.017: width * 0.045)),
             ),
           ],
         ),
@@ -1131,7 +1129,7 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,));
           }
 
           if (snapshot.hasError) {

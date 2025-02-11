@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/groupChat_services.dart';
 import '../../services/users_services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AddNewMembersToGroup extends StatefulWidget {
   final List<String> existingMembers;
@@ -91,16 +92,16 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
               children: [
                 Text(
                     "Add Members",
-                    style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: width*0.043),
+                    style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: kIsWeb ? width * 0.01 : width*0.043),
                   ),
                 Text(
                   "${newMembers.length} new members added ",
-                  style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: width*0.032),
+                  style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: kIsWeb ? width * 0.01 :  width*0.032),
                 ),
               ],
             ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black,),
           onPressed: () {
             if (_isSearching) {
               setState(() {
@@ -133,7 +134,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: height * 0.012, horizontal: width * 0.012),
               child: SizedBox(
-                height: height*0.1, // Ensure enough height for ListView
+                height:kIsWeb?height*0.16:  height*0.1, // Ensure enough height for ListView
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: newMembers.length,
@@ -151,7 +152,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                         ),
                       ),
                             child: CircleAvatar(
-                              radius: width * 0.07,
+                              radius:  kIsWeb?width*0.022:width * 0.07,
                               backgroundColor: Colors.white,
                               child: Text(
                               newMembersName[index][0].toUpperCase(),
@@ -180,76 +181,81 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
               child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
                 stream: fetchUsers(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData)
-                    return Center(child: CircularProgressIndicator());
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,));
+                  }
         
                   var users = snapshot.data!;
                   if (users.isEmpty) return Center(child: Text("No users found"));
         
                   return ListView.builder(
+                    padding: kIsWeb?EdgeInsets.symmetric(vertical: height*0.012):EdgeInsets.zero,
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: users.length,
                     itemBuilder: (context, index) {
                       var user = users[index];
-                      return ListTile(
-                        leading:Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                        decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                          border: Border.all(
-                            color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
-                            width: width*0.002, // Set the border width
-                          ),
-                        ),
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: width * 0.05,
-                                child: Text(
-                                 user['firstName'][0].toUpperCase(),
-                                  style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
-                                ),
-                              ),
+                      return Padding(
+                        padding: kIsWeb? EdgeInsets.symmetric(vertical: height*0.004):EdgeInsets.zero,
+                        child: ListTile(
+                          leading:Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                          decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                            border: Border.all(
+                              color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
+                              width: kIsWeb? width*0.001: width*0.002, // Set the border width
                             ),
-                            if (newMembers.contains(user['uid']))
-                              Positioned(
-                                right: -2,
-                                bottom: -2,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                  ),
-                                  child: Icon(
-                                    Icons.check_circle,
-                                    size: width * 0.035,
-                                    color: Color.fromRGBO(21, 171, 97, 1),
+                          ),
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: width * 0.05,
+                                  child: Text(
+                                   user['firstName'][0].toUpperCase(),
+                                    style: TextStyle(color: Color.fromRGBO(21, 171, 97, 1)),
                                   ),
                                 ),
                               ),
-                          ],
+                              if (newMembers.contains(user['uid']))
+                                Positioned(
+                                  right:kIsWeb?35: -2,
+                                  bottom: -2,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      size: kIsWeb?width*0.016: width * 0.035,
+                                      color: Color.fromRGBO(21, 171, 97, 1),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          title: Text(user['firstName']),
+                          onTap: () {
+                            setState(() {
+                              if (newMembers.contains(user['uid'])) {
+                                newMembers.remove(user['uid']);
+                              } else {
+                                newMembers.add(user['uid']);
+                              }
+                            });
+                            setState(() {
+                              if (newMembersName.contains(user['firstName'])) {
+                                newMembersName.remove(user['firstName']);
+                              } else {
+                                newMembersName.add(user['firstName']);
+                              }
+                            });
+                          },
+                          tileColor:newMembers.contains(user['uid']) ? Colors.grey.shade300
+                          : Colors.transparent,
                         ),
-                        title: Text(user['firstName']),
-                        onTap: () {
-                          setState(() {
-                            if (newMembers.contains(user['uid'])) {
-                              newMembers.remove(user['uid']);
-                            } else {
-                              newMembers.add(user['uid']);
-                            }
-                          });
-                          setState(() {
-                            if (newMembersName.contains(user['firstName'])) {
-                              newMembersName.remove(user['firstName']);
-                            } else {
-                              newMembersName.add(user['firstName']);
-                            }
-                          });
-                        },
-                        tileColor:newMembers.contains(user['uid']) ? Colors.grey.shade300
-                        : Colors.transparent,
                       );
                     },
                   );
