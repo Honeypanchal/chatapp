@@ -28,11 +28,11 @@ class _FirstpageState extends State<Firstpage>  {
             child: Column(
               children: [
 
-                SizedBox(height: height * (isWeb ? 0.05 : 0.1)),
+                SizedBox(height: height * (isWeb ? 0.09 : 0.1)),
 
 
                 Container(
-                  height: height * (isWeb ? 0.4 : 0.5),
+                  height: height * (isWeb ? 0.25 : 0.5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(width * 0.35),
@@ -70,13 +70,13 @@ class _FirstpageState extends State<Firstpage>  {
                             alignment: Alignment.center,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: width * (isWeb ? 0.12 : 0.064)),
+                                  horizontal: width * (isWeb ? 0.08 : 0.064)),
                               child: Text(
                                 "Let's Get started!",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
-                                  fontSize: isWeb ? width * 0.045 : width * 0.059,
+                                  fontSize: isWeb ? width * 0.030 : width * 0.059,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
@@ -86,7 +86,7 @@ class _FirstpageState extends State<Firstpage>  {
                           SizedBox(height: height * 0.012),
                           // Subtitle text
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
+                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.09 : 0.06)),
                             child: Text(
                               "Chat with people around you easily.",
                               style: TextStyle(
@@ -97,7 +97,7 @@ class _FirstpageState extends State<Firstpage>  {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
+                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.09 : 0.06)),
                             child: Text(
                               "Sign in easily using Google/Facebook",
                               style: TextStyle(
@@ -130,7 +130,7 @@ class _FirstpageState extends State<Firstpage>  {
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
-                                        fontSize: width * (isWeb ? 0.03 : 0.04),
+                                        fontSize: width * (isWeb ? 0.016 : 0.04),
                                         color: Colors.white,
                                       ),
                                     ),
@@ -138,7 +138,7 @@ class _FirstpageState extends State<Firstpage>  {
                                     Icon(
                                       Icons.arrow_forward_ios,
                                       color: Colors.white,
-                                      size: width * (isWeb ? 0.03 : 0.045),
+                                      size: width * (isWeb ? 0.016 : 0.045),
                                     ),
                                   ],
                                 ),
@@ -169,14 +169,14 @@ class _FirstpageState extends State<Firstpage>  {
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
                                         fontWeight: FontWeight.bold,
-                                        fontSize: width * (isWeb ? 0.03 : 0.04),
+                                        fontSize: width * (isWeb ? 0.016 : 0.04),
                                         color: Colors.black,
                                       ),
                                     ),
                                     SizedBox(width: width * 0.01),
                                     Icon(
                                       Icons.arrow_forward_ios,
-                                      size: width * (isWeb ? 0.03 : 0.045),
+                                      size: width * (isWeb ? 0.016 : 0.045),
                                     ),
                                   ],
                                 ),
