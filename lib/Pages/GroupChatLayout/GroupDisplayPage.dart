@@ -140,7 +140,11 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
             ],
             onSelected: (val) {
               switch (val) {
-                case 0: //neha ka code
+                case 0: Navigator.pushNamed(
+                    context,
+                    '/starredMessages',
+                    arguments: {'currentUser': widget.currentUser}
+                ); //neha ka code
                   break;
                 case 1:
                   Navigator.pushNamed(

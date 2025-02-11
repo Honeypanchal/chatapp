@@ -108,9 +108,10 @@ class _ProfileState extends State<Profile> {
           children: [
             Center(
               child: CircleAvatar(
-                radius: 50,
+                radius: width> 600 ? width *0.07 : width *0.15,
                 backgroundColor: Colors.grey.shade300,
-             child: Icon(Icons.person,color: Colors.white,size: width*0.2,),
+             child: Icon(Icons.person,color: Colors.white,
+               size: width>600 ? width *0.1: width*0.16,),
               ),
             ),
             SizedBox(
@@ -132,32 +133,30 @@ class _ProfileState extends State<Profile> {
                   children: [
                     Icon(
                       Icons.perm_identity,
-                      color: Colors.black45,
-                      size: width * 0.09,
+                      color: Colors.grey,
+                      size: width > 600 ? width*0.04 : width *0.08,
                     ),
-                    SizedBox(
-                      width: width * 0.03,
-                    ),
+                    SizedBox(width:width>600 ? width*0.018: width*0.03),
+
                     Column(
                       children: [
                         Text(
                           "Name",
                           style: TextStyle(
                               color: Colors.black,
-                              fontSize: width * 0.035,
+                              fontSize: width> 600 ? width*0.015 : width*0.035,
                               fontFamily: 'poppins',
                               fontWeight: FontWeight.w700),
                         ),
-                        SizedBox(
-                          height: height * 0.003,
-                        ),
+
                         Text(
                           firstName.isNotEmpty ? firstName : "",
                           style: TextStyle(
                               color: Colors.grey,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Raleways',
-                              fontSize: width * 0.035),
+                            fontSize: width> 600 ? width*0.015 : width*0.035,
+                          ),
                         ),
                       ],
                     ),
@@ -165,9 +164,10 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
+            SizedBox(height: width>600 ? height*0.05 : height*0),
             Container(
               margin: EdgeInsets.symmetric(horizontal: width * 0.02),
-              height: height * 0.08,
+              height: height * 0.12,
               width: width,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -181,12 +181,11 @@ class _ProfileState extends State<Profile> {
                   children: [
                     Icon(
                       Icons.email_outlined,
-                      color: Colors.black45,
-                      size: width * 0.09,
+                      color: Colors.grey,
+                      size: width > 600 ? width*0.035 : width *0.075,
                     ),
-                    SizedBox(
-                      width: width * 0.05,
-                    ),
+                    SizedBox(width:width>600 ? width*0.02: width*0.03)
+                    ,
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -194,7 +193,7 @@ class _ProfileState extends State<Profile> {
                           "Email",
                           style: TextStyle(
                               color: Colors.black,
-                              fontSize: width * 0.035,
+                              fontSize: width> 600 ? width*0.015 : width*0.035,
                               fontFamily: 'poppins',
                               fontWeight: FontWeight.w700),
                         ),
@@ -207,7 +206,7 @@ class _ProfileState extends State<Profile> {
                               color: Colors.grey,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Raleways',
-                              fontSize: width * 0.035),
+                            fontSize: width> 600 ? width*0.015 : width*0.035,),
                         ),
                       ],
                     ),
@@ -215,25 +214,34 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
-            ListTile(
-              onTap: (){
-                logOutUser().then((_){
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => Firstpage()), // Navigate to login screen
-                        (Route<dynamic> route) => false, // Remove all previous routes from stack
-                  );
-                });
+            SizedBox(height: width>600 ? height*0.015 : height*0),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: width>600? width*0.02 : width*0.002),
+              child: ListTile(
+                onTap: (){
+                  logOutUser().then((_){
+                    Navigator.pushAndRemoveUntil
+                      (
+                      context,
+                      MaterialPageRoute(builder: (context) => Firstpage()), // Navigate to login screen
+                          (Route<dynamic> route) => false, // Remove all previous routes from stack
+                       );
+                  });
 
-              },
+                },
 
-              leading: Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
-              title: Text(
-                "Log out",
-                style: TextStyle(fontFamily: 'Raleway', color: Colors.red),
+                leading: Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                  size: width>600? width*0.02 : width*0.067,
+
+                ),
+
+                title: Text(
+                  "Log out",
+                  style: TextStyle(fontFamily: 'Raleway', color: Colors.red,
+                  fontSize: width>600? width*0.02: width*0.045),
+                ),
               ),
             )
           ],
