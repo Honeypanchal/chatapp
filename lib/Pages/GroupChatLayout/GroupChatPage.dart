@@ -665,157 +665,238 @@ class _GroupchatpageState extends State<Groupchatpage> {
         children: [
           Expanded(
             child:      StreamBuilder(
-      stream: _firestore
-          .collection('groups')
-          .doc(group['groupId'])
-          .collection('messages')
-          .orderBy('timestamp', descending: false)
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+              stream: _firestore
+                  .collection('groups')
+                  .doc(group['groupId'])
+                  .collection('messages')
+                  .orderBy('timestamp', descending: false)
+                  .snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
 
-        var messages = snapshot.data!.docs;
+                var messages = snapshot.data!.docs;
 
-        Map<String, List<QueryDocumentSnapshot>> groupedMessages = {};
+                Map<String, List<QueryDocumentSnapshot>> groupedMessages = {};
 
-        for (var message in messages) {
-          Map<String, dynamic> messageData = message.data() as Map<String, dynamic>;
-
-
-          Timestamp? timestamp = messageData['timestamp'] as Timestamp?;
+                for (var message in messages) {
+                  Map<String, dynamic> messageData = message.data() as Map<String, dynamic>;
 
 
-          String messageDate = timestamp != null
-              ? formatDateForGrouping(timestamp)
-              : ''; // Fallback value
-
-          groupedMessages.putIfAbsent(messageDate, () => []).add(message);
-        }
+                  Timestamp? timestamp = messageData['timestamp'] as Timestamp?;
 
 
-        List<String> sortedDates = groupedMessages.keys.toList()
-          ..sort((a, b) {
-            if (a == 'Today') return 1;
-            if (b == 'Today') return -1;
-            if (a == 'Yesterday') return -1;
-            if (b == 'Yesterday') return 1;
+                  String messageDate = timestamp != null
+                      ? formatDateForGrouping(timestamp)
+                      : ''; // Fallback value
+
+                  groupedMessages.putIfAbsent(messageDate, () => []).add(message);
+                }
 
 
-            if (a.isEmpty || b.isEmpty) return 0;
-
-            try {
-              return DateFormat('MMM dd').parse(a).compareTo(DateFormat('MMM dd').parse(b));
-            } catch (e) {
-              return 0;
-            }
-          });
+                List<String> sortedDates = groupedMessages.keys.toList()
+                  ..sort((a, b) {
+                    if (a == 'Today') return 1;
+                    if (b == 'Today') return -1;
+                    if (a == 'Yesterday') return -1;
+                    if (b == 'Yesterday') return 1;
 
 
-        return ListView(
-          reverse: false, // Keeps the latest messages at the bottom
-          children: sortedDates.map((date) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    date,
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                ...groupedMessages[date]!.map((message) {
-                  bool isMe = message['senderUid'] == _auth.currentUser!.uid;
-                  bool isPoll = message['isPoll'] ?? false;
-                  bool isSelected = selectedMessages.contains(message.id);
-                  bool isPinned = message['pinned'] ?? false;
-                  bool isFavorite = message['favorite'] ?? false;
-                  bool isSearched = searchQuery.isNotEmpty &&
-                      RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b', caseSensitive: false)
-                          .hasMatch(message['message']);
+                    if (a.isEmpty || b.isEmpty) return 0;
 
-                  return GestureDetector(
-                    onLongPress: () {
-                      handleMessageLongPress(message.id);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.grey[300] : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        border: isPinned ? Border.all(color: Colors.black, width: 2) : null,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min, // Ensures the container adjusts based on content
-                        children: [
-                          isPoll
-                              ? buildPollWidget(message, isMe)
-                              : IntrinsicWidth( // Use IntrinsicWidth here to adjust the container width
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: isMe ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.min, // Ensures the container adjusts to content
-                                children: [
-                                  // Make sure to use Flexible for long messages
-                                  Align(
-                                    alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                                    child: Text(
-                                      message['message'],
-                                      style: TextStyle(
-                                        color: isMe ? Colors.black : Colors.black,
-                                        backgroundColor: isSearched ? Colors.green : null,
-                                      ),
-                                      softWrap: true, // Allow text to wrap if too long
-                                      maxLines: null, // Allow unlimited lines for long messages
-                                      overflow: TextOverflow.visible, // Allow overflow to be visible
-                                    ),
-                                  ),
-                                  if (isFavorite)
-                                    Icon(
-                                      Icons.star,
-                                      color:Colors.grey[300],
-                                      size: 14,
-                                    ),
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: Text(
-                                      formatMessageTime(message['timestamp']),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: isMe ? Colors.black: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    try {
+                      return DateFormat('MMM dd').parse(a).compareTo(DateFormat('MMM dd').parse(b));
+                    } catch (e) {
+                      return 0;
+                    }
+                  });
+
+                return Column(
+                  children: [
+                    if (groupedMessages.values.expand((messages) => messages).any((msg) => msg['pinned'] ?? false))
+                      Builder(
+                        builder: (context) {
+                          var pinnedMessages = groupedMessages.values.expand((messages) => messages)
+                              .where((msg) => msg['pinned'] ?? false)
+                              .toList();
+
+                          var latestPinnedMessage = pinnedMessages.isNotEmpty ? pinnedMessages.last : null;
+
+                          return latestPinnedMessage != null
+                              ? Container(
+                            padding: EdgeInsets.all(8),
+                            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          ),
-                        ],
+                            child: Row(
+                              children: [
+                                Icon(Icons.push_pin, color: Colors.black, size: 16),
+                                SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    latestPinnedMessage['message'],
+                                    style: TextStyle(color: Colors.black),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                              : SizedBox.shrink();
+                        },
+                      ),
+
+                    // Chat Messages Section
+                    Expanded(
+                      child: ListView(
+                        reverse: false,
+                        children: sortedDates.map((date) {
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                child: Text(
+                                  date,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              ...groupedMessages[date]!.map((message) {
+                                bool isMe = message['senderUid'] == _auth.currentUser!.uid;
+                                bool isPoll = message['isPoll'] ?? false;
+                                bool isSelected = selectedMessages.contains(message.id);
+                                bool isPinned = message['pinned'] ?? false;
+                                bool isFavorite = message['favorite'] ?? false;
+                                bool isSearched = searchQuery.isNotEmpty &&
+                                    RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b', caseSensitive: false)
+                                        .hasMatch(message['message']);
+
+                                return Column(
+                                  crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onLongPress: () {
+                                        handleMessageLongPress(message.id);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? Colors.grey[300] : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+
+
+                                            isPoll
+                                                ? buildPollWidget(message, isMe)
+                                                : IntrinsicWidth(
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                                decoration: BoxDecoration(
+                                                  color: isMe ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Align(
+                                                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                                      child: Column(
+                                                        crossAxisAlignment:   CrossAxisAlignment.start,
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          // Sender name inside the message container (top left)
+                                                          if (!isMe)
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(bottom: 1),
+                                                              child: Text(
+                                                                (message.data() as Map<String, dynamic>)['sender'] ?? 'Unknown',
+                                                                style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: Colors.grey[600],
+                                                                ),
+                                                              ),
+                                                            ),
+
+
+                                                          if (isPinned) SizedBox(width: 5),
+                                                          Flexible(
+                                                            child: Text(
+                                                              message['message'],
+                                                              style: TextStyle(
+                                                                color: isMe ? Colors.black : Colors.black,
+                                                                backgroundColor: isSearched ? Colors.green : null,
+                                                              ),
+                                                              softWrap: true,
+                                                              maxLines: null,
+                                                              overflow: TextOverflow.visible,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                      children: [
+                                                        if (isPinned)
+                                                          Icon(Icons.push_pin, color: Colors.black, size: 16),
+                                                        if (isFavorite)
+                                                          Icon(
+                                                            Icons.star,
+                                                            color: Colors.yellow.shade500,
+                                                            size: 14,
+                                                          ),
+                                                        SizedBox(width: 4),
+                                                        Align(
+                                                          alignment: Alignment.bottomRight,
+                                                          child: Text(
+                                                            formatMessageTime(message['timestamp']),
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              color: isMe ? Colors.black : Colors.black,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ],
+                          );
+                        }).toList(),
                       ),
                     ),
-                  );
-                }).toList(),
-              ],
-            );
-          }).toList(),
-        );
-      },
-    ),
+                  ],
+                );
+
+
+              },
+            ),
 
 
 
 
-    ),
+          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: width * 0.012, vertical: height * 0.01),
             child: Row(
@@ -883,18 +964,27 @@ class _GroupchatpageState extends State<Groupchatpage> {
       ),
     );
   }
-
-
-
-
   String formatMessageTime(Timestamp? timestamp) {
     try {
       if (timestamp == null) return 'Invalid Time'; // Handle null timestamps
-      return DateFormat('hh:mm a').format(timestamp.toDate());
+      DateTime dateTime = timestamp.toDate();
+      return DateFormat('HH:mm').format(dateTime); // 24-hour format
     } catch (e) {
       return 'Invalid Time';  // Fallback for error handling
     }
   }
+
+
+
+
+  // String formatMessageTime(Timestamp? timestamp) {
+  //   try {
+  //     if (timestamp == null) return 'Invalid Time'; // Handle null timestamps
+  //     return DateFormat('hh:mm a').format(timestamp.toDate());
+  //   } catch (e) {
+  //     return 'Invalid Time';  // Fallback for error handling
+  //   }
+  // }
   String formatDateForGrouping(Timestamp? timestamp) {
     if (timestamp == null) return 'Unknown'; // Ensure no empty values
 
@@ -912,11 +1002,28 @@ class _GroupchatpageState extends State<Groupchatpage> {
     }
   }
 
+  Widget buildSenderName(Map<String, dynamic>? message) {
+    if (message == null || message['senderUid'] == _auth.currentUser?.uid) {
+      return SizedBox.shrink(); // Don't show sender name for the current user
+    }
 
+    String senderName = message['sender']?.toString() ?? 'Unknown'; // Safely fetch sender name
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, bottom: 2),
+      child: Text(
+        senderName,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey[600],
+        ),
+      ),
+    );
+  }
 
 
   //poll  display method
-
   Widget buildPollWidget(QueryDocumentSnapshot message, bool isSender) {
     Map<String, dynamic> pollOptions = Map<String, dynamic>.from(message['pollOptions'] ?? {});
     ValueNotifier<bool> showVotes = ValueNotifier<bool>(false);
@@ -965,7 +1072,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
               children: [
                 Text(
                   message['message'],
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isSender ? Colors.black : Colors.black),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
                 ),
                 SizedBox(height: 8),
                 Column(
@@ -1010,7 +1117,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: voters.map((uid) {
                                         String voterName = voterNames[uid] ?? "Fetching...";
-                                        return Text("- $voterName", style: TextStyle(fontSize: 14, color: Colors.white));
+                                        return Text("- $voterName", style: TextStyle(fontSize: 14, color: Colors.black));
                                       }).toList(),
                                     ),
                                   ),
@@ -1031,13 +1138,23 @@ class _GroupchatpageState extends State<Groupchatpage> {
                         showVotes.value = !showVotes.value;
                       },
                       child: Center(
-                          child:Text(
-                        value ? "Hide Voters" : "Show Voters",
-                        style: TextStyle(color: isSender ? Colors.black : Colors.black),
-                      )
+                        child: Text(
+                          value ? "Hide Voters" : "Show Voters",
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
                     );
                   },
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,  // Align timestamp to the bottom right
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 5, right: 5),
+                    child: Text(
+                      formatMessageTime(message['timestamp']),  // Display formatted time
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1046,6 +1163,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
       },
     );
   }
+
 
   Stream<List<String>> getReadReceipts(String messageId) {
     return _firestore
@@ -1122,11 +1240,16 @@ class _CreatePollPageState extends State<CreatePollPage> {
 
   void createPoll() {
     List<String> pollOptions = optionControllers
-        .where((controller) => controller.text.trim().isNotEmpty)
+        .where((controller) =>
+    controller.text
+        .trim()
+        .isNotEmpty)
         .map((controller) => controller.text.trim())
         .toList();
 
-    if (questionController.text.trim().isNotEmpty && pollOptions.length >= 2) {
+    if (questionController.text
+        .trim()
+        .isNotEmpty && pollOptions.length >= 2) {
       widget.sendMessage(
         isPoll: true,
         pollOptions: pollOptions,
@@ -1144,7 +1267,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
       appBar: AppBar(
         title: Text(
           "Create a Poll",
-          style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         iconTheme: IconThemeData(color: Colors.black),
@@ -1167,7 +1291,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 8),
               ),
             ),
             SizedBox(height: 8),
@@ -1189,10 +1314,13 @@ class _CreatePollPageState extends State<CreatePollPage> {
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
                         suffixIcon: index >= 2
                             ? IconButton(
-                          icon: Icon(Icons.remove_circle, color: Colors.green.shade200, size: 18),
+                          icon: Icon(
+                              Icons.remove_circle, color: Colors.green.shade200,
+                              size: 18),
                           onPressed: () {
                             setState(() {
                               optionControllers.removeAt(index);
@@ -1217,9 +1345,11 @@ class _CreatePollPageState extends State<CreatePollPage> {
                     });
                   }
                 },
-                icon: Icon(Icons.add, color: Colors.black87, size: 16),
+                icon: Icon(Icons.add, color: Colors.green, size: 16),
                 label: Text("Add Option",
-                    style: TextStyle(color: Color.fromARGB(255, 213, 252, 208), fontSize: 15, fontWeight: FontWeight.bold)),
+                    style: TextStyle(color: Colors.green,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold)),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -1234,24 +1364,32 @@ class _CreatePollPageState extends State<CreatePollPage> {
                 TextButton(
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    backgroundColor: Color.fromARGB(255, 213, 252, 208),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     minimumSize: Size(0, 0),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Cancel", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text("Cancel", style: TextStyle(color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                    backgroundColor: Color.fromARGB(255, 213, 252, 208),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    minimumSize: Size(0, 0),
+                      padding: EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 12),
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      minimumSize: Size(0, 0)
                   ),
                   onPressed: createPoll,
-                  child: Text("Create Poll", style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  child: Text("Create Poll", style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
