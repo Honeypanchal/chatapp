@@ -6,7 +6,6 @@ import 'package:chatapp/services/auth_services.dart';
 import 'package:chatapp/pages/Authentication/SigninPage.dart';
 import 'package:chatapp/Pages/Authentication/FirstPage.dart';
 
-
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
 
@@ -21,7 +20,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmpasswordController =
-  TextEditingController();
+      TextEditingController();
 
   final TextEditingController _firstnameController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
@@ -72,14 +71,13 @@ class _SignupPageState extends State<SignupPage> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 60),
+          padding: width>600? EdgeInsets.only(left: 450.0, right: 450.0, top: 60):EdgeInsets.only(left: 20.0, right: 20.0, top: 60),
           child: Column(
             children: [
-
               Text(
                 'Sign Up For Free.',
                 style: TextStyle(
-                  fontSize: 33,
+                  fontSize: width > 600 ? width * 0.020 : 33,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                   fontFamily: 'poppins',
@@ -104,7 +102,8 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Name',
                         style: TextStyle(
-                            fontSize: width * 0.033,
+                            fontSize:
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -122,21 +121,21 @@ class _SignupPageState extends State<SignupPage> {
                           fontFamily: 'poppins'),
                     ),*/
                     TextFormField(
-
                       style:
-                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _firstnameController,
                       decoration: InputDecoration(
-                          focusColor:Color.fromRGBO(21, 171, 97, 1),
+                          focusColor: Color.fromRGBO(21, 171, 97, 1),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1) )
-                          ),
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(21, 171, 97, 1))),
                           hintText: 'your name',
                           hintStyle: const TextStyle(color: Colors.grey),
                           prefixIcon: const Icon(Icons.person_2_outlined),
                           border: const OutlineInputBorder(
-                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1)),
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(21, 171, 97, 1)),
+                            // borderRadius: BorderRadius.all(Radius.circular(10)),
                           )),
                       validator: (val) {
                         if (val == null || val.isEmpty) {
@@ -161,7 +160,8 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Email Address',
                         style: TextStyle(
-                            fontSize: width * 0.033,
+                            fontSize:
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Poppins'),
                         textAlign: TextAlign.left,
@@ -172,13 +172,13 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     TextFormField(
                       style:
-                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _emailController,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return 'Email is required';
                         } else if (!RegExp(
-                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
                             .hasMatch(val.trim())) {
                           return 'Enter a valid email';
                         }
@@ -187,15 +187,15 @@ class _SignupPageState extends State<SignupPage> {
                       decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.email_outlined),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
-                        ) ,
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(21, 171, 97, 1))),
                         focusColor: Color.fromRGBO(21, 171, 97, 1),
                         hintText: 'Email',
                         hintStyle: TextStyle(color: Colors.grey),
                         // label: Text('Email'),
                         border: OutlineInputBorder(
-                            borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
-                        ),
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(21, 171, 97, 1))),
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -205,7 +205,8 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Password',
                         style: TextStyle(
-                            fontSize: width * 0.033,
+                            fontSize:
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -214,7 +215,7 @@ class _SignupPageState extends State<SignupPage> {
                     SizedBox(height: height * 0.010),
                     TextFormField(
                       style:
-                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _passwordController,
                       validator: (val) {
                         if (val!.isEmpty) {
@@ -226,13 +227,13 @@ class _SignupPageState extends State<SignupPage> {
                           fillColor: Colors.white38,
                           prefixIcon: Icon(Icons.vpn_key_outlined),
                           border: OutlineInputBorder(
-                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
-                          ),
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(21, 171, 97, 1))),
                           hintText: "Password",
                           focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
-                          ),
-                          focusColor:Color.fromRGBO(21, 171, 97, 1) ,
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(21, 171, 97, 1))),
+                          focusColor: Color.fromRGBO(21, 171, 97, 1),
                           hintStyle: TextStyle(color: Colors.grey),
                           // helperText: "Password must contain special character",
                           helperStyle: TextStyle(color: Colors.green),
@@ -242,24 +243,23 @@ class _SignupPageState extends State<SignupPage> {
                           //         color: Colors.red)),
                           suffixIcon: showPass
                               ? IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  showPass = !showPass;
-                                });
-                              },
-                              icon: Icon(
-                                  color: Colors.black,
-                                  Icons.visibility_outlined))
+                                  onPressed: () {
+                                    setState(() {
+                                      showPass = !showPass;
+                                    });
+                                  },
+                                  icon: Icon(
+                                      color: Colors.black,
+                                      Icons.visibility_outlined))
                               : IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  showPass = !showPass;
-                                });
-                              },
-                              icon: Icon(
-                                  color: Colors.grey,
-                                  Icons.visibility_off_outlined))),
-
+                                  onPressed: () {
+                                    setState(() {
+                                      showPass = !showPass;
+                                    });
+                                  },
+                                  icon: Icon(
+                                      color: Colors.grey,
+                                      Icons.visibility_off_outlined))),
                       obscureText: !showPass,
                     ),
                     SizedBox(height: height * 0.030),
@@ -268,7 +268,8 @@ class _SignupPageState extends State<SignupPage> {
                       child: Text(
                         'Re-Type Password',
                         style: TextStyle(
-                            fontSize: width * 0.033,
+                            fontSize:
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -285,7 +286,7 @@ class _SignupPageState extends State<SignupPage> {
                     SizedBox(height: height * 0.010),
                     TextFormField(
                       style:
-                      TextStyle(color: Colors.black, fontFamily: 'Raleway'),
+                          TextStyle(color: Colors.black, fontFamily: 'Raleway'),
                       controller: _confirmpasswordController,
                       validator: (val) {
                         if (val!.isEmpty) {
@@ -298,11 +299,11 @@ class _SignupPageState extends State<SignupPage> {
                           fillColor: Colors.white38,
                           prefixIcon: Icon(Icons.vpn_key_outlined),
                           border: OutlineInputBorder(
-                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
-                          ),
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(21, 171, 97, 1))),
                           focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color:Color.fromRGBO(21, 171, 97, 1))
-                          ) ,
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(21, 171, 97, 1))),
                           focusColor: Color.fromRGBO(21, 171, 97, 1),
                           hintText: "Password",
                           hintStyle: TextStyle(color: Colors.grey),
@@ -314,23 +315,23 @@ class _SignupPageState extends State<SignupPage> {
                           //         color: Colors.red)),
                           suffixIcon: showPass
                               ? IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  showPass = !showPass;
-                                });
-                              },
-                              icon: Icon(
-                                  color: Colors.black,
-                                  Icons.visibility_outlined))
+                                  onPressed: () {
+                                    setState(() {
+                                      showPass = !showPass;
+                                    });
+                                  },
+                                  icon: Icon(
+                                      color: Colors.black,
+                                      Icons.visibility_outlined))
                               : IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  showPass = !showPass;
-                                });
-                              },
-                              icon: Icon(
-                                  color: Colors.grey,
-                                  Icons.visibility_off_outlined))),
+                                  onPressed: () {
+                                    setState(() {
+                                      showPass = !showPass;
+                                    });
+                                  },
+                                  icon: Icon(
+                                      color: Colors.grey,
+                                      Icons.visibility_off_outlined))),
                       obscureText: !showPass,
                     ),
                   ],
@@ -345,70 +346,73 @@ class _SignupPageState extends State<SignupPage> {
                     _signup();
                   },
                   style: ElevatedButton.styleFrom(
-                    // Color(0XFF185FED)
-                      backgroundColor:   Color.fromRGBO(21, 171, 97, 1),
+                      // Color(0XFF185FED)
+                      backgroundColor: Color.fromRGBO(21, 171, 97, 1),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10))),
                   child: Text(
                     'Sign Up',
                     style: TextStyle(
-                        fontSize: width * 0.045, fontWeight: FontWeight.w500),
+                        fontSize: width > 600 ? width * 0.020 : width * 0.045,
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
               ),
               SizedBox(
                 height: height * 0.015,
               ),
-              SizedBox(
-                height: height * 0.060,
-                width: width * 0.9,
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(
+              Padding(
+                padding: const EdgeInsets.only(left: 1.0, right: 1.0),
+                child: SizedBox(
+                  height: height * 0.060,
+                  // width: width * 0.9,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
                                 color: Colors.grey,
-                                width: 2
-                            ))),
-                    onPressed: () async {
-                      CustomClass? user = await signInWithGoogle();
+                                // width: 2
+                              ))),
+                      onPressed: () async {
+                        CustomClass? user = await signInWithGoogle();
 
-                      if (user != null) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  ChatPage(currentUser: user)),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("No user recieved")));
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Image.asset(
-                          'assets/images/Google.jpg',
-                          height: height * 0.054,
-                          width: width * 0.054,
-                        ),
-                        SizedBox(
-                          width: width * 0.01,
-                        ),
-                        Text(
-                          "Sign up with google  ",
-                          style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                              fontSize: width * 0.040),
-                        ),
-                      ],
-                    )),
+                        if (user != null) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatPage(currentUser: user)),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("No user recieved")));
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: width>600? MainAxisAlignment.center:MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Image.asset(
+                            'assets/images/Google.jpg',
+                            height: height > 500 ? height * 0.035 : height * 0.054,
+                            width: width > 600 ? width * 0.040 : width * 0.054,
+                          ),
+                          SizedBox(
+                            width: width * 0.01,
+                          ),
+                          Text(
+                            "Sign up with google  ",
+                            style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                                fontSize: width > 600 ? width * 0.015 : width * 0.040),
+                          ),
+                        ],
+                      )),
+                ),
               ),
-
               GestureDetector(
                 onTap: () {
                   Navigator.of(context).push(
@@ -422,7 +426,7 @@ class _SignupPageState extends State<SignupPage> {
                       "Already have an account? ",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: width * 0.035,
+                        fontSize: width > 600 ? width * 0.011 :width * 0.035,
                         color: Colors.black54,
                       ),
                     ),
@@ -430,11 +434,13 @@ class _SignupPageState extends State<SignupPage> {
                       "Sign in ",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: width * 0.040,
+                        fontSize:width > 600 ? width * 0.013 : width * 0.040,
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height: 80,)
+                    SizedBox(
+                      height: 80,
+                    )
                   ],
                 ),
               ),

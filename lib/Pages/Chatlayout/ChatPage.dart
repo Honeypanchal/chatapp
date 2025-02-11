@@ -176,9 +176,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: Colors.black))
-                : _filteredUsers.isEmpty
+            child: _filteredUsers.isEmpty
                     ? Center(
                         child: Text(
                             "No chats available. Click + to start a chat."))
@@ -289,22 +287,28 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Map<String, dynamic>? selectedUser = await Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) =>
-                  UserListPage(currentUser: widget.currentUser),
+              builder: (context) => UserListPage(currentUser: widget.currentUser),
             ),
           );
 
-          if (selectedUser != null) {
+          if (selectedUser != null && !_selectedUsers.any((u) => u['uid'] == selectedUser['uid'])) {
             setState(() {
-              _selectedUsers.add(selectedUser);
-              _filteredUsers = _selectedUsers;
+              _selectedUsers.add(selectedUser);  // Add selected user
+              _filteredUsers = _selectedUsers;   // Update list
+            });
+
+            // Also save it to Firestore so it persists
+            await _database.doc(widget.currentUser.uid).update({
+              "selectedUsers": FieldValue.arrayUnion([selectedUser])
             });
           }
         },
+
         backgroundColor: Color.fromRGBO(21, 171, 97, 1),
         tooltip: 'Contact with new User..',
         child: Icon(

@@ -10,15 +10,13 @@ class Firstpage extends StatefulWidget {
   State<Firstpage> createState() => _FirstpageState();
 }
 
-class _FirstpageState extends State<Firstpage>  {
-
+class _FirstpageState extends State<Firstpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: LayoutBuilder(
         builder: (context, constraints) {
-
           bool isWeb = constraints.maxWidth > 800;
 
           final height = MediaQuery.of(context).size.height;
@@ -27,27 +25,21 @@ class _FirstpageState extends State<Firstpage>  {
           return SingleChildScrollView(
             child: Column(
               children: [
-
-                SizedBox(height: height * (isWeb ? 0.05 : 0.1)),
-
-
+                SizedBox(height: height * (isWeb ? 0.09 : 0.1)),
                 Container(
-                  height: height * (isWeb ? 0.4 : 0.5),
+                  height: height * (isWeb ? 0.25 : 0.5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(width * 0.35),
                     ),
                   ),
                   child: Center(
-
                     child: Image.asset(
                       'assets/images/logo.png',
-
                     ),
                   ),
                 ),
                 SizedBox(height: height * 0.012),
-
                 Align(
                   alignment: Alignment.center,
                   child: Container(
@@ -60,7 +52,7 @@ class _FirstpageState extends State<Firstpage>  {
                     child: Container(
                       margin: EdgeInsets.symmetric(
                         horizontal: width * (isWeb ? 0.15 : 0.062),
-                        vertical: height * 0.012,
+                        vertical: height>500?height*0.020:height * 0.012,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -70,115 +62,146 @@ class _FirstpageState extends State<Firstpage>  {
                             alignment: Alignment.center,
                             child: Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: width * (isWeb ? 0.12 : 0.064)),
+                                  horizontal: width * (isWeb ? 0.08 : 0.064)),
                               child: Text(
                                 "Let's Get started!",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
-                                  fontSize: isWeb ? width * 0.045 : width * 0.059,
+                                  fontSize:
+                                      isWeb ? width * 0.030 : width * 0.059,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: height * 0.012),
+                          SizedBox(height:  height>500?height*0.016:height * 0.012),
                           // Subtitle text
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: width * (isWeb ? 0.09 : 0.06)),
                             child: Text(
                               "Chat with people around you easily.",
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: width * (isWeb ? 0.022 : 0.029),
+                                fontSize: width * (isWeb ? 0.015 : 0.029),
                                 color: Colors.black,
                               ),
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: width * (isWeb ? 0.12 : 0.06)),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: width * (isWeb ? 0.05 : 0.06)),
                             child: Text(
                               "Sign in easily using Google/Facebook",
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: width * (isWeb ? 0.022 : 0.029),
+                                fontSize: width * (isWeb ? 0.015 : 0.029),
                                 color: Colors.black,
                               ),
                             ),
                           ),
-                          SizedBox(height: height * 0.012),
+                          SizedBox(
+                              height: height > 500
+                                  ? height * 0.035
+                                  : height * 0.012),
+
                           // Sign in button
                           GestureDetector(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => SigninPage()));
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => SigninPage()));
                             },
-                            child: Container(
-                              height: height * 0.06,
-                              width: width,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(21, 171, 97, 1),
-                                  border: Border.all(color: Color(0xFF9C9998)),
-                                  borderRadius: BorderRadius.circular(width * 0.03)),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Sign in",
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: width * (isWeb ? 0.03 : 0.04),
-                                        color: Colors.white,
+                            child: Padding(
+                              padding: width > 600
+                                  ? EdgeInsets.only(left: 260.0, right: 260.0)
+                                  : EdgeInsets.all(1.0),
+                              child: Container(
+                                height: height * 0.06,
+                                width: width,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(21, 171, 97, 1),
+                                    border:
+                                        Border.all(color: Color(0xFF9C9998)),
+                                    borderRadius: BorderRadius.circular(
+                                        width > 600
+                                            ? width * 0.005
+                                            : width * 0.03)),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Sign in",
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize:
+                                              width * (isWeb ? 0.016 : 0.04),
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: width * 0.01),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Colors.white,
-                                      size: width * (isWeb ? 0.03 : 0.045),
-                                    ),
-                                  ],
+                                      SizedBox(width: width * 0.01),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: Colors.white,
+                                        size: width * (isWeb ? 0.016 : 0.045),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: height * 0.012),
+                          SizedBox(height:  height>500?height*0.016:height * 0.012),
                           // Register button
                           GestureDetector(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignupPage()));
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => SignupPage()));
                             },
-                            child: Container(
-                              height: height * 0.06,
-                              width: width,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(color: Colors.grey, width: 2),
-                                borderRadius: BorderRadius.circular(width * 0.03),
-                              ),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Register",
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: width * (isWeb ? 0.03 : 0.04),
-                                        color: Colors.black,
+                            child: Padding(
+                              padding: width > 600
+                                  ? EdgeInsets.only(left: 260.0, right: 260.0)
+                                  : EdgeInsets.all(1.0),
+                              child: Container(
+                                height: height * 0.06,
+                                width: width,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border:
+                                      Border.all(color: Colors.grey, width: 2),
+                                  borderRadius: BorderRadius.circular(
+                                      width > 600
+                                          ? width * 0.005
+                                          : width * 0.03),
+                                ),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Register",
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize:
+                                              width * (isWeb ? 0.016 : 0.04),
+                                          color: Colors.black,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(width: width * 0.01),
-                                    Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: width * (isWeb ? 0.03 : 0.045),
-                                    ),
-                                  ],
+                                      SizedBox(width: width * 0.01),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: width * (isWeb ? 0.016 : 0.045),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
