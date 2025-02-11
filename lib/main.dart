@@ -16,7 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'Pages/GroupChatLayout/GroupPermissions.dart';
 import 'models/CustomClass.dart';
-
+import 'package:chatapp/pages/GroupChatLayout/StarredAllMessage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -167,6 +167,13 @@ class _MyAppState extends State<MyApp> {
                     members: args['members'],
                     currentUser: args['currentUser'],
                     createdBy:args['createdBy']));
+          case '/starredMessages':
+            return MaterialPageRoute(builder: (context) => StarredAllMessagesPage(
+              currentUser: args?['currentUser'],
+
+            )
+
+            );
           default:
             return null;
         }
