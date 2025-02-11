@@ -214,10 +214,11 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
-            SizedBox(height: width>600 ? height*0.015 : height*0),
+            SizedBox(height: width>600 ? height*0.015 : 0.00),
             Container(
               margin: EdgeInsets.symmetric(horizontal: width>600? width*0.02 : width*0.002),
               child: ListTile(
+
                 onTap: (){
                   logOutUser().then((_){
                     Navigator.pushAndRemoveUntil
@@ -229,7 +230,6 @@ class _ProfileState extends State<Profile> {
                   });
 
                 },
-
                 leading: Icon(
                   Icons.delete,
                   color: Colors.red,

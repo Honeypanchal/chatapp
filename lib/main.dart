@@ -139,6 +139,7 @@ class _MyAppState extends State<MyApp> {
                 admins: args['admins'],
                 members: args['members'],
                 currentUser: args['currentUser'],
+
               ),
             );
 

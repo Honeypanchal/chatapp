@@ -171,7 +171,7 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                 borderRadius: BorderRadius.circular(kIsWeb ? width * 0.013 :width * 0.03),
               ),
               child: TextField(
-                autofocus: true,
+
                 enableSuggestions: false,
                 autocorrect: false,
                 cursorColor: Color.fromRGBO(21, 171, 97, 1),

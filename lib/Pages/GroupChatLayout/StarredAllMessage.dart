@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class StarredAllMessagesPage extends StatefulWidget {
   const StarredAllMessagesPage({Key? key, required currentUser}) : super(key: key);
@@ -63,9 +64,17 @@ class _StarredAllMessagesPageState extends State<StarredAllMessagesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final width=MediaQuery.of(context).size.width;
+    final height=MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Color(0xFFF6F1EB),
       appBar: AppBar(
+        leading: Padding(
+          padding:  EdgeInsets.only(left:kIsWeb?width*0.032:  width * 0.034),
+          child: IconButton(onPressed: (){
+            Navigator.of(context).pop();
+          }, icon: Icon(Icons.arrow_back_ios,color: Colors.black,)),
+        ),
         title: Text("Starred Messages"),
         backgroundColor: Colors.white,
       ),

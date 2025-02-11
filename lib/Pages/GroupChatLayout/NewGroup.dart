@@ -29,7 +29,7 @@ class _NewGroupState extends State<NewGroup> {
       return AppBar(
         backgroundColor: Colors.white,
         leading: Padding(
-          padding: EdgeInsets.only(left:kIsWeb?width*0.032:  width * 0.064),
+          padding: EdgeInsets.only(left:kIsWeb?width*0.02:  width * 0.064),
           child: IconButton(
             icon: Icon(Icons.arrow_back_ios, color: Colors.black),
             onPressed: () => setState(() => _showSearch = false),
@@ -57,7 +57,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
 
     return AppBar(
       leading: Padding(
-        padding: EdgeInsets.only(left:kIsWeb?width*0.032:  width * 0.064),
+        padding: EdgeInsets.only(left:kIsWeb?width*0.025:  width * 0.064),
         child: GestureDetector(
           onTap: () => Navigator.pushNamed(context,'/groupDisplay',arguments: {'currentUser':widget.currentUser})
        ,   child: Icon(
@@ -92,7 +92,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
       ),
       actions: [
         Padding(
-          padding:   EdgeInsets.only(right:kIsWeb?width*0.022:0),
+          padding:   EdgeInsets.only(right:kIsWeb?width*0.022:width*0.017),
           child: IconButton(
             icon: Icon(Icons.search, color: Colors.black),
             onPressed: () => setState(() => _showSearch = true),
@@ -145,9 +145,9 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                 children: [
                   if (groupChatUsers.isNotEmpty && firstNames.isNotEmpty)
                     SizedBox(
-                      height: kIsWeb?height*0.13:  height * 0.12,
+                      height: kIsWeb?height*0.14:  height * 0.12,
                       child: ListView.builder(
-                        padding: kIsWeb? EdgeInsets.symmetric(horizontal:width*0.012 ):EdgeInsets.zero,
+                        padding: kIsWeb? EdgeInsets.symmetric(horizontal:width*0.01 ):EdgeInsets.symmetric(horizontal: width*0.03),
                         scrollDirection: Axis.horizontal,
                         itemCount: firstNames.length,
                         itemBuilder: (context, index) {
@@ -202,7 +202,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                           itemBuilder: (context, index) {
                             var user = users[index];
                             return Padding(
-                              padding: kIsWeb? EdgeInsets.symmetric(vertical: height*0.004):EdgeInsets.zero,
+                              padding: kIsWeb? EdgeInsets.symmetric(vertical: height*0.004):EdgeInsets.symmetric(vertical: height*0.003),
                               child: ListTile(
 
                                 leading: Stack(

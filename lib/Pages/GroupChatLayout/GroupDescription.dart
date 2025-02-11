@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:chatapp/models/CustomClass.dart';
 
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -11,6 +10,7 @@ import 'package:chatapp/services/groupChat_services.dart';
 
 import '../../services/auth_services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+
 class GroupDescription extends StatefulWidget {
   final String groupId;
   final String currentUser;
@@ -41,8 +41,6 @@ class _GroupDescriptionState extends State<GroupDescription> {
   TextEditingController _searchText = TextEditingController();
   bool _isSearching = false;
 
-
-
   StreamSubscription? _groupSubscription;
 
   void listenToDatabaseUpdates() {
@@ -56,7 +54,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
         var updatedGroupData = snapshot.data() as Map<String, dynamic>;
 
         setState(() {
-          isLoading=true;
+          isLoading = true;
           isLoadingDatabse = true;
         });
 
@@ -75,7 +73,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             sendMessages = group['sendMessages'];
             addOtherMembers = group['addOtherMembers'];
             isLoading = false;
-            isLoadingDatabse=false;
+            isLoadingDatabse = false;
           });
 
           await membersFirstName();
@@ -179,7 +177,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           removeGroupFromCurrentUser(
                                   widget.currentUser, widget.groupId)
                               .then((_) {
-                            Navigator.of(context).pushNamed('/groupDisplay',arguments: {'currentUser':user});
+                            Navigator.of(context).pushNamed('/groupDisplay',
+                                arguments: {'currentUser': user});
                           });
                         } catch (e) {
                           print(e.toString());
@@ -196,6 +195,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
           );
         });
   }
+
   void getCurrentUserDetails() async {
     CustomClass? found = await getUserDetails(widget.currentUser);
     if (found != null) {
@@ -204,6 +204,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
       });
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -236,14 +237,17 @@ class _GroupDescriptionState extends State<GroupDescription> {
             children: [
               Text(
                 "Group Description",
-                style: TextStyle(fontSize:kIsWeb?screenWidth*0.02:  screenWidth * 0.05),
+                style: TextStyle(
+                    fontSize: kIsWeb ? screenWidth * 0.02 : screenWidth * 0.05),
               ),
-              SizedBox(height:kIsWeb?screenHeight*0.009:  screenHeight * 0.015),
+              SizedBox(
+                  height: kIsWeb ? screenHeight * 0.009 : screenHeight * 0.015),
               TextFormField(
                 cursorColor: Colors.grey,
                 controller: descriptionController,
                 decoration: InputDecoration(
-                  hintText: group['groupDescription'] ?? "Add group description",
+                  hintText:
+                      group['groupDescription'] ?? "Add group description",
                   border: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey),
                   ),
@@ -258,13 +262,14 @@ class _GroupDescriptionState extends State<GroupDescription> {
               SizedBox(height: screenHeight * 0.02),
               Text(
                 "The group description is visible to members of this group and people invited to this group.",
-                style: TextStyle(fontSize:kIsWeb?screenWidth*0.01:  screenWidth * 0.04, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: kIsWeb ? screenWidth * 0.01 : screenWidth * 0.04,
+                    color: Colors.grey),
               ),
               Spacer(),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
                   Row(
                     children: [
                       Expanded(
@@ -279,7 +284,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           onPressed: () {
                             Navigator.pop(context, null);
                           },
-                          child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                          child: Text("Cancel",
+                              style: TextStyle(color: Colors.red)),
                         ),
                       ),
                       Container(width: 1, color: Colors.grey),
@@ -293,13 +299,15 @@ class _GroupDescriptionState extends State<GroupDescription> {
                             padding: EdgeInsets.zero,
                           ),
                           onPressed: () {
-                            String enteredDescription = descriptionController.text;
+                            String enteredDescription =
+                                descriptionController.text;
                             if (enteredDescription.isNotEmpty) {
                               print("Group Description: $enteredDescription");
                               Navigator.pop(context, enteredDescription);
                             }
                           },
-                          child: Text("Ok", style: TextStyle(color: Colors.green)),
+                          child:
+                              Text("Ok", style: TextStyle(color: Colors.green)),
                         ),
                       ),
                     ],
@@ -309,7 +317,6 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ],
           ),
         );
-
       },
     );
   }
@@ -338,9 +345,11 @@ class _GroupDescriptionState extends State<GroupDescription> {
             children: [
               Text(
                 "Group Name",
-                style: TextStyle(fontSize: kIsWeb?screenWidth*0.02: screenWidth * 0.05),
+                style: TextStyle(
+                    fontSize: kIsWeb ? screenWidth * 0.02 : screenWidth * 0.05),
               ),
-              SizedBox(height:kIsWeb?screenHeight*0.009:  screenHeight * 0.015),
+              SizedBox(
+                  height: kIsWeb ? screenHeight * 0.009 : screenHeight * 0.015),
               TextFormField(
                 cursorColor: Colors.grey,
                 controller: groupName,
@@ -360,39 +369,41 @@ class _GroupDescriptionState extends State<GroupDescription> {
               SizedBox(height: screenHeight * 0.02),
               Text(
                 "The group Name is visible to members of this group and people invited to this group.",
-                style:
-                    TextStyle(fontSize: kIsWeb?screenWidth*0.01: screenWidth * 0.04, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: kIsWeb ? screenWidth * 0.01 : screenWidth * 0.04,
+                    color: Colors.grey),
               ),
               Spacer(),
-              Column(mainAxisSize: MainAxisSize.min,
+              Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
                       Expanded(
                         child: TextButton(
                           style: TextButton.styleFrom(
-
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.zero,
-                              side: BorderSide(color: Colors.grey, width: 0),),
+                              side: BorderSide(color: Colors.grey, width: 0),
+                            ),
                             padding: EdgeInsets.zero,
                           ),
                           onPressed: () {
-                            Navigator.pop(context, null); // Return null if canceled
+                            Navigator.pop(
+                                context, null); // Return null if canceled
                           },
-                          child:
-                              Text("Cancel", style: TextStyle(color: Colors.red)),
+                          child: Text("Cancel",
+                              style: TextStyle(color: Colors.red)),
                         ),
                       ),
                       Container(width: 1, color: Colors.grey),
                       Expanded(
                         child: TextButton(
                           style: TextButton.styleFrom(
-
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.zero,
                                 side: BorderSide(color: Colors.grey, width: 0)),
-                              padding: EdgeInsets.zero,
+                            padding: EdgeInsets.zero,
                           ),
                           onPressed: () {
                             String enteredName = groupName.text;
@@ -403,7 +414,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                   enteredName); // Return the entered description
                             }
                           },
-                          child: Text("OK", style: TextStyle(color: Colors.green)),
+                          child:
+                              Text("OK", style: TextStyle(color: Colors.green)),
                         ),
                       ),
                     ],
@@ -430,7 +442,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Group Name edited succesfully",selectionColor: Colors.white,style: TextStyle(color: Colors.white)),
+          content: Text("Group Name edited succesfully",
+              selectionColor: Colors.white,
+              style: TextStyle(color: Colors.white)),
           backgroundColor: Color.fromRGBO(207, 214, 220, 1),
         ));
       } catch (e) {
@@ -445,7 +459,10 @@ class _GroupDescriptionState extends State<GroupDescription> {
     final height = MediaQuery.of(context).size.height;
     if (isLoading) {
       return Center(
-        child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,),
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.white,
+          color: Colors.grey,
+        ),
       );
     }
     return Scaffold(
@@ -453,68 +470,75 @@ class _GroupDescriptionState extends State<GroupDescription> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () {
-            Navigator.of(context).pushNamed(
-              '/groupchat',
-              arguments: {
-                'groupId': widget.groupId,
-                'currentUser': widget.currentUser,
-              },
-            );
-          },
-
+        leading: Padding(
+          padding:
+              EdgeInsets.only(left: kIsWeb ? width * 0.015 : width * 0.034),
+          child: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                '/groupchat',
+                arguments: {
+                  'groupId': widget.groupId,
+                  'currentUser': widget.currentUser,
+                },
+              );
+            },
+          ),
         ),
         actions: [
-          PopupMenuButton(
-            offset: Offset(0, height * 0.052),
-            elevation: 2,
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 0,
-                child: Text("Add members"),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: Text("Change group name"),
-              )
-            ],
-            color: Colors.grey.shade200,
-            onSelected: (value) {
-              if (value == 0) {
-                print('$addOtherMembers');
-                if (addOtherMembers || admins.contains(widget.currentUser)) {
-                  Navigator.of(context).pushNamed(
-                    '/addNewMembers',
-                    arguments: {
-                      'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
-                      'groupId': widget.groupId,
-                    },
-                  );
-
-
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("You are not the admin of this group.",
-                        style: TextStyle(
-                            color: Colors.white, fontFamily: 'Raleway')),
-                    backgroundColor: Colors.red.shade200,
-                  ));
+          Padding(
+            padding:
+                EdgeInsets.only(right: kIsWeb ? width * 0.015 : width * 0.024),
+            child: PopupMenuButton(
+              offset: Offset(0, height * 0.052),
+              elevation: 2,
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 0,
+                  child: Text("Add members"),
+                ),
+                PopupMenuItem(
+                  value: 1,
+                  child: Text("Change group name"),
+                )
+              ],
+              color: Colors.grey.shade200,
+              onSelected: (value) {
+                if (value == 0) {
+                  print('$addOtherMembers');
+                  if (addOtherMembers || admins.contains(widget.currentUser)) {
+                    Navigator.of(context).pushNamed(
+                      '/addNewMembers',
+                      arguments: {
+                        'existingMembers':
+                            List<String>.from(group['participants'] as List),
+                        // Explicit conversion
+                        'groupId': widget.groupId,
+                      },
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("You are not the admin of this group.",
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Raleway')),
+                      backgroundColor: Colors.red.shade200,
+                    ));
+                  }
+                } else if (value == 1) {
+                  if (!isCurrentUserAdmin(widget.currentUser)) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("You are not the admin",
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Raleway')),
+                      backgroundColor: Colors.red.shade200,
+                    ));
+                  } else {
+                    changeGroupName();
+                  }
                 }
-              } else if (value == 1) {
-                if (!isCurrentUserAdmin(widget.currentUser)) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("You are not the admin",
-                        style: TextStyle(
-                            color: Colors.white, fontFamily: 'Raleway')),
-                    backgroundColor: Colors.red.shade200,
-                  ));
-                } else {
-                  changeGroupName();
-                }
-              }
-            },
+              },
+            ),
           )
         ],
       ),
@@ -523,16 +547,21 @@ class _GroupDescriptionState extends State<GroupDescription> {
           children: [
             Center(
               child: CircleAvatar(
-                radius: kIsWeb?width*0.05: width * 0.13,
+                radius: kIsWeb ? width * 0.05 : width * 0.13,
                 backgroundColor: Color.fromRGBO(207, 214, 220, 1),
-                child:
-                    Icon(Icons.group, color: Colors.white, size:kIsWeb?width*0.04: width * 0.09),
+                child: Icon(Icons.group,
+                    color: Colors.white,
+                    size: kIsWeb ? width * 0.04 : width * 0.09),
               ),
             ),
             SizedBox(height: height * 0.012),
-            Text(group['groupName'], style: TextStyle(fontSize: kIsWeb?width*0.02: width * 0.055)),
+            Text(group['groupName'],
+                style: TextStyle(
+                    fontSize: kIsWeb ? width * 0.015 : width * 0.055)),
             Text('Group · ${group['participants'].length} members',
-                style: TextStyle(color: Colors.grey, fontSize: kIsWeb?width*0.02:width * 0.042)),
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: kIsWeb ? width * 0.015 : width * 0.042)),
             SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -549,7 +578,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         Navigator.of(context).pushNamed(
                           '/addNewMembers',
                           arguments: {
-                            'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                            'existingMembers': List<String>.from(
+                                group['participants'] as List),
+                            // Explicit conversion
                             'groupId': widget.groupId,
                           },
                         );
@@ -574,7 +605,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
             SizedBox(height: height * 0.012),
             Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal:kIsWeb?width*0.04:   width * 0.057, vertical: height * 0.017),
+                  horizontal: kIsWeb ? width * 0.02 : width * 0.057,
+                  vertical: height * 0.017),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Column(
@@ -606,8 +638,12 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               ScaffoldMessenger.of(context)
                                   .showSnackBar(SnackBar(
                                 content: Text(
-                                    "Group description edited succesfully",selectionColor: Colors.white,style: TextStyle(color: Colors.white),),
-                                backgroundColor: Color.fromRGBO(207, 214, 220, 1),
+                                  "Group description edited succesfully",
+                                  selectionColor: Colors.white,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor:
+                                    Color.fromRGBO(207, 214, 220, 1),
                               ));
                             } catch (e) {
                               print(e.toString());
@@ -618,7 +654,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       child: Text(
                         groupDescription,
                         style: TextStyle(
-                            color: Color.fromRGBO(21, 171, 97, 1), fontSize:kIsWeb?width*0.02: width * 0.037),
+                            color: Color.fromRGBO(21, 171, 97, 1),
+                            fontSize: kIsWeb ? width * 0.015 : width * 0.037),
                       ),
                     ),
                     SizedBox(height: height * 0.005),
@@ -637,48 +674,53 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.notifications_none,
-                size: kIsWeb? width*0.02: width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
               ),
               title: Text(
                 'Notifications',
-                style: TextStyle(fontSize:kIsWeb?width*0.017:  width * 0.045),
+                style:
+                    TextStyle(fontSize: kIsWeb ? width * 0.015 : width * 0.045),
               ),
               trailing: Icon(
                 Icons.chevron_right,
-                size: kIsWeb? width*0.02: width * 0.07,
+                size: kIsWeb ? width * 0.015 : width * 0.07,
               ),
             ),
             ListTile(
               leading: Icon(
                 Icons.image_outlined,
-                size: kIsWeb? width*0.02: width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
               ),
               title: Text('Media visibility',
-                  style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045)),
+                  style: TextStyle(
+                      fontSize: kIsWeb ? width * 0.015 : width * 0.045)),
               trailing: Icon(
                 Icons.chevron_right,
-                size:kIsWeb? width*0.02:  width * 0.07,
+                size: kIsWeb ? width * 0.015 : width * 0.07,
               ),
             ),
             ListTile(
               leading: Icon(
                 Icons.star_border,
-                size: kIsWeb? width*0.02: width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
                 color: Colors.black,
               ),
               title: Text(
                 'Starred Messages',
-                style: TextStyle(fontSize:kIsWeb?width*0.017: width * 0.045),
+                style:
+                    TextStyle(fontSize: kIsWeb ? width * 0.015 : width * 0.045),
               ),
-              trailing: Icon(Icons.arrow_forward_ios, size: kIsWeb? width*0.016: width * 0.04, color: Colors.black),
+              trailing: Icon(Icons.chevron_right,
+                  size: kIsWeb ? width * 0.015 : width * 0.07),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => StarredMessagesPage(groupId: widget.groupId)),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          StarredMessagesPage(groupId: widget.groupId)),
                 );
               },
             ),
-
             SizedBox(height: height * 0.012),
             Divider(
                 height: height * 0.012,
@@ -688,24 +730,27 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.lock_outline,
-                size:kIsWeb?width*0.02:  width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
               ),
               title: Padding(
-                padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                padding: EdgeInsets.symmetric(
+                    horizontal: kIsWeb ? 0 : width * 0.012),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Encryption',
-                      style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045),
+                      style: TextStyle(
+                          fontSize: kIsWeb ? width * 0.015 : width * 0.045),
                     ),
                     Container(
                         width: width * 0.6,
                         child: Text(
                             "Messages and calls are end-to-end encrypted.",
                             style: TextStyle(
-                                fontSize: kIsWeb?width*0.014:width * 0.035, color: Colors.grey)))
+                                fontSize: kIsWeb ? width * 0.01 : width * 0.035,
+                                color: Colors.grey)))
                   ],
                 ),
               ),
@@ -713,19 +758,22 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.timer_outlined,
-                size: kIsWeb?width*0.02:width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
               ),
               title: Padding(
-                padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                padding: EdgeInsets.symmetric(
+                    horizontal: kIsWeb ? 0 : width * 0.012),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Disappearing messages',
-                        style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045)),
+                        style: TextStyle(
+                            fontSize: kIsWeb ? width * 0.015 : width * 0.045)),
                     Text("off",
                         style: TextStyle(
-                            fontSize:kIsWeb?width*0.014: width * 0.035, color: Colors.grey))
+                            fontSize: kIsWeb ? width * 0.01 : width * 0.035,
+                            color: Colors.grey))
                   ],
                 ),
               ),
@@ -733,29 +781,36 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.mail_lock_outlined,
-                size:kIsWeb?width*0.02: width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
               ),
               title: Padding(
-                padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                padding: EdgeInsets.symmetric(
+                    horizontal: kIsWeb ? 0 : width * 0.012),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Chat lock',
-                        style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.045)),
+                        style: TextStyle(
+                            fontSize: kIsWeb ? width * 0.015 : width * 0.045)),
                     Text("Lock and hide this chat on this device",
                         style: TextStyle(
-                            fontSize: kIsWeb?width*0.014:width * 0.035, color: Colors.grey))
+                            fontSize: kIsWeb ? width * 0.01 : width * 0.035,
+                            color: Colors.grey))
                   ],
                 ),
               ),
-              trailing: Transform.scale(
-                  scale: kIsWeb?width*0.0004:  width * 0.002,
-                  child: Switch(
-                    value: false,
-                    onChanged: (val) {},
-                    activeColor: Colors.black,
-                  )),
+              trailing: Padding(
+                padding:
+                    EdgeInsets.only(left: kIsWeb ? width * 0.03 : width * 0.1),
+                child: Transform.scale(
+                    scale: kIsWeb ? width * 0.0004 : width * 0.0016,
+                    child: Switch(
+                      value: false,
+                      onChanged: (val) {},
+                      activeColor: Colors.black,
+                    )),
+              ),
             ),
             if (isCurrentUserAdmin(widget.currentUser)) ...[
               ListTile(
@@ -772,7 +827,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       'createdBy': group['createdBy']
                     },
                   ) as Map<String, dynamic>?;
-                  if(result!=null){
+                  if (result != null) {
                     List<String> newAdmins = result['admins'];
 
                     setState(() {
@@ -809,16 +864,17 @@ class _GroupDescriptionState extends State<GroupDescription> {
                       print(e.toString());
                     }
                   }
-
                 },
                 leading: Icon(
                   Icons.settings,
-                  size: kIsWeb?width*0.02:  width * 0.06,
+                  size: kIsWeb ? width * 0.015 : width * 0.06,
                 ),
                 title: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.012),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: kIsWeb ? 0 : width * 0.012),
                   child: Text('Group permissions',
-                      style: TextStyle(fontSize:kIsWeb?width*0.017:  width * 0.045)),
+                      style: TextStyle(
+                          fontSize: kIsWeb ? width * 0.015 : width * 0.045)),
                 ),
               )
             ],
@@ -829,7 +885,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
             SizedBox(height: height * 0.012),
             Container(
               margin: EdgeInsets.symmetric(
-                  horizontal: width * 0.035, vertical: height * 0.012),
+                  horizontal: kIsWeb?0: width * 0.035, vertical: height * 0.012),
               padding: EdgeInsets.symmetric(horizontal: width * 0.012),
               child: Column(
                 children: [
@@ -838,7 +894,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
                     children: [
                       Text(
                         "${group['participants'].length} members ",
-                        style: TextStyle(fontSize: kIsWeb?width*0.017:width * 0.042),
+                        style: TextStyle(
+                            fontSize: kIsWeb ? width * 0.015 : width * 0.042),
                       ),
                       Spacer(),
                       // Padding(
@@ -866,7 +923,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                               Navigator.of(context).pushNamed(
                                 '/addNewMembers',
                                 arguments: {
-                                  'existingMembers': List<String>.from(group['participants'] as List), // Explicit conversion
+                                  'existingMembers': List<String>.from(
+                                      group['participants'] as List),
+                                  // Explicit conversion
                                   'groupId': widget.groupId,
                                 },
                               );
@@ -884,34 +943,40 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           },
                           contentPadding: EdgeInsets.zero,
                           leading: CircleAvatar(
-                              backgroundColor:Color.fromRGBO(21, 171, 97, 1),
+                              backgroundColor: Color.fromRGBO(21, 171, 97, 1),
                               child: Icon(
                                 Icons.group_add_outlined,
                                 color: Colors.white,
-                                size: kIsWeb?width*0.02:width * 0.052,
+                                size: kIsWeb ? width * 0.015 : width * 0.052,
                               )),
                           title: Text(
                             "Add members",
-                            style: TextStyle(fontSize:kIsWeb?width*0.017:  width * 0.045),
+                            style: TextStyle(
+                                fontSize:
+                                    kIsWeb ? width * 0.015 : width * 0.045),
                           ),
                         ),
                         if (isLoading || isLoadingDatabse)
-                          CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,)
+                          CircularProgressIndicator(
+                            backgroundColor: Colors.white,
+                            color: Colors.grey,
+                          )
                         else ...[
-                          ListView.builder(
-                           
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: group['participants'].length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
+                          Padding(
+                            padding:  EdgeInsets.zero,
+                            child: ListView.builder(
 
-                                onLongPress: () {
-                                  if(widget.currentUser==group['participants'][index]) {
-
-                                  }else
-                                    {
-                                      if (isCurrentUserAdmin(widget.currentUser)) {
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: group['participants'].length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  onLongPress: () {
+                                    if (widget.currentUser ==
+                                        group['participants'][index]) {
+                                    } else {
+                                      if (isCurrentUserAdmin(
+                                          widget.currentUser)) {
                                         showDialog(
                                             context: context,
                                             builder: (context) {
@@ -925,9 +990,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                                 actions: [
                                                   Column(
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment.center,
+                                                        MainAxisAlignment.center,
                                                     crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
+                                                        CrossAxisAlignment.center,
                                                     children: [
                                                       TextButton(
                                                           onPressed: () {
@@ -938,20 +1003,28 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                                             "Cancel",
                                                             style: TextStyle(
                                                                 fontFamily:
-                                                                'Raleway',
-                                                                color: Colors
-                                                                    .black),
+                                                                    'Raleway',
+                                                                color:
+                                                                    Colors.black),
                                                           )),
                                                       TextButton(
-                                                          onPressed: () async{
+                                                          onPressed: () async {
                                                             try {
-                                                              print("The particpant you are removing is ${group['participants'][index]} their name is ${membersFirstNameList[index]}");
+                                                              print(
+                                                                  "The particpant you are removing is ${group['participants'][index]} their name is ${membersFirstNameList[index]}");
 
-                                                              await   removeGroupFromThisUser(group['participants'][index],widget.groupId);
-                                                              removeUserFromThisGroup(widget.groupId,group['participants'][index])
+                                                              await removeGroupFromThisUser(
+                                                                  group['participants']
+                                                                      [index],
+                                                                  widget.groupId);
+                                                              removeUserFromThisGroup(
+                                                                      widget
+                                                                          .groupId,
+                                                                      group['participants']
+                                                                          [index])
                                                                   .then((_) {
                                                                 Navigator.of(
-                                                                    context)
+                                                                        context)
                                                                     .pop();
                                                               });
                                                             } catch (e) {
@@ -962,8 +1035,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                                             "Remove",
                                                             style: TextStyle(
                                                                 fontFamily:
-                                                                'Raleway',
-                                                                color: Colors.red),
+                                                                    'Raleway',
+                                                                color:
+                                                                    Colors.red),
                                                           ))
                                                     ],
                                                   ),
@@ -983,41 +1057,44 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                         ));
                                       }
                                     }
-
-                                },
-                                contentPadding: EdgeInsets.zero,
-                                leading: CircleAvatar(
-                                  backgroundColor: Color.fromRGBO(30, 170, 97, 1),
-                                  child: Text(
-                                    membersFirstNameList[index][0]
-                                        .toUpperCase(),
-                                    style: TextStyle(color: Colors.white),
+                                  },
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: CircleAvatar(
+                                    backgroundColor:
+                                        Color.fromRGBO(30, 170, 97, 1),
+                                    child: Text(
+                                      membersFirstNameList[index][0]
+                                          .toUpperCase(),
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   ),
-                                ),
-                                title: Text(membersFirstNameList[index]),
-                                trailing: isCurrentUserAdmin(
-                                        group['participants'][index])
-                                    ? Container(
-                                        decoration: BoxDecoration(
-                                            color: Color.fromRGBO(217,252,210,1),
-                                            border: Border.all(
-                                                color: Color.fromRGBO(217,252,210,1)),
-                                            borderRadius: BorderRadius.circular(
-                                                width * 0.01)),
-                                        width: kIsWeb?width*0.05:  width * 0.12,
-                                        height: height * 0.017,
-                                        child: Center(
+                                  title: Text(membersFirstNameList[index]),
+                                  trailing: isCurrentUserAdmin(
+                                          group['participants'][index])
+                                      ? Container(
+                                          margin: EdgeInsets.only(
+                                              right: kIsWeb
+                                                  ? width * 0.01
+                                                  : width * 0.026),
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFFD9FCD2),
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
                                           child: Text(
                                             "Admin",
                                             style: TextStyle(
-                                                fontSize:kIsWeb?width*0.0055:  width * 0.027,
-                                                color: Color.fromRGBO(34, 89, 49, 1)),
+                                              fontSize: 10,
+                                              color: Color(0xFF225931),
+                                            ),
                                           ),
-                                        ),
-                                      )
-                                    : null,
-                              );
-                            },
+                                        )
+                                      : null,
+                                );
+                              },
+                            ),
                           ),
                         ]
                       ],
@@ -1034,20 +1111,22 @@ class _GroupDescriptionState extends State<GroupDescription> {
             ListTile(
               leading: Icon(
                 Icons.favorite_outline,
-                size:kIsWeb?width*0.02:  width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
               ),
               title: Text(
                 'Add to Favourites',
-                style: TextStyle(fontSize: kIsWeb?width*0.017: width * 0.045),
+                style:
+                    TextStyle(fontSize: kIsWeb ? width * 0.015 : width * 0.045),
               ),
             ),
             ListTile(
               leading: Icon(
                 Icons.people_outline,
-                size: kIsWeb?width*0.02:width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
               ),
               title: Text('Add to list',
-                  style: TextStyle(fontSize: kIsWeb?width*0.017: width * 0.045)),
+                  style: TextStyle(
+                      fontSize: kIsWeb ? width * 0.015 : width * 0.045)),
             ),
             ListTile(
               onTap: () {
@@ -1055,20 +1134,24 @@ class _GroupDescriptionState extends State<GroupDescription> {
               },
               leading: Icon(
                 Icons.exit_to_app,
-                size: kIsWeb?width*0.02:width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
                 color: Colors.red,
               ),
               title: Text('Exit group',
-                  style: TextStyle(color: Colors.red, fontSize: kIsWeb?width*0.017: width * 0.045)),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: kIsWeb ? width * 0.015 : width * 0.045)),
             ),
             ListTile(
               leading: Icon(
                 Icons.thumb_down_alt_outlined,
-                size: kIsWeb?width*0.02:width * 0.06,
+                size: kIsWeb ? width * 0.015 : width * 0.06,
                 color: Colors.red,
               ),
               title: Text('Report group',
-                  style: TextStyle(color: Colors.red, fontSize: kIsWeb?width*0.017: width * 0.045)),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: kIsWeb ? width * 0.015 : width * 0.045)),
             ),
           ],
         ),
@@ -1086,9 +1169,10 @@ class _GroupDescriptionState extends State<GroupDescription> {
               horizontal: width * 0.042, vertical: height * 0.017),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(width * 0.032),
+            borderRadius:
+                BorderRadius.circular(kIsWeb ? width * 0.02 : width * 0.032),
           ),
-          child: Icon(icon, color:Color.fromRGBO(21, 171, 97, 1)),
+          child: Icon(icon, color: Color.fromRGBO(21, 171, 97, 1)),
         ),
         SizedBox(height: height * 0.01),
         Text(label),
@@ -1101,7 +1185,8 @@ class _GroupDescriptionState extends State<GroupDescription> {
 class StarredMessagesPage extends StatefulWidget {
   final String groupId;
 
-  const StarredMessagesPage({Key? key, required this.groupId}) : super(key: key);
+  const StarredMessagesPage({Key? key, required this.groupId})
+      : super(key: key);
 
   @override
   _StarredMessagesPageState createState() => _StarredMessagesPageState();
@@ -1113,11 +1198,10 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(0xFFF6F1EB),
+      backgroundColor: Color(0xFFF6F1EB),
       appBar: AppBar(
         title: Text("Starred Messages"),
         backgroundColor: Colors.white,
-
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
@@ -1129,7 +1213,11 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator(backgroundColor: Colors.white,color: Colors.grey,));
+            return Center(
+                child: CircularProgressIndicator(
+              backgroundColor: Colors.white,
+              color: Colors.grey,
+            ));
           }
 
           if (snapshot.hasError) {
@@ -1170,12 +1258,10 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
-
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     Text(
                       senderName,
                       style: TextStyle(fontSize: 14, color: Colors.black87),
@@ -1183,25 +1269,26 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
                     SizedBox(height: 5),
                     Text(
                       messageText,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                     SizedBox(height: 5),
-                     Align(
-                       alignment: Alignment.bottomRight,
-                     child:Row(
-                       mainAxisAlignment: MainAxisAlignment.end,
-                       children: [
-                         Icon(
-                           Icons.star,
-                           color:Colors.yellow,
-                         ),
-                         SizedBox(width:3),
-
-                       Text(
-                        "${timestamp.hour}:${timestamp.minute}",
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                    ])),
+                    Align(
+                        alignment: Alignment.bottomRight,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Icon(
+                                Icons.star,
+                                color: Colors.yellow,
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                "${timestamp.hour}:${timestamp.minute}",
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey[600]),
+                              ),
+                            ])),
                   ],
                 ),
               );
@@ -1210,6 +1297,5 @@ class _StarredMessagesPageState extends State<StarredMessagesPage> {
         },
       ),
     );
-
   }
 }

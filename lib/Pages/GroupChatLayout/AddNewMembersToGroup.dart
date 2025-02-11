@@ -92,7 +92,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
               children: [
                 Text(
                     "Add Members",
-                    style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: kIsWeb ? width * 0.01 : width*0.043),
+                    style: TextStyle(color: Colors.black, fontFamily: 'Raleway',fontSize: kIsWeb ? width * 0.02 : width*0.043),
                   ),
                 Text(
                   "${newMembers.length} new members added ",
@@ -101,7 +101,10 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
               ],
             ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black,),
+          icon: Padding(
+            padding: EdgeInsets.only(left:kIsWeb?width*0.02:  width * 0.034),
+            child: Icon(Icons.arrow_back_ios, color: Colors.black,),
+          ),
           onPressed: () {
             if (_isSearching) {
               setState(() {
@@ -115,13 +118,16 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
         ),
         actions: [
           if (!_isSearching)
-            IconButton(
-              icon: Icon(Icons.search, color: Colors.black),
-              onPressed: () {
-                setState(() {
-                  _isSearching = true;
-                });
-              },
+            Padding(
+              padding:  EdgeInsets.only(right:kIsWeb?width*0.032:  width * 0.034),
+              child: IconButton(
+                icon: Icon(Icons.search, color: Colors.black),
+                onPressed: () {
+                  setState(() {
+                    _isSearching = true;
+                  });
+                },
+              ),
             ),
         ],
       ),
@@ -132,15 +138,16 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
           children: [
           if(newMembers.isNotEmpty && newMembersName.isNotEmpty)...[
             Padding(
-              padding: EdgeInsets.symmetric(vertical: height * 0.012, horizontal: width * 0.012),
+              padding: EdgeInsets.symmetric(vertical: height * 0.012, horizontal:kIsWeb?width*0.012:  width * 0.034  ),
               child: SizedBox(
-                height:kIsWeb?height*0.16:  height*0.1, // Ensure enough height for ListView
+                height:kIsWeb?height*0.16:  height*0.1,
                 child: ListView.builder(
+
                   scrollDirection: Axis.horizontal,
                   itemCount: newMembers.length,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: EdgeInsets.symmetric(horizontal: width * 0.02), // Adjust spacing
+                      padding: EdgeInsets.symmetric(horizontal: kIsWeb?width*0.009: width * 0.02),
                       child: Column(
                         children: [
                           Container(
@@ -148,7 +155,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                       shape: BoxShape.circle,
                         border: Border.all(
                           color:Color.fromRGBO(21, 171, 97, 1), // Set the border color
-                          width: width*0.002, // Set the border width
+                          width:kIsWeb? width*0.001: width*0.002, // Set the border width
                         ),
                       ),
                             child: CircleAvatar(
@@ -177,7 +184,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
           ],
             Padding(
               padding: EdgeInsets.symmetric(
-                  vertical: height * 0.012, horizontal: width * 0.012),
+                  vertical: height * 0.012, horizontal: kIsWeb?0: width * 0.012),
               child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
                 stream: fetchUsers(),
                 builder: (context, snapshot) {
@@ -198,6 +205,7 @@ class _AddNewMembersToGroupState extends State<AddNewMembersToGroup> {
                       return Padding(
                         padding: kIsWeb? EdgeInsets.symmetric(vertical: height*0.004):EdgeInsets.zero,
                         child: ListTile(
+
                           leading:Stack(
                             clipBehavior: Clip.none,
                             children: [

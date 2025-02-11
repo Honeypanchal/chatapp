@@ -66,26 +66,27 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
           'New  Group',
           style: TextStyle(fontFamily: 'Raleway', color: Colors.black),
         ),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, "/newGroup",
-                  arguments: {'currentUser': widget.createdBy});
-            },
-            icon: Padding(
-              padding:kIsWeb?EdgeInsets.only(left:width*0.032)  : EdgeInsets.zero,
-              child: Icon(
+        leading: Padding(
+          padding: EdgeInsets.only(left: kIsWeb?width*0.015:  width * 0.048),
+          child: IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "/newGroup",
+                    arguments: {'currentUser': widget.createdBy});
+              },
+              icon: Icon(
                 Icons.arrow_back_ios,
                 color: Colors.black,
-              ),
-            )),
+              )),
+        ),
         backgroundColor:Colors.white,
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: width * 0.032, vertical: height * 0.032),
+              horizontal: kIsWeb?width*0.02:  width * 0.042, vertical: kIsWeb?height*0.035:  height * 0.032),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               // Group Name Section
             Row(
@@ -101,7 +102,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                   size: kIsWeb ? width * 0.02 : width * 0.06,
                 ),
               ),
-             SizedBox(width: width * 0.012), // Add spacing only on mobile
+             SizedBox(width: width * 0.015), // Add spacing only on mobile
               Expanded(
                 child: TextFormField(
                   cursorColor: Colors.grey,
@@ -116,7 +117,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                     hintText: 'Group Name',
                   ),
                   style: TextStyle(
-                    fontSize: kIsWeb ? width * 0.02 : width * 0.05,
+                    fontSize:kIsWeb ? width * 0.015 : width * 0.05,
                     fontFamily: 'Raleway',
                     color: Colors.black,
                   ),
@@ -159,7 +160,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             'Disappearing messages ',
                             style: TextStyle(
-                              fontSize: kIsWeb?width*0.02:  width * 0.042,
+                              fontSize: kIsWeb ? width * 0.012 :  width * 0.042,
                               color: Colors.black87,
                             ),
                           ),
@@ -172,14 +173,14 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.timer,
                                 color: Colors.grey,
-                                size:kIsWeb?width*0.025:  width * 0.06,
+                                size:kIsWeb ? width * 0.015 :  width * 0.06,
                               ))
                         ],
                       ),
                       Text(
                         'Off',
                         style: TextStyle(
-                          fontSize:kIsWeb?width*0.019: width * 0.03,
+                          fontSize: kIsWeb ? width * 0.01 : width * 0.03,
                           color: Colors.black87,
                         ),
                       ),
@@ -191,7 +192,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             'Group Permissions',
                             style: TextStyle(
-                              fontSize: kIsWeb?width*0.02:width * 0.042,
+                              fontSize:  kIsWeb ? width * 0.012 :width * 0.042,
                               color: Colors.black87,
                             ),
                           ),
@@ -208,6 +209,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                                     'admins': admins,
                                     'members': widget.members,
                                     'currentUser': widget.createdBy.uid,
+
                                   },
                                 );
 
@@ -223,7 +225,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                               icon: Icon(
                                 Icons.settings,
                                 color: Colors.grey,
-                                size:kIsWeb?width*0.025: width * 0.06,
+                                size:kIsWeb ? width * 0.015 :width * 0.06,
                               ))
                         ],
                       ),
@@ -247,7 +249,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                     Text(
                       'Members : ${widget.members.length}',
                       style: TextStyle(
-                        fontSize: kIsWeb?width*0.02: width * 0.035,
+                        fontSize:  kIsWeb ? width * 0.012 : width * 0.035,
                         color: Colors.black,
                       ),
                     ),
@@ -279,7 +281,7 @@ class _NewGroupDefinitionState extends State<NewGroupDefinition> {
                           Text(
                             membersFirstNameList[index],
                             style: TextStyle(
-                              fontSize:kIsWeb?width*0.02: width * 0.04,
+                              fontSize: kIsWeb ? width * 0.012 : width * 0.04,
                               color: Colors.black,
                             ),
                           ),
