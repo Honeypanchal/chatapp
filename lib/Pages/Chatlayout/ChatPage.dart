@@ -287,30 +287,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
         ],
       ),
-      /*floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          Map<String, dynamic>? selectedUser = await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) =>
-                  UserListPage(currentUser: widget.currentUser),
-            ),
-          );
 
-          if (selectedUser != null) {
-            setState(() {
-              _selectedUsers.add(selectedUser);
-              _filteredUsers = _selectedUsers;
-            });
-          }
-        },
-        backgroundColor: Color.fromRGBO(21, 171, 97, 1),
-        tooltip: 'Contact with new User..',
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-          size: width > 600 ? width * 0.025 : width * 0.09,
-        ),
-      ),*/
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           Map<String, dynamic>? selectedUser = await Navigator.of(context).push(
