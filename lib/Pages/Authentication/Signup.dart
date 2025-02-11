@@ -71,7 +71,7 @@ class _SignupPageState extends State<SignupPage> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 60),
+          padding: width>600? EdgeInsets.only(left: 450.0, right: 450.0, top: 60):EdgeInsets.only(left: 20.0, right: 20.0, top: 60),
           child: Column(
             children: [
               Text(
@@ -103,7 +103,7 @@ class _SignupPageState extends State<SignupPage> {
                         'Name',
                         style: TextStyle(
                             fontSize:
-                                width > 600 ? width * 0.020 : width * 0.033,
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -135,7 +135,7 @@ class _SignupPageState extends State<SignupPage> {
                           border: const OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromRGBO(21, 171, 97, 1)),
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            // borderRadius: BorderRadius.all(Radius.circular(10)),
                           )),
                       validator: (val) {
                         if (val == null || val.isEmpty) {
@@ -161,7 +161,7 @@ class _SignupPageState extends State<SignupPage> {
                         'Email Address',
                         style: TextStyle(
                             fontSize:
-                                width > 600 ? width * 0.020 : width * 0.033,
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Poppins'),
                         textAlign: TextAlign.left,
@@ -206,7 +206,7 @@ class _SignupPageState extends State<SignupPage> {
                         'Password',
                         style: TextStyle(
                             fontSize:
-                                width > 600 ? width * 0.020 : width * 0.033,
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
@@ -269,7 +269,7 @@ class _SignupPageState extends State<SignupPage> {
                         'Re-Type Password',
                         style: TextStyle(
                             fontSize:
-                                width > 600 ? width * 0.020 : width * 0.033,
+                                width > 600 ? width * 0.012 : width * 0.033,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'poppins'),
                         textAlign: TextAlign.left,
