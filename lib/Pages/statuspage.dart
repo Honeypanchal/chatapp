@@ -160,7 +160,7 @@ class _StatusPageState extends State<StatusPage> {
                   child: Text(
                     "Recently Added",
                     style: TextStyle(
-                      fontSize: width > 600 ? width * 0.01 : width * 0.06,
+                      fontSize: width > 600 ? width * 0.01 : width * 0.05,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey,
                     ),
@@ -179,7 +179,7 @@ class _StatusPageState extends State<StatusPage> {
                   child: Text(
                     "Viewed Status",
                     style: TextStyle(
-                      fontSize: width > 600 ? width * 0.01 : width * 0.06,
+                      fontSize: width > 600 ? width * 0.01 : width * 0.05,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey,
                     ),
@@ -363,8 +363,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
               Text(
                 "Status Replies",
                 style: TextStyle(
-                    //fontSize: MediaQuery.sizeOf(context).width*0.04,
-                    fontSize: width < 600 ? width * 0.03 : width * 0.02,
+                    fontSize: width > 600 ? width * 0.01 : width * 0.03,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(height: MediaQuery.sizeOf(context).height*0.02),
@@ -512,7 +511,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     ),
                     child: CircleAvatar(
                       backgroundColor: Colors.black26,
-                      radius: width>600 ?  width*0.018 : width*0.025,
+                      radius: width>600 ?  width*0.018 : width*0.04,
                       child: Text(
                         widget.statuses[0].username[0].toUpperCase(),
                         style: TextStyle(
@@ -527,7 +526,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     width:width> 600 ? width*0.015 : width*0.03
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 13),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -536,8 +535,8 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                           style: TextStyle(
                               color: Colors.white,
                               fontFamily: 'poppins',
-                              fontSize: width>600 ? width*0.015: width*0.03,
-                              fontWeight: FontWeight.w600),
+                              fontSize: width>600 ? width*0.015: width*0.035,
+                              fontWeight: FontWeight.w500),
                         ),
 
                         Text(
@@ -554,21 +553,43 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                   if (widget.statuses[currentIndex].userId ==
                       FirebaseAuth.instance.currentUser!.uid)
                     Container(
-                       height: width>600 ? height*0.05: height*0.1,
-                      width: width>600 ? height*0.05: height*0.1,
+                       height: width>600 ? height*0.05: height*0.05,
+                      width: width>600 ? height*0.05: height*0.05,
 
                       decoration: BoxDecoration(
                           shape: BoxShape.circle, color: Colors.black26),
                       child: IconButton(
-                          onPressed: () async {
-                            await _statusService.deleteStatus(
-                                widget.statuses[currentIndex].uid);
-                            Navigator.pop(context);
+                          onPressed: ()
+
+                        {
+                          showDialog(context: context,
+                              builder: (context){
+                            return AlertDialog(
+                              title: Text('Delete Status',textAlign: TextAlign.center,),
+                              content:Text('Are your sure to delete status?',textAlign: TextAlign.center,),
+                              actions: [TextButton(onPressed: (){
+                                Navigator.pop(context);
+                              },
+                                  child:Text('cancel',style: TextStyle(color: Colors.grey),
+                                  ),
+                              ),
+                              TextButton(onPressed: ()async{
+                                await _statusService.deleteStatus(widget.statuses[currentIndex].uid);
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+
+
+                              },
+                                  child: Text('Delete',style: TextStyle(color: Colors.red),))],
+
+                            );
+                              });
                           },
+
                           icon: Icon(
                             Icons.delete,
                             color: Colors.red,
-                            size: width> 600 ? width*0.012:width*0.05,
+                            size: width> 600 ? width*0.012:width*0.04,
                           )),
                     ),
                 ],
@@ -740,18 +761,36 @@ class _EnterStatusState extends State<EnterStatus> {
           children: [
             Padding(
               padding: EdgeInsets.symmetric(
-                horizontal:width>600 ? width*0.05:width*0.02,
-                vertical: height * 0.025,
+                horizontal:width>600 ? width*0.02:width*0.02,
+                vertical: height * 0.02,
               ),
               child: Row(
                 children: [
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      height: height * 0.15,
+                      width: width > 600 ? width*0.035 : width*0.1,
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: width>600 ? width*0.02 : width*0.065,
+                      ),
+                    ),
+                  ),
 
                   Spacer(),
                   GestureDetector(
                     onTap: _changeTextStyle,
                     child: Container(
                       height: height * 0.15,
-                      width: width > 600 ? width*0.035 : width*0.015 ,
+                      width: width > 600 ? width*0.035 : width*0.1,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         shape: BoxShape.circle,
@@ -759,18 +798,18 @@ class _EnterStatusState extends State<EnterStatus> {
                       child: Icon(
                         Icons.text_fields_rounded,
                         color: Colors.white,
-                        size: width>600 ? width*0.02 : width*0.04,
+                        size: width>600 ? width*0.02 : width*0.065,
                       ),
                     ),
                   ),
                   SizedBox(
-                    width: width * 0.01,
+                    width: width * 0.02,
                   ),
                   GestureDetector(
                     onTap: _changeColor,
                     child: Container(
                       height: height * 0.15,
-                      width: width > 600 ? width*0.035 : width*0.015 ,
+                      width: width > 600 ? width*0.035 : width*0.1,
                       decoration: BoxDecoration(
                         color: Colors.black26,
                         shape: BoxShape.circle,
@@ -778,7 +817,7 @@ class _EnterStatusState extends State<EnterStatus> {
                       child: Icon(
                         Icons.color_lens_sharp,
                         color: Colors.white,
-                        size: width>600 ? width*0.02 : width*0.04,
+                        size: width>600 ? width*0.02 : width*0.065,
                       ),
                     ),
                   ),
@@ -805,7 +844,7 @@ class _EnterStatusState extends State<EnterStatus> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.small(
 
         onPressed: _uploadTextStatus,
         backgroundColor: Colors.black26,
@@ -813,7 +852,7 @@ class _EnterStatusState extends State<EnterStatus> {
         child: Icon(
           Icons.send,
           color: Colors.white,
-          size: width>600 ? width*0.015 : width*0.04,
+          size: width>600 ? width*0.015 : width*0.05,
         ),
       ),
     );
