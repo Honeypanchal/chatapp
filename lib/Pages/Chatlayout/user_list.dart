@@ -141,8 +141,13 @@ class _UserListPageState extends State<UserListPage> {
                 Map<String, dynamic> user = _filteredUsers[index];
                 return ListTile(
                   onTap: () {
-                    navigateToChat(user);
+                    Navigator.pop(context, user);
+                    navigateToChat(user);// Return the selected user
                   },
+
+                  /*onTap: () {
+                    navigateToChat(user);
+                  },*/
                   leading: CircleAvatar(
                     backgroundColor: Colors.grey[100],
                     child: Text(

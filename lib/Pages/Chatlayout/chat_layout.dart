@@ -182,7 +182,7 @@ class _ChatLayoutState extends State<ChatLayout> {
     } else if (difference == 1) {
       return 'Yesterday';
     } else {
-      return DateFormat('dd MMM yyyy').format(messageTime);
+      return DateFormat('MMM dd').format(messageTime);
     }
   }
 
@@ -207,7 +207,509 @@ class _ChatLayoutState extends State<ChatLayout> {
   }
 
   @override
+  // @override
   Widget build(BuildContext context) {
+    final TextEditingController message = TextEditingController();
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
+    // Group messages by date
+    Map<String, List<DocumentSnapshot>> groupedMessages = {};
+    for (var message in messages) {
+      final messageDate = formatDateForGrouping(message['timestamp']);
+      if (!groupedMessages.containsKey(messageDate)) {
+        groupedMessages[messageDate] = [];
+      }
+      groupedMessages[messageDate]!.add(message);
+    }
+
+    // Flatten the grouped messages into a list with separators
+    List<Widget> messageWidgets = [];
+    groupedMessages.forEach((date, messages) {
+      // Add date separator
+      messageWidgets.add(
+        Center(
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: Text(
+              date,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Add messages for this date
+      for (var message in messages) {
+        final messageData = message.data() as Map<String, dynamic>;
+        final isCurrentUser = messageData['sentBy'] == widget.currentUser.uid;
+        final repliedMessage = messageData['replyTo'];
+        final repliedSender = messageData['replyToSender'];
+        final messageId = message.id;
+
+        bool x = messageData['sentBy'] == widget.currentUser.uid;
+        bool seenStatus = messageData.containsKey('seen') ? messageData['seen'] : false;
+        bool isEdited = messageData.containsKey('edited') ? messageData['edited'] : false;
+
+        messageWidgets.add(
+          GestureDetector(
+            onLongPress: () {
+              toggleMessageSelection(messageId);
+            },
+            onHorizontalDragEnd: (details) {
+              setState(() {
+                replyToMessage = messageData['message'];
+                replyToSender = isCurrentUser ? "You" : widget.user['firstName'];
+              });
+            },
+            child: Column(
+              crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                if (repliedMessage != null)
+                  Container(
+                    margin: EdgeInsets.only(
+                      left: isCurrentUser
+                          ? width > 600
+                          ? width * 0.05
+                          : width * 0.2
+                          : width > 600
+                          ? width * 0.01
+                          : width * 0.04,
+                      right: isCurrentUser
+                          ? width > 600
+                          ? width * 0.01
+                          : width * 0.04
+                          : width > 600
+                          ? width * 0.05
+                          : width * 0.2,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          repliedSender ?? "",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          repliedMessage,
+                          style: const TextStyle(
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Container(
+                  color: selectedMessages.contains(messageId) ? Colors.grey.shade300 : Colors.transparent,
+                  child: Align(
+                    alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isCurrentUser ? Color(0XFFD5FCD0) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            messageData['message'],
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: isCurrentUser ? Colors.black : Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                DateFormat.Hm().format(
+                                  (messageData['timestamp'] as Timestamp).toDate(),
+                                ),
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              SizedBox(width: 3),
+                              Icon(
+                                seenStatus ? Icons.done_all : Icons.check,
+                                size: 16,
+                                color: seenStatus ? Colors.blue : Colors.grey,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 1),
+                if (x)
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: width > 600 ? width * 0.01 : width * 0.03),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (isEdited)
+                          if (messageData['edited'] == true)
+                            const Text(
+                              "Edited",
+                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      }
+    });
+
+    return Scaffold(
+      backgroundColor: Color(0XFFF6F1EB),
+      appBar: PreferredSize(
+        preferredSize: Size(width, height * 0.072),
+        child: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            ),
+          ),
+          title: isAppBarForSelectedMessages
+              ? Text(
+            "${selectedMessages.length} selected",
+            style: TextStyle(color: Colors.black),
+          )
+              : GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ContectInfo(
+                        currentUser: widget.user['firstName'],
+                        email: widget.user['email'],
+                      )));
+            },
+            child: Text(
+              widget.user['firstName'],
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+          backgroundColor: Colors.white,
+          actions: [
+            if (isAppBarForSelectedMessages) ...[
+              IconButton(
+                icon: const Icon(Icons.push_pin, color: Colors.black),
+                onPressed: pinMessages,
+              ),
+              IconButton(
+                icon: const Icon(Icons.star, color: Colors.black),
+                onPressed: () {
+                  for (var messageId in selectedMessages) {
+                    var message = messages.firstWhere(
+                            (msg) => msg.id == messageId,
+                        orElse: () => null);
+                    if (message != null) {
+                      favoriteMessages(message.id);
+                    }
+                  }
+                  setState(() {
+                    selectedMessages.clear();
+                    isAppBarForSelectedMessages = false;
+                  });
+                },
+              ),
+              Builder(
+                builder: (context) {
+                  return IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      int index = messages.indexWhere((message) =>
+                          selectedMessages.contains(message.id));
+                      if (index != -1) {
+                        for (var messageId in selectedMessages) {
+                          var message = messages.firstWhere(
+                                  (msg) => msg.id == messageId,
+                              orElse: () => null);
+                          if (message != null) {
+                            deleteMessage(message.id);
+                          }
+                        }
+                        setState(() {
+                          selectedMessages.clear();
+                          isAppBarForSelectedMessages = false;
+                        });
+                      }
+                    },
+                  );
+                },
+              ),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert, color: Colors.black),
+                onSelected: (value) {
+                  int index = messages.indexWhere((message) =>
+                      selectedMessages.contains(message.id));
+                  String messageId = selectedMessages.first;
+                  if (value == 'edit') {
+                    final TextEditingController editController =
+                    TextEditingController(text: messages[index]['message']);
+                    if (selectedMessages.length == 1) {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Edit Message"),
+                            content: TextField(
+                              controller: editController,
+                              decoration:
+                              const InputDecoration(labelText: "Message"),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text(
+                                  "Cancel",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  final updatedMessage =
+                                  editController.text.trim();
+                                  if (updatedMessage.isNotEmpty) {
+                                    await editMessage(
+                                        messages[index].id, updatedMessage);
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                child: const Text(
+                                  "Save",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      setState(() {
+                        selectedMessages.clear();
+                        isAppBarForSelectedMessages = false;
+                      });
+                    } else {
+                      final snackbar = SnackBar(
+                          content: const Text('updated only on 1 message'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      setState(() {
+                        selectedMessages.clear();
+                        isAppBarForSelectedMessages = false;
+                      });
+                    }
+                  } else if (value == 'copy') {
+                    Clipboard.setData(
+                      ClipboardData(
+                          text: selectedMessages.map((messageId) {
+                            var msgData =
+                            messages.firstWhere((msg) => msg.id == messageId);
+                            return msgData['message'];
+                          }).join("\n")),
+                    );
+                    setState(() {
+                      selectedMessages.clear();
+                      isAppBarForSelectedMessages = false;
+                    });
+                  } else if (value == 'info') {
+                    if (selectedMessages.length == 1) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserInfoPage(
+                            messageData:
+                            messages[index].data() as Map<String, dynamic>,
+                            deliveredAt: messages[index]['deliveredAt'],
+                            readAt: messages[index]['readAt'],
+                          ),
+                        ),
+                      );
+                    } else {
+                      final snackbar = SnackBar(
+                          content: const Text('Info only on 1 message'));
+                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                      setState(() {
+                        selectedMessages.clear();
+                        isAppBarForSelectedMessages = false;
+                      });
+                    }
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: ListTile(
+                      leading: Icon(Icons.edit),
+                      title: Text("Edit"),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'copy',
+                    child: ListTile(
+                      leading: Icon(Icons.content_copy),
+                      title: Text("Copy"),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'info',
+                    child: ListTile(
+                      leading: Icon(Icons.info),
+                      title: Text("Info"),
+                    ),
+                  ),
+                ],
+                offset: Offset(30, 58),
+              ),
+            ],
+          ],
+        ),
+      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(color: Colors.black))
+          : Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(top: 5, bottom: 5),
+              child: messages.isNotEmpty
+                  ? ListView.builder(
+                controller: scrollController,
+                itemCount: messageWidgets.length,
+                itemBuilder: (context, index) {
+                  return messageWidgets[index];
+                },
+              )
+                  : const Center(
+                child: Text("No messages yet."),
+              ),
+            ),
+          ),
+          if (replyToMessage != null)
+            Container(
+              color: Colors.grey.shade200,
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          replyToSender ?? "Unknown",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54),
+                        ),
+                        Text(
+                          replyToMessage!,
+                          style: const TextStyle(color: Colors.black54),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black54),
+                    onPressed: () => setState(() {
+                      replyToMessage = null;
+                      replyToSender = null;
+                    }),
+                  ),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    child: Icon(Icons.camera_alt, color: Colors.grey),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: message,
+                      decoration: InputDecoration(
+                        hintText: "Type a message",
+                        hintStyle: TextStyle(color: Colors.grey),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      setState(() {
+                        messages = [];
+                      });
+                      if (message.text.isNotEmpty) {
+                        await sendMessage(message.text.trim());
+                      } else {
+                        final snackbar = SnackBar(
+                            content: const Text('Not send empty message'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                        setState(() {
+                          selectedMessages.clear();
+                          isAppBarForSelectedMessages = false;
+                        });
+                      }
+                      fetchMessagesByCurrentUser();
+                      message.clear();
+                    },
+                    child: Icon(Icons.send, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  /*Widget build(BuildContext context) {
     final TextEditingController message = TextEditingController();
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
@@ -755,7 +1257,7 @@ class _ChatLayoutState extends State<ChatLayout> {
               ],
             ),
     );
-  }
+  }*/
 }
 
 // container
