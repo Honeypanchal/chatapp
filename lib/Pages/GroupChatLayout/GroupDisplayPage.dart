@@ -163,11 +163,11 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
               top: height * 0.018,
             ),
             child: Container(
-              height: height * 0.052,
-              width: width * 0.9,
+              // height: height * 0.052,
+              width: width > 600 ? width * 1 : width * 0.9,
               decoration: BoxDecoration(
                 color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(width * 0.03),
+                borderRadius: BorderRadius.circular(width > 600 ? width * 0.013 :width * 0.03),
               ),
               child: TextField(
                 autofocus: true,

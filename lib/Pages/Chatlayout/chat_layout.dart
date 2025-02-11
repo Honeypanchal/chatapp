@@ -312,9 +312,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                       .contains(message.id)); // Find index dynamically
                   String messageId = selectedMessages
                       .first; // Using the first selected message as an example
-                  if (value == 'reply') {
-                    // Handle reply action
-                  } else if (value == 'edit') {
+                  if (value == 'edit') {
                     // Handle edit action
 
                     final TextEditingController editController =
@@ -425,13 +423,6 @@ class _ChatLayoutState extends State<ChatLayout> {
                 },
                 itemBuilder: (context) => [
                   PopupMenuItem(
-                    value: 'reply',
-                    child: ListTile(
-                      leading: Icon(Icons.reply),
-                      title: Text("Reply"),
-                    ),
-                  ),
-                  PopupMenuItem(
                     value: 'edit',
                     child: ListTile(
                       leading: Icon(Icons.edit),
@@ -453,6 +444,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                     ),
                   ),
                 ],
+                offset: Offset(30,58),
               ),
             ],
           ],
