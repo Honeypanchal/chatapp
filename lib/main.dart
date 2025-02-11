@@ -127,6 +127,7 @@ class _MyAppState extends State<MyApp> {
           case '/profile':
             return MaterialPageRoute(
               builder: (context) => Profile(currentUser: args!["currentUser"]),
+
             );
 
           case '/groupPermissions':

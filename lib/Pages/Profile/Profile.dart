@@ -86,7 +86,7 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-      automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -94,7 +94,7 @@ class _ProfileState extends State<Profile> {
             "Profile",
             style: TextStyle(
                 fontFamily: 'poppins',
-            
+
                 color: Colors.black,
                 fontWeight: FontWeight.bold),
           ),
@@ -110,8 +110,8 @@ class _ProfileState extends State<Profile> {
               child: CircleAvatar(
                 radius: width> 600 ? width *0.07 : width *0.15,
                 backgroundColor: Colors.grey.shade300,
-             child: Icon(Icons.person,color: Colors.white,
-               size: width>600 ? width *0.1: width*0.16,),
+                child: Icon(Icons.person,color: Colors.white,
+                  size: width>600 ? width *0.1: width*0.16,),
               ),
             ),
             SizedBox(
@@ -152,9 +152,9 @@ class _ProfileState extends State<Profile> {
                         Text(
                           firstName.isNotEmpty ? firstName : "",
                           style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Raleways',
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Raleways',
                             fontSize: width> 600 ? width*0.015 : width*0.035,
                           ),
                         ),
@@ -203,9 +203,9 @@ class _ProfileState extends State<Profile> {
                         Text(
                           email.isNotEmpty ? email : "",
                           style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Raleways',
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Raleways',
                             fontSize: width> 600 ? width*0.015 : width*0.035,),
                         ),
                       ],
@@ -225,7 +225,7 @@ class _ProfileState extends State<Profile> {
                       context,
                       MaterialPageRoute(builder: (context) => Firstpage()), // Navigate to login screen
                           (Route<dynamic> route) => false, // Remove all previous routes from stack
-                       );
+                    );
                   });
 
                 },
@@ -240,7 +240,7 @@ class _ProfileState extends State<Profile> {
                 title: Text(
                   "Log out",
                   style: TextStyle(fontFamily: 'Raleway', color: Colors.red,
-                  fontSize: width>600? width*0.02: width*0.045),
+                      fontSize: width>600? width*0.02: width*0.045),
                 ),
               ),
             )
