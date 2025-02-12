@@ -349,6 +349,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
   int currentIndex = 0;
   Timer? _viewTimer;
   String currentUserId="";
+  bool _isTyping=false;
 
   @override
   void initState() {
@@ -446,6 +447,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
   void _markStatusAsViewed() {
     Status currentStatus = widget.statuses[currentIndex];
     String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    if(_isTyping) return;
     if (!currentStatus.viewedBy.contains(currentUserId)) {
       _viewTimer?.cancel();
       _viewTimer = Timer(Duration(seconds: 3), () async {
@@ -896,8 +898,8 @@ class _EnterStatusState extends State<EnterStatus> {
                       maxLines: 3,
                       style: _textStyles[_selectedStyleIndex],
                       decoration: InputDecoration(
-                        hintText: 'Type a Status',
-                        hintStyle: TextStyle(color: Colors.white60),
+                        hintText: 'Type Somethingg...',
+                        hintStyle: TextStyle(color: Colors.black26),
                         border: InputBorder.none,
                       ),
                     )),
