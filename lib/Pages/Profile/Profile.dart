@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../services/auth_services.dart';
 import '../Authentication/FirstPage.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Profile extends StatefulWidget {
   final CustomClass currentUser;
@@ -89,7 +90,9 @@ class _ProfileState extends State<Profile> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Padding(
-          padding: const EdgeInsets.all(8.0),
+
+          padding:kIsWeb?EdgeInsets.only(left: width*0.45,right: width*0.1,top: height*0.05):
+          EdgeInsets.only(top: height*0.04,left: width*0.03,right: width*0.03),
           child: Text(
             "Profile",
             style: TextStyle(
@@ -101,150 +104,171 @@ class _ProfileState extends State<Profile> {
         ),
         elevation: 0,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: CircleAvatar(
-                radius: width> 600 ? width *0.07 : width *0.15,
-                backgroundColor: Colors.grey.shade300,
-                child: Icon(Icons.person,color: Colors.white,
-                  size: width>600 ? width *0.1: width*0.16,),
-              ),
-            ),
-            SizedBox(
-              height: height * 0.04,
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: width * 0.02),
-              height: height * 0.1,
-              width: width,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.perm_identity,
-                      color: Colors.grey,
-                      size: width > 600 ? width*0.04 : width *0.08,
+      body:
+      Container(
+        decoration: BoxDecoration(
+            // color: Color.fromARGB(255, 246, 241, 235),
+          color: Colors.white,
+        boxShadow: [
+          new BoxShadow(color:Colors.black26, blurRadius: 20) ],
+        borderRadius: BorderRadius.circular(10)),
+        height: kIsWeb ? height*0.7 : height*0.6,
+        width: kIsWeb ? width*width*0.5:width*0.85,
+        margin: EdgeInsets.symmetric(horizontal:kIsWeb? width*0.3:width*0.08,
+        vertical: kIsWeb?height*0.04:height*0.05),
+        child: Padding(
+
+          padding:kIsWeb?EdgeInsets.only(left: width*0.03,right: width*0.1,top: height*0.05):
+          EdgeInsets.only(top: height*0.03,left: width*0.03,right: width*0.03),
+          child:
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: kIsWeb? 150 : 8,right: kIsWeb? 50:8),
+                    child: CircleAvatar(
+                      radius: kIsWeb ? width *0.05 : width *0.12,
+                      backgroundColor: Colors.grey.shade300,
+                      child: Icon(Icons.person,color: Colors.white,
+                        size: width>600 ? width *0.08: width*0.16,),
                     ),
-                    SizedBox(width:width>600 ? width*0.018: width*0.03),
+                  ),
+                ),
 
-                    Column(
-                      children: [
-                        Text(
-                          "Name",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: width> 600 ? width*0.015 : width*0.035,
-                              fontFamily: 'poppins',
-                              fontWeight: FontWeight.w700),
-                        ),
+              SizedBox(
+                height: height * 0.04,
+              ),
+              Container(
+                height: kIsWeb? height*0.1:height * 0.09,
+                width: width,
+                decoration: BoxDecoration(
+                   borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.perm_identity,
+                        color: Colors.grey,
+                        size: width > 600 ? width*0.03 : width *0.08,
+                      ),
+                      SizedBox(width:width>600 ? width*0.015: width*0.03),
 
-                        Text(
-                          firstName.isNotEmpty ? firstName : "",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Raleways',
-                            fontSize: width> 600 ? width*0.015 : width*0.035,
+                      Column(
+                        children: [
+                          Text(
+                            "Name",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: width> 600 ? width*0.013   : width*0.035,
+                                fontFamily: 'poppins',
+                                fontWeight: FontWeight.w700),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+
+                          Text(
+                            firstName.isNotEmpty ? firstName : "",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Raleways',
+                              fontSize: width> 600 ? width*0.012 : width*0.035,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: width>600 ? height*0.05 : height*0),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: width * 0.02),
-              height: height * 0.12,
-              width: width,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.email_outlined,
-                      color: Colors.grey,
-                      size: width > 600 ? width*0.035 : width *0.075,
-                    ),
-                    SizedBox(width:width>600 ? width*0.02: width*0.03)
-                    ,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Email",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: width> 600 ? width*0.015 : width*0.035,
-                              fontFamily: 'poppins',
-                              fontWeight: FontWeight.w700),
-                        ),
-                        SizedBox(
-                          height: height * 0.005,
-                        ),
-                        Text(
-                          email.isNotEmpty ? email : "",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Raleways',
-                            fontSize: width> 600 ? width*0.015 : width*0.035,),
-                        ),
-                      ],
-                    ),
-                  ],
+              SizedBox(height: width>600 ? height*0.03 : height*0.03),
+              Container(
+                height: kIsWeb? height*0.12:height * 0.1,
+                width: kIsWeb? width*0.3:width,
+                decoration: BoxDecoration(
+                  //color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.email_outlined,
+                        color: Colors.grey,
+                        size: width > 600 ? width*0.025 : width *0.075,
+                      ),
+                      SizedBox(width:width>600 ? width*0.02: width*0.03)
+                      ,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Email",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: width> 600 ? width*0.013 : width*0.035,
+                                fontFamily: 'poppins',
+                                fontWeight: FontWeight.w700),
+                          ),
+                          SizedBox(
+                            height: height * 0.005,
+                          ),
+                          Text(
+                            email.isNotEmpty ? email : "",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Raleways',
+                              fontSize: width> 600 ? width*0.012 : width*0.035,),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: width>600 ? height*0.015 : height*0),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: width>600? width*0.02 : width*0.002),
-              child: ListTile(
-                onTap: (){
-                  logOutUser().then((_){
-                    Navigator.pushAndRemoveUntil
-                      (
-                      context,
-                      MaterialPageRoute(builder: (context) => Firstpage()), // Navigate to login screen
-                          (Route<dynamic> route) => false, // Remove all previous routes from stack
-                    );
-                  });
+              SizedBox(height: width>600 ? height*0: height*0),
+              Container(
+               // margin: EdgeInsets.symmetric(horizontal: width>600? width*0.02 : width*0.002),
+                child: ListTile(
+                  onTap: (){
+                    logOutUser().then((_){
+                      Navigator.pushAndRemoveUntil
+                        (
+                        context,
+                        MaterialPageRoute
+                          (builder: (context) => Firstpage()
+                        ),
+                            (Route<dynamic> route) => false,
+                        );
+                    });
 
-                },
+                  },
 
-                leading: Icon(
-                  Icons.delete,
-                  color: Colors.red,
-                  size: width>600? width*0.02 : width*0.067,
+                  leading: Icon(
+                    Icons.logout,
+                    color: Colors.red,
+                    size: width>600? width*0.018 : width*0.067,
 
+                  ),
+
+                  title: Text(
+                    "Log out",
+                    style: TextStyle(fontFamily: 'Raleway', color: Colors.red,
+                        fontSize: width>600? width*0.015: width*0.045),
+                  ),
                 ),
-
-                title: Text(
-                  "Log out",
-                  style: TextStyle(fontFamily: 'Raleway', color: Colors.red,
-                      fontSize: width>600? width*0.02: width*0.045),
-                ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: MainNavigationPage(

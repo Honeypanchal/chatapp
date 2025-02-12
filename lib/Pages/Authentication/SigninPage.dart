@@ -87,7 +87,9 @@ class _SigninPageState extends State<SigninPage> {
             Form(
               key: _formKey,
               child: Padding(
-                padding: width>600? EdgeInsets.only(top: 8.0, bottom: 10.0, left: 450.0, right: 450.0):EdgeInsets.only(top: 8.0, bottom: 10.0, left: 20.0, right: 20.0),
+                padding: width>600?
+                EdgeInsets.only(top: 8.0, bottom: 10.0, left: 450.0, right: 450.0):
+                EdgeInsets.only(top: 8.0, bottom: 10.0, left: 20.0, right: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

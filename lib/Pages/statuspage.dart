@@ -652,25 +652,31 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                       ),
                       controller: _replyController,
                       decoration: InputDecoration(
-                        prefixIcon: IconButton(
-                            onPressed: () {
-                              _showRepliesBottomSheet();
-                            },
-                            icon: Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.white,
-                            )),
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.only(left: kIsWeb? 10:10),
+                          child: IconButton(
+                              onPressed: () {
+                                _showRepliesBottomSheet();
+                              },
+                              icon: Icon(
+                                Icons.remove_red_eye,
+                                color: Colors.white,
+                              )),
+                        ),
                         fillColor: Colors.black26,
                         filled: true,
-                        hintText: " Reply    ",
+                        hintText: " Reply",
                         focusedBorder: InputBorder.none,
                         hintStyle: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
-                        suffixIcon: IconButton(
-                          onPressed: _sendReply,
-                          icon: Icon(
-                            Icons.send,
-                            color: Colors.white,
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(right: kIsWeb? 8:5),
+                          child: IconButton(
+                            onPressed: _sendReply,
+                            icon: Icon(
+                              Icons.send,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
