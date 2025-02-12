@@ -1267,6 +1267,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                                                               .italic,
                                                                     ),
                                                                   ),
+                                                                if(isMe)
                                                                 Padding(
                                                                   padding:
                                                                       const EdgeInsets

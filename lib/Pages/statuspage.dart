@@ -257,9 +257,13 @@ class _StatusPageState extends State<StatusPage> {
             String username = groupedStatuses.keys.elementAt(index);
             List<Status> userStatus = groupedStatuses[username]!;
 
-            bool isMyStatus = userId == currentUserId;
-            String displayName =
-            isMyStatus ? "My Status" : userStatus[0].username;
+
+
+            bool isMyStatus = userStatus[0].userId == currentUserId;
+            print("User ID from Status: ${userStatus[0].userId}, Current User ID: $currentUserId, isMyStatus: $isMyStatus");
+            String displayName = isMyStatus ? "My Status" : userStatus[0].username;
+
+            print("Final Display Name: $displayName");
 
 
             return ListTile(
@@ -286,7 +290,7 @@ class _StatusPageState extends State<StatusPage> {
                 ),
               ),
               title: Text(
-                username == currentUserId ? "My Status" : username,
+                displayName,
                 style: TextStyle(
                     fontFamily: 'poppins',
                     fontWeight: FontWeight.w500
@@ -344,11 +348,13 @@ class ViewStatusScreen extends StatefulWidget {
 class _ViewStatusScreenState extends State<ViewStatusScreen> {
   int currentIndex = 0;
   Timer? _viewTimer;
+  String currentUserId="";
 
   @override
   void initState() {
     super.initState();
     _markStatusAsViewed();
+    currentUserId = FirebaseAuth.instance.currentUser!.uid;
     _statusService.fetchAndPrintStatuses();
   }
 
@@ -364,6 +370,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
 
   void _showRepliesBottomSheet() {
     Status status = widget.statuses[currentIndex];
+    String currentUserId=FirebaseAuth.instance.currentUser!.uid;
 
     showModalBottomSheet(
       isScrollControlled: true,
@@ -391,7 +398,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
               Text(
                 "Status Replies",
                 style: TextStyle(
-                    fontSize: width > 600 ? width * 0.01 : width * 0.03,
+                    fontSize: width > 600 ? width * 0.015 : width * 0.04,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(height: MediaQuery.sizeOf(context).height * 0.02),
@@ -406,7 +413,8 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     String replyBy = reply['replyBy'] ?? "Unknown";
                     String replyText = reply['replyText'] ?? "No reply";
 
-                    return ListTile(
+                    return
+                      ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
                         backgroundColor:
@@ -676,12 +684,20 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                             color: Colors.white, fontWeight: FontWeight.bold),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.only(right: kIsWeb? 8:5),
-                          child: IconButton(
-                            onPressed: _sendReply,
-                            icon: Icon(
-                              Icons.send,
-                              color: Colors.white,
-                            ),
+                          child:
+                          IconButton(
+                            icon: Icon(Icons.send,color: Colors.white,),
+                            onPressed:(){
+                              if(widget.statuses[currentIndex].userId==currentUserId)
+                              {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("you can't reply to your own status")
+                                ));
+                              }
+                              else{
+                                _sendReply();
+                              }
+                            }
+                            
                           ),
                         ),
                       ),
@@ -758,18 +774,20 @@ class _EnterStatusState extends State<EnterStatus> {
   ];
 
   final List<Color> _backgroundColors = [
-    Colors.red,
-    Colors.blueAccent,
+    Colors.pinkAccent.shade100,
+    Colors.green.shade200,
+    Colors.orange.shade200,
     Colors.pink,
     Colors.lightBlue.shade200,
-    Colors.pinkAccent.shade100,
+
   ];
   final List<String> _colorHexCodes = [
-    "#F44336",
-    "2196F3",
+    "#F8BBD0",
+    "#A5D5A7",
+    "#FFCC80",
     "#E91E63",
     "#81D4F3",
-    "#F8BBD0"
+
   ];
 
   void _changeColor() {
