@@ -239,7 +239,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     for (var doc in messages.docs) {
       List<String> readBy = List<String>.from(doc["readBy"] ?? []);
       if (!readBy.contains(userId)) {
-        // ✅ Prevents duplicate updates
+
         await _firestore
             .collection('groups')
             .doc(group['groupId'])
@@ -671,93 +671,138 @@ class _GroupchatpageState extends State<Groupchatpage> {
                         style: TextStyle(color: Colors.black)),
             backgroundColor: Colors.white,
             actions: [
-              if (selectedMessages.isNotEmpty) ...[
-                IconButton(
-                  icon: const Icon(Icons.push_pin, color: Colors.black),
-                  onPressed: pinMessages,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.star, color: Colors.black),
-                  onPressed: favoriteMessages,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.black),
-                  onPressed: deleteMessages,
-                ),
-                // Display 3 dots when messages are selected
-                PopupMenuButton<String>(
-                  color: Colors.white,
-                  icon: Icon(Icons.more_vert, color: Colors.black),
-                  onSelected: (value) async {
-                    String messageId = selectedMessages
-                        .first; // Using the first selected message as an example
-                    if (value == 'reply') {
-                      // Perform reply action on selected message
-                      String messageText = await getMessageTextById(messageId);
-                      replyToMessage(messageText, messageId);
-                    } else if (value == 'edit') {
-                      String messageText = await getMessageTextById(messageId);
+              if (selectedMessages.isNotEmpty)
+                FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance
+                      .collection('groups')
+                      .doc(group['groupId'])
+                      .collection('messages')
+                      .doc(selectedMessages.first) // Fetch first selected message
+                      .get(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData || !snapshot.data!.exists) return SizedBox();
 
-                      setState(() {
-                        selectedMessageId =
-                            messageId; // Store the message ID being edited
-                        _messageController.text =
-                            messageText; // Load message in input field
-                      });
-                    } else if (value == 'copy') {
-                      copyMessage(messageId);
-                    } else if (value == 'info') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MessageInfoPage(
-                                messageId: messageId,
-                                groupId: group['groupId'],
-                                markMessagesAsRead: () =>
-                                    markMessagesAsRead())),
-                      );
-                    }
+                    String senderUid = snapshot.data!['senderUid']; // Get sender ID
+                    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+                    bool isCurrentUserMessage = senderUid == currentUserId;
+
+                    return Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.push_pin, color: Colors.black),
+                          onPressed: pinMessages,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.star, color: Colors.black),
+                          onPressed: favoriteMessages,
+                        ),
+
+                        // Show Edit & Delete ONLY if the message belongs to the current user
+                        if (isCurrentUserMessage) ...[
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.black),
+                            onPressed: () async {
+                              String messageText = snapshot.data!['message'];
+                              setState(() {
+                                selectedMessageId = selectedMessages.first;
+                                _messageController.text = messageText;
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.black),
+                            onPressed: deleteMessages,
+                          ),
+                        ],
+
+                        // Popup menu (No functionality changes, just display logic)
+                        PopupMenuButton<String>(
+                          icon: Icon(Icons.more_vert, color: Colors.black),
+                          onSelected: (value) async {
+                            String messageText = snapshot.data!['message'];
+
+                            if (value == 'reply') {
+                              replyToMessage(messageText, selectedMessages.first);
+                            }
+                            else if (value == 'copy') {
+                              copyMessage(selectedMessages.first);
+                            }
+                            else if (value == 'info') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MessageInfoPage(
+                                    messageId: selectedMessages.first,
+                                    groupId: group['groupId'],
+                                    markMessagesAsRead: () => markMessagesAsRead(),
+                                  ),
+                                ),
+                              );
+                            }
+                            else if (value == 'edit' && isCurrentUserMessage) {
+                              setState(() {
+                                selectedMessageId = selectedMessages.first;
+                                _messageController.text = messageText;
+                              });
+                            }
+                          },
+                          itemBuilder: (context) {
+                            List<PopupMenuEntry<String>> items = [
+                              PopupMenuItem(
+                                value: 'reply',
+                                child: ListTile(
+                                  leading: Icon(Icons.reply),
+                                  title: Text("Reply"),
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: 'copy',
+                                child: ListTile(
+                                  leading: Icon(Icons.content_copy),
+                                  title: Text("Copy"),
+                                ),
+                              ),
+                              PopupMenuItem(
+                                value: 'info',
+                                child: ListTile(
+                                  leading: Icon(Icons.info),
+                                  title: Text("Info"),
+                                ),
+                              ),
+                            ];
+
+                            // Add "Edit" ONLY if the message belongs to the current user
+                            if (isCurrentUserMessage) {
+                              items.insert(
+                                1,
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: ListTile(
+                                    leading: Icon(Icons.edit),
+                                    title: Text("Edit"),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            return items;
+                          },
+                        ),
+                      ],
+                    );
                   },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'reply',
-                      child: ListTile(
-                        leading: Icon(Icons.reply),
-                        title: Text("Reply"),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: ListTile(
-                        leading: Icon(Icons.edit),
-                        title: Text("Edit"),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'copy',
-                      child: ListTile(
-                        leading: Icon(Icons.content_copy),
-                        title: Text("Copy"),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'info',
-                      child: ListTile(
-                        leading: Icon(Icons.info),
-                        title: Text("Info"),
-                      ),
-                    ),
-                  ],
-                ),
-              ] else ...[
+                )
+              else ...[
                 if (!isSearching)
                   IconButton(
-                      icon: const Icon(Icons.search, color: Colors.black),
-                      onPressed: startSearch),
+                    icon: const Icon(Icons.search, color: Colors.black),
+                    onPressed: startSearch,
+                  ),
                 if (isSearching)
                   IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black),
-                      onPressed: stopSearch),
+                    icon: const Icon(Icons.close, color: Colors.black),
+                    onPressed: stopSearch,
+                  ),
               ],
             ],
           ),

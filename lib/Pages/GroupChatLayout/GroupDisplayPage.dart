@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/models/CustomClass.dart';
+import 'package:intl/intl.dart';
 
 import '../helpers/MainNavigation.dart';
 
@@ -80,6 +81,15 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     return query.snapshots().map((querySnapshot) => querySnapshot.docs
         as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
   }
+  String formatMessageTime(Timestamp? timestamp) {
+    try {
+      if (timestamp == null) return 'Invalid Time'; // Handle null timestamps
+      DateTime dateTime = timestamp.toDate();
+      return DateFormat('HH:mm').format(dateTime); // 24-hour format
+    } catch (e) {
+      return 'Invalid Time'; // Fallback for error handling
+    }
+  }
 
   Future<Map<String, String>> getLastMessage(String groupId) async {
     var snapshot = await groupsDB
@@ -91,12 +101,16 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
 
     if (snapshot.docs.isNotEmpty) {
       var lastMessageData = snapshot.docs.first.data();
+
       return {
+
         'sender': lastMessageData['sender'] ?? 'Unknown',
-        'message': lastMessageData['message'] ?? ''
+        'message': lastMessageData['message'] ?? '',
+        'timestamp':formatMessageTime(lastMessageData['timestamp'])?? '',
+
       };
     }
-    return {'sender': '', 'message': 'No messages yet'};
+    return {'sender': '', 'message': 'No messages yet','timestamp':''};
   }
 
   @override
@@ -227,23 +241,37 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
                       builder: (context, lastMessageSnapshot) {
                         String lastMessageText = "No messages yet";
                         String sender = "";
+                        String lastTimeStamp='';
 
                         if (lastMessageSnapshot.hasData) {
                           sender = lastMessageSnapshot.data!['sender']!;
                           lastMessageText =
                               lastMessageSnapshot.data!['message']!;
+                          lastTimeStamp=lastMessageSnapshot.data!['timestamp']!;
                         }
 
                         return ListTile(
+
+
                           leading: CircleAvatar(
                             backgroundColor: Color.fromRGBO(207, 214, 220, 1),
                             child: Icon(Icons.group, color: Colors.white),
                           ),
                           title:
                               Text(groupData["groupName"] ?? "Unnamed Group"),
-                          subtitle: sender.isNotEmpty
-                              ? Text('$sender: $lastMessageText')
-                              : Text(lastMessageText),
+                          subtitle: Row(
+                            children: [
+                              sender.isNotEmpty
+                                  ? Text('$sender: $lastMessageText')
+                                  : Text(lastMessageText),
+                              Spacer(),
+                              Text(lastTimeStamp,  style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                                fontFamily: 'Raleway',
+                              ),)
+                            ],
+                          ),
                           onTap: () {
                             Navigator.of(context).pushNamed('/groupchat',
                                 arguments: {

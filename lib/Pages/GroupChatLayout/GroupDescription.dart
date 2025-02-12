@@ -303,6 +303,9 @@ class _GroupDescriptionState extends State<GroupDescription> {
                                 descriptionController.text;
                             if (enteredDescription.isNotEmpty) {
                               print("Group Description: $enteredDescription");
+                              setState(() {
+                                groupDescription = enteredDescription;
+                              });
                               Navigator.pop(context, enteredDescription);
                             }
                           },
@@ -527,12 +530,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   }
                 } else if (value == 1) {
                   if (!isCurrentUserAdmin(widget.currentUser)) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("You are not the admin",
-                          style: TextStyle(
-                              color: Colors.white, fontFamily: 'Raleway')),
-                      backgroundColor: Colors.red.shade200,
-                    ));
+                    if(groupSettings){
+                      changeGroupName();
+                    }else
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("You are not the admin",
+                              style: TextStyle(
+                                  color: Colors.white, fontFamily: 'Raleway')),
+                          backgroundColor: Colors.red.shade200,
+                        ));
+                      }
+
                   } else {
                     changeGroupName();
                   }
@@ -615,14 +624,45 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        if (!isCurrentUserAdmin(widget.currentUser)) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("You are not the admin",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Raleway')),
-                            backgroundColor: Colors.red.shade200,
-                          ));
+                        if (!isCurrentUserAdmin(widget.currentUser) ) {
+                          if(groupSettings){
+                            String? desc = await _showGroupDescriptionModal();
+                            if (desc != null) {
+                              try {
+                                await editGroupInfo(group['groupId'], desc);
+                                // setState(() {
+                                //   group['groupDescription'] = desc;
+                                // });
+                                setState(() {
+                                  print(desc);
+                                  groupDescription = desc;
+                                });
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(
+                                    "Group description edited succesfully",
+                                    selectionColor: Colors.white,
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor:
+                                  Color.fromRGBO(207, 214, 220, 1),
+                                ));
+
+                              } catch (e) {
+                                print(e.toString());
+                              }
+                            }
+                          }else
+                            {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text("You are not the admin",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway')),
+                                backgroundColor: Colors.red.shade200,
+                              ));
+                            }
+
                         } else {
                           String? desc = await _showGroupDescriptionModal();
                           if (desc != null) {
