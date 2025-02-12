@@ -110,21 +110,21 @@ class _StatusPageState extends State<StatusPage> {
                 : width * 0.02,
             top: 2,
             bottom: 1),
-        child:
-        Text(
-          'Status',
-          style:
+          child:
+          Text(
+            'Status',
+            style:
 
-          TextStyle(
-            color: Colors.black,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-            fontSize: MediaQuery.of(context).size.width > 600
-                ? width * 0.02
-                : width * 0.06,
+            TextStyle(
+              color: Colors.black,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w500,
+              fontSize: MediaQuery.of(context).size.width > 600
+                  ? width * 0.02
+                  : width * 0.06,
+            ),
           ),
         ),
-      ),
       ),
       body: StreamBuilder<List<Status>>(
         stream: _statusService.getStatuses(),
@@ -166,51 +166,51 @@ class _StatusPageState extends State<StatusPage> {
             SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (notSeenStatuses.isNotEmpty) ...[
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width > 600
-                          ? width * 0.01
-                          : width * 0.06,
+                children: [
+                  if (notSeenStatuses.isNotEmpty) ...[
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width > 600
+                              ? width * 0.01
+                              : width * 0.06,
 
-                      top: 2,
-                      bottom: 1
-                    ),
-                    child: Text(
-                      "Recently Added",
-                      style: TextStyle(
-                        fontSize: width > 600 ? width * 0.01 : width * 0.05,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                          top: 2,
+                          bottom: 1
                       ),
-                    ),
-                  ),
-                  _buildStatusCategory("", notSeenStatuses, false),
-                ] else
-                  SizedBox.shrink(),
-                if (seenStatuses.isNotEmpty) ...[
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width > 600
-                          ? width * 0.01
-                          : width * 0.06,
-                      top: 2,
-                    bottom: 1),
-                    child: Text(
-                      "Viewed Status",
-                      style: TextStyle(
-                        fontSize: width > 600 ? width * 0.01 : width * 0.05,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  _buildStatusCategory("", seenStatuses, true),
-                ] else
-                  SizedBox.shrink(),
-              ],
+                      child: Text(
+                        "Recently Added",
+                        style: TextStyle(
+                          fontSize: width > 600 ? width * 0.01 : width * 0.05,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
                         ),
+                      ),
+                    ),
+                    _buildStatusCategory("", notSeenStatuses, false),
+                  ] else
+                    SizedBox.shrink(),
+                  if (seenStatuses.isNotEmpty) ...[
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width > 600
+                              ? width * 0.01
+                              : width * 0.06,
+                          top: 2,
+                          bottom: 1),
+                      child: Text(
+                        "Viewed Status",
+                        style: TextStyle(
+                          fontSize: width > 600 ? width * 0.01 : width * 0.05,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    _buildStatusCategory("", seenStatuses, true),
+                  ] else
+                    SizedBox.shrink(),
+                ],
+              ),
             );
         },
       ),
@@ -248,7 +248,7 @@ class _StatusPageState extends State<StatusPage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
         ),
         ListView.builder(
-         // padding: EdgeInsets.symmetric(vertical: 1),
+          // padding: EdgeInsets.symmetric(vertical: 1),
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: groupedStatuses.keys.length,
@@ -259,12 +259,12 @@ class _StatusPageState extends State<StatusPage> {
 
             bool isMyStatus = userId == currentUserId;
             String displayName =
-                isMyStatus ? "My Status" : userStatus[0].username;
+            isMyStatus ? "My Status" : userStatus[0].username;
 
             return ListTile(
               //minVerticalPadding: 10,
-             //visualDensity: VisualDensity.compact,
-             // visualDensity: VisualDensity(vertical: -4,horizontal: 0),
+              //visualDensity: VisualDensity.compact,
+              // visualDensity: VisualDensity(vertical: -4,horizontal: 0),
               //contentPadding: EdgeInsets.symmetric(horizontal: 0,vertical: 0),
               dense: true,
               // contentPadding: EdgeInsets.symmetric(vertical: 0),
@@ -293,7 +293,7 @@ class _StatusPageState extends State<StatusPage> {
                 isSeen
                     ? '${userStatus.length} status viewed '
                     : '${userStatus.length}'
-                        ' status available',
+                    ' status available',
                 style: TextStyle(
                     fontFamily: 'poppins',
                     fontWeight: FontWeight.w600,
@@ -395,36 +395,36 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
               status.statusReplies.isEmpty
                   ? Center(child: Text("No replies yet..."))
                   : Expanded(
-                      child: ListView.builder(
-                        itemCount: status.statusReplies.length,
-                        itemBuilder: (context, index) {
-                          final reply = status.statusReplies[index];
+                child: ListView.builder(
+                  itemCount: status.statusReplies.length,
+                  itemBuilder: (context, index) {
+                    final reply = status.statusReplies[index];
 
-                          String replyBy = reply['replyBy'] ?? "Unknown";
-                          String replyText = reply['replyText'] ?? "No reply";
+                    String replyBy = reply['replyBy'] ?? "Unknown";
+                    String replyText = reply['replyText'] ?? "No reply";
 
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: CircleAvatar(
-                              backgroundColor:
-                                  Color.fromARGB(255, 232, 244, 234),
-                              child: Text(
-                                replyBy[0].toUpperCase(),
-                                style: TextStyle(
-                                    color: Colors.green.shade800,
-                                    fontFamily: 'poppins',
-                                    fontWeight: FontWeight.w700),
-                              ),
-                            ),
-                            title: Text(
-                              replyBy,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(replyText),
-                          );
-                        },
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        backgroundColor:
+                        Color.fromARGB(255, 232, 244, 234),
+                        child: Text(
+                          replyBy[0].toUpperCase(),
+                          style: TextStyle(
+                              color: Colors.green.shade800,
+                              fontFamily: 'poppins',
+                              fontWeight: FontWeight.w700),
+                        ),
                       ),
-                    ),
+                      title: Text(
+                        replyBy,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(replyText),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         );
@@ -534,14 +534,14 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                     ),
                     child: CircleAvatar(
                       backgroundColor: Colors.black26,
-                      radius: width > 600 ? width * 0.015 : width * 0.04,
+                      radius: width > 600 ? width * 0.015 : width * 0.045,
                       child: Text(
                         widget.statuses[0].username[0].toUpperCase(),
                         style: TextStyle(
                             color: Colors.white,
                             fontFamily: 'poppins',
                             fontSize:
-                                width > 600 ? width * 0.012 : width * 0.04),
+                            width > 600 ? width * 0.012 : width * 0.04),
                       ),
                     ),
                   ),
@@ -557,7 +557,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                               color: Colors.white,
                               fontFamily: 'poppins',
                               fontSize:
-                                  width > 600 ? width * 0.012 : width * 0.035,
+                              width > 600 ? width * 0.012 : width * 0.035,
                               fontWeight: FontWeight.w500),
                         ),
                         Text(
@@ -566,7 +566,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize:
-                                width > 600 ? width * 0.011 : width * 0.03,
+                            width > 600 ? width * 0.011 : width * 0.03,
                           ),
                         ),
                       ],
@@ -576,8 +576,8 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                   if (widget.statuses[currentIndex].userId ==
                       FirebaseAuth.instance.currentUser!.uid)
                     Container(
-                      height: width > 600 ? height * 0.06 : height * 0.05,
-                      width: width > 600 ? height * 0.06 : height * 0.05,
+                      height: width > 600 ? height * 0.06 : height * 0.055,
+                      width: width > 600 ? height * 0.06 : height * 0.055,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle, color: Colors.black26),
                       child: IconButton(
@@ -586,45 +586,45 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    content: Text(
-                                      'Are you sure you want to delete status?',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                      fontSize: width>600? width*0.017 : width*0.05),
-                                    ),
-                                    actions: [Column(
-                                      children: [
-
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text(
-                                          'cancel',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
+                                      content: Text(
+                                        'Are you sure you want to delete status?',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: width>600? width*0.017 : width*0.05),
                                       ),
-                                      TextButton(
-                                          onPressed: () async {
-                                            await _statusService.deleteStatus(
-                                                widget.statuses[currentIndex]
-                                                    .uid);
-                                            Navigator.pop(context);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text(
-                                            'Delete',
-                                            style: TextStyle(color: Colors.red),
-                                          ))
-                                    ],)]
+                                      actions: [Column(
+                                        children: [
+
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              'cancel',
+                                              style: TextStyle(color: Colors.grey),
+                                            ),
+                                          ),
+                                          TextButton(
+                                              onPressed: () async {
+                                                await _statusService.deleteStatus(
+                                                    widget.statuses[currentIndex]
+                                                        .uid);
+                                                Navigator.pop(context);
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                'Delete',
+                                                style: TextStyle(color: Colors.red),
+                                              ))
+                                        ],)]
                                   );
                                 });
                           },
                           icon: Icon(
                             Icons.delete,
                             color: Colors.red,
-                            size: width > 600 ? width * 0.015 : width * 0.04,
+                            size: width > 600 ? width * 0.015 : width * 0.05,
                           )),
                     ),
                 ],
@@ -642,7 +642,9 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
               ),
             ),
             Spacer(),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: kIsWeb?25:10, vertical: kIsWeb?30:10),
               child: Row(
                 children: [
                   Expanded(
@@ -653,7 +655,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                       controller: _replyController,
                       decoration: InputDecoration(
                         prefixIcon: Padding(
-                          padding: const EdgeInsets.only(left: kIsWeb? 10:10),
+                          padding: const EdgeInsets.only(left: kIsWeb? 10:2,right: kIsWeb?10:1),
                           child: IconButton(
                               onPressed: () {
                                 _showRepliesBottomSheet();
