@@ -261,6 +261,7 @@ class _StatusPageState extends State<StatusPage> {
             String displayName =
             isMyStatus ? "My Status" : userStatus[0].username;
 
+
             return ListTile(
               //minVerticalPadding: 10,
               //visualDensity: VisualDensity.compact,
@@ -287,7 +288,9 @@ class _StatusPageState extends State<StatusPage> {
               title: Text(
                 username == currentUserId ? "My Status" : username,
                 style: TextStyle(
-                    fontFamily: 'poppins', fontWeight: FontWeight.w500),
+                    fontFamily: 'poppins',
+                    fontWeight: FontWeight.w500
+                ),
               ),
               subtitle: Text(
                 isSeen

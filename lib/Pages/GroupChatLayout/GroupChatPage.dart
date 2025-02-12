@@ -254,7 +254,19 @@ class _GroupchatpageState extends State<Groupchatpage> {
   }
 
   FocusNode _messageFocusNode = FocusNode();
-
+  Stream<int> getGroupMemberCountStream(String groupId) {
+    return FirebaseFirestore.instance
+        .collection('groups')
+        .doc(groupId)
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.exists) {
+        List<dynamic> participants = snapshot['participants'] ?? [];
+        return participants.length; // ✅ Return updated participant count
+      }
+      return 1; // Fallback if group does not exist
+    });
+  }
   void editMessage(String messageId, String newMessage) async {
     if (messageId.isEmpty || newMessage.trim().isEmpty)
       return; // Prevent empty edits
@@ -861,240 +873,193 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
                     // Chat Messages Section
                     Expanded(
-                      child: ListView(
-                        reverse: false,
-                        children: sortedDates.map((date) {
-                          return Column(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8),
-                                child: Text(
-                                  date,
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              ...groupedMessages[date]!.map((message) {
-                                bool isMe = message['senderUid'] ==
-                                    _auth.currentUser!.uid;
-                                bool isPoll = message['isPoll'] ?? false;
-                                bool isSelected =
-                                    selectedMessages.contains(message.id);
-                                bool isPinned = message['pinned'] ?? false;
-                                bool isFavorite = message['favorite'] ?? false;
-                                bool isSearched = searchQuery.isNotEmpty &&
-                                    RegExp(
-                                            r'\b' +
-                                                RegExp.escape(searchQuery) +
-                                                r'\b',
-                                            caseSensitive: false)
-                                        .hasMatch(message['message']);
+                      child:StreamBuilder<int>(
+                        stream: getGroupMemberCountStream(group['groupId']), // ✅ Use StreamBuilder instead
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(child: CircularProgressIndicator());
+                          }
 
-                                return Column(
-                                  crossAxisAlignment: isMe
-                                      ? CrossAxisAlignment.end
-                                      : CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onLongPress: () {
-                                        handleMessageLongPress(message.id);
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 5, horizontal: 10),
-                                        margin:
-                                            EdgeInsets.only(left: 5, right: 5),
-                                        alignment: isMe
-                                            ? Alignment.centerRight
-                                            : Alignment.centerLeft,
-                                        decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? Colors.grey[300]
-                                              : Colors.transparent,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            isPoll
-                                                ? buildPollWidget(message, isMe)
-                                                : IntrinsicWidth(
-                                                    child: Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          vertical: 8,
-                                                          horizontal: 12),
-                                                      margin: EdgeInsets.only(
-                                                          left: 5, right: 5),
-                                                      decoration: BoxDecoration(
-                                                        color: isMe
-                                                            ? Color.fromARGB(
-                                                                255,
-                                                                213,
-                                                                252,
-                                                                208)
-                                                            : Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          Align(
-                                                            alignment: isMe
-                                                                ? Alignment
-                                                                    .centerRight
-                                                                : Alignment
-                                                                    .centerLeft,
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              children: [
-                                                                // Sender name inside the message container (top left)
-                                                                if (!isMe)
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
-                                                                        .only(
-                                                                        bottom:
-                                                                            1),
-                                                                    child: Text(
-                                                                      (message.data() as Map<
-                                                                              String,
-                                                                              dynamic>)['sender'] ??
-                                                                          'Unknown',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            12,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        color: Colors
-                                                                            .grey[600],
-                                                                      ),
-                                                                    ),
-                                                                  ),
+                          int groupMemberCount = snapshot.data ?? 1; // ✅ Get the latest count
 
-                                                                if (isPinned)
-                                                                  SizedBox(
-                                                                      width: 5),
-                                                                Flexible(
-                                                                  child: Text(
-                                                                    message[
-                                                                        'message'],
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color: isMe
-                                                                          ? Colors
-                                                                              .black
-                                                                          : Colors
-                                                                              .black,
-                                                                      backgroundColor: isSearched
-                                                                          ? Colors
-                                                                              .green
-                                                                          : null,
-                                                                    ),
-                                                                    softWrap:
-                                                                        true,
-                                                                    maxLines:
-                                                                        null,
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .visible,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              if (isPinned)
-                                                                Icon(
-                                                                    Icons
-                                                                        .push_pin,
-                                                                    color: Colors
-                                                                        .black,
-                                                                    size: 16),
-                                                              if (isFavorite)
-                                                                Icon(
-                                                                  Icons.star,
-                                                                  color: Colors
-                                                                      .yellow
-                                                                      .shade500,
-                                                                  size: 14,
-                                                                ),
-                                                              SizedBox(
-                                                                  width: 4),
-                                                              Align(
-                                                                alignment: Alignment
-                                                                    .bottomRight,
-                                                                child: Text(
-                                                                  formatMessageTime(
-                                                                      message[
-                                                                          'timestamp']),
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: isMe
-                                                                        ? Colors
-                                                                            .black
-                                                                        : Colors
-                                                                            .black,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              if (message[
-                                                                      'isEdited'] ==
-                                                                  true) // Display "Edited" if the message is modified
-                                                                Text(
-                                                                    '  (Edited)',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontSize:
-                                                                          10,
-                                                                      color: Colors
-                                                                          .grey,
-                                                                      fontStyle:
-                                                                          FontStyle
-                                                                              .italic,
-                                                                    )),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ],
-                                        ),
+                          return ListView(
+                            reverse: false,
+                            children: sortedDates.map((date) {
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
+                                    child: Text(
+                                      date,
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ],
-                                );
-                              }).toList(),
-                            ],
+                                  ),
+                                  ...groupedMessages[date]!.map((message) {
+                                    bool isMe = message['senderUid'] == _auth.currentUser!.uid;
+                                    bool isSelected = selectedMessages.contains(message.id);
+                                    bool isPoll = message['isPoll'] ?? false;
+                                    bool isPinned = message['pinned'] ?? false;
+                                    bool isFavorite = message['favorite'] ?? false;
+                                    bool isEdited = message['isEdited'] ?? false;
+                                    bool isSearched = searchQuery.isNotEmpty &&
+                                        RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b', caseSensitive: false)
+                                            .hasMatch(message['message']);
+
+                                    List<String> readBy = List<String>.from(message["readBy"] ?? []);
+                                    List<String> deliveredTo = List<String>.from(message["deliveredTo"] ?? []);
+                                    String userId = _auth.currentUser!.uid;
+
+                                    // ✅ Mark as read if necessary
+                                    if (!readBy.contains(userId) && deliveredTo.contains(userId)) {
+                                      markMessageAsRead(message.id);
+                                    }
+
+                                    return Column(
+                                      crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onLongPress: () {
+                                            handleMessageLongPress(message.id);
+                                          },
+                                          onHorizontalDragUpdate: (details) {
+                                            if (details.primaryDelta! < -20) { // ✅ Left swipe detection
+                                              replyToMessage(message['message'], message.id);
+                                            }
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                            margin: EdgeInsets.only(left: 5, right: 5),
+                                            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? Colors.grey[300] : Colors.transparent,
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                isPoll
+                                                    ? buildPollWidget(message, isMe)
+                                                    : IntrinsicWidth(
+                                                  child: Container(
+                                                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                                    margin: EdgeInsets.only(left: 5, right: 5),
+                                                    decoration: BoxDecoration(
+                                                      color: isMe ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
+                                                      borderRadius: BorderRadius.circular(10),
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Align(
+                                                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [
+                                                              if (!isMe)
+                                                                Padding(
+                                                                  padding: const EdgeInsets.only(bottom: 1),
+                                                                  child: Text(
+                                                                    message['sender'] ?? 'Unknown',
+                                                                    style: TextStyle(
+                                                                      fontSize: 12,
+                                                                      fontWeight: FontWeight.bold,
+                                                                      color: Colors.grey[600],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              if (isPinned) SizedBox(width: 5),
+                                                              Flexible(
+                                                                child: Text(
+                                                                  message['message'],
+                                                                  style: TextStyle(
+                                                                    color: Colors.black,
+                                                                    backgroundColor: isSearched ? Colors.green : null,
+                                                                  ),
+                                                                  softWrap: true,
+                                                                  maxLines: null,
+                                                                  overflow: TextOverflow.visible,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.end,
+                                                          children: [
+                                                            if(isPinned)
+                                                              Icon(
+                                                                Icons.push_pin,
+                                                                color:Colors.black,
+
+                                                              ),
+
+
+                                                            if (isFavorite)
+                                                              Icon(
+                                                                Icons.star,
+                                                                color: Colors.grey[300],
+                                                                size: 14,
+                                                              ),
+                                                            SizedBox(width: 4),
+                                                            Align(
+                                                              alignment: Alignment.bottomRight,
+                                                              child: Text(
+                                                                formatMessageTime(message['timestamp']),
+                                                                style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: isMe ? Colors.black : Colors.black,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            if (message['isEdited'] == true)
+                                                              Text(
+                                                                '  (Edited)',
+                                                                style: TextStyle(
+                                                                  fontSize: 10,
+                                                                  color: Colors.grey,
+                                                                  fontStyle: FontStyle.italic,
+                                                                ),
+                                                              ),
+
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(left: 4),
+                                                              child: Icon(
+                                                                readBy.length == groupMemberCount // ✅ Double Tick if all read
+                                                                    ? Icons.done_all
+                                                                    : Icons.check, // ✅ Single Tick if only delivered
+                                                                color: readBy.length == groupMemberCount
+                                                                    ? Colors.blue // ✅ Double Tick (blue) if read
+                                                                    : Colors.grey, // ✅ Single Tick (grey) if delivered
+                                                                size: 16,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ],
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
-                      ),
-                    ),
+                        },
+                      )
+                    )
                   ],
                 );
               },
