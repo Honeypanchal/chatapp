@@ -48,7 +48,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
         FirebaseFirestore.instance.collection("groups").doc(group['groupId']);
 
     _groupSubscription = groupRef.snapshots().listen((snapshot) async {
-      print("Listening to changes");
+
 
       if (snapshot.exists && mounted) {
         var updatedGroupData = snapshot.data() as Map<String, dynamic>;
@@ -87,7 +87,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
       final anothergroup = await fetchGroupByGroupId(widget.groupId);
       setState(() {
         group = anothergroup;
-        print(group['groupId']);
+
       });
 
       if (group != null) {
@@ -118,19 +118,12 @@ class _GroupDescriptionState extends State<GroupDescription> {
   }
 
   bool isCurrentUserAdmin(String userId) {
-    print('Here for the admin purposes : $userId');
+
     return admins.contains(userId);
   }
 
   Future<void> membersFirstName() async {
-    print('here populating participants');
 
-    // setState(() {
-    //   participants = (group['participants'] as List<dynamic>)
-    //       .map((e) => e.toString())
-    //       .toList();
-    //   print(participants[0]);
-    // });
 
     List<String> fetchedNames = await getUserNames(participants);
 
@@ -301,8 +294,16 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           onPressed: () {
                             String enteredDescription =
                                 descriptionController.text;
+
                             if (enteredDescription.isNotEmpty) {
-                              print("Group Description: $enteredDescription");
+
+
+        setState(() {
+        group['groupDescription'] = enteredDescription;
+        });
+                              setState(() {
+                                groupDescription = enteredDescription;
+                              });
                               Navigator.pop(context, enteredDescription);
                             }
                           },
@@ -408,7 +409,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                           onPressed: () {
                             String enteredName = groupName.text;
                             if (enteredName.isNotEmpty) {
-                              print("Group Description: $enteredName");
+
 
                               Navigator.pop(context,
                                   enteredName); // Return the entered description
@@ -434,9 +435,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
     if (name != null) {
       try {
         await editGroupName(group['groupId'], name);
-        // setState(() {
-        //   group['groupDescription'] = desc;
-        // });
+
         setState(() {
           groupName = name;
         });
@@ -506,7 +505,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
               color: Colors.grey.shade200,
               onSelected: (value) {
                 if (value == 0) {
-                  print('$addOtherMembers');
+
                   if (addOtherMembers || admins.contains(widget.currentUser)) {
                     Navigator.of(context).pushNamed(
                       '/addNewMembers',
@@ -527,12 +526,18 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   }
                 } else if (value == 1) {
                   if (!isCurrentUserAdmin(widget.currentUser)) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("You are not the admin",
-                          style: TextStyle(
-                              color: Colors.white, fontFamily: 'Raleway')),
-                      backgroundColor: Colors.red.shade200,
-                    ));
+                    if(groupSettings){
+                      changeGroupName();
+                    }else
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("You are not the admin",
+                              style: TextStyle(
+                                  color: Colors.white, fontFamily: 'Raleway')),
+                          backgroundColor: Colors.red.shade200,
+                        ));
+                      }
+
                   } else {
                     changeGroupName();
                   }
@@ -572,7 +577,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                 //Adding a new member to the group ;
                 GestureDetector(
                     onTap: () {
-                      print('$addOtherMembers');
+
                       if (addOtherMembers ||
                           admins.contains(widget.currentUser)) {
                         Navigator.of(context).pushNamed(
@@ -615,22 +620,51 @@ class _GroupDescriptionState extends State<GroupDescription> {
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        if (!isCurrentUserAdmin(widget.currentUser)) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text("You are not the admin",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Raleway')),
-                            backgroundColor: Colors.red.shade200,
-                          ));
+                        if (!isCurrentUserAdmin(widget.currentUser) ) {
+                          if(groupSettings){
+                            String? desc = await _showGroupDescriptionModal();
+
+                            if (desc != null) {
+
+                              try {
+                                await editGroupInfo(group['groupId'], desc);
+
+                                setState(() {
+
+                                  groupDescription = desc;
+                                });
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text(
+                                    "Group description edited succesfully",
+                                    selectionColor: Colors.white,
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor:
+                                  Color.fromRGBO(207, 214, 220, 1),
+                                ));
+
+                              } catch (e) {
+                                print(e.toString());
+                              }
+                            }
+                          }else
+                            {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text("You are not the admin",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Raleway')),
+                                backgroundColor: Colors.red.shade200,
+                              ));
+                            }
+
                         } else {
                           String? desc = await _showGroupDescriptionModal();
                           if (desc != null) {
                             try {
                               await editGroupInfo(group['groupId'], desc);
-                              // setState(() {
-                              //   group['groupDescription'] = desc;
-                              // });
+
                               setState(() {
                                 groupDescription = desc;
                               });
@@ -652,7 +686,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         }
                       },
                       child: Text(
-                        groupDescription,
+                        group['groupDescription'],
                         style: TextStyle(
                             color: Color.fromRGBO(21, 171, 97, 1),
                             fontSize: kIsWeb ? width * 0.015 : width * 0.037),
@@ -838,7 +872,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                     });
 
                     try {
-                      print("Here to update group settings");
+
                       print(
                           '${result['groupSettings']}, ${result['sendMessages']},${result['addOtherMembers']}');
                       updateGroupSettings(
@@ -851,11 +885,11 @@ class _GroupDescriptionState extends State<GroupDescription> {
 
                       for (String members in group['participants']) {
                         if (admins.contains(members)) {
-                          print('$members is the admin');
+
                           updateAdminStatusForCurrentUser(
                               members, group['groupId'], true);
                         } else {
-                          print('$members is  not the admin');
+
                           updateAdminStatusForCurrentUser(
                               members, group['groupId'], false);
                         }
@@ -917,7 +951,7 @@ class _GroupDescriptionState extends State<GroupDescription> {
                         ListTile(
                           //Adding new members to the group after checking if the user is the admin and the permissions
                           onTap: () {
-                            print('$addOtherMembers');
+
                             if (addOtherMembers ||
                                 admins.contains(widget.currentUser)) {
                               Navigator.of(context).pushNamed(

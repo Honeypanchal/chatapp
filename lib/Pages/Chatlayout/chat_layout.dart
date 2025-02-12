@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+// import 'starMessage.dart';
 
 class ChatLayout extends StatefulWidget {
   final CustomClass currentUser;
@@ -25,13 +26,21 @@ class _ChatLayoutState extends State<ChatLayout> {
   bool _isLoading = false;
   List messages = [];
   ScrollController scrollController = ScrollController();
-  Set<String> addedDates = {};
+  // Set<String> addedDates = {};
   late Stream<QuerySnapshot> messageStream;
   String? replyToMessage;
   String? replyToSender;
   bool isAppBarForSelectedMessages =
-      false; // Check if the app bar should show options for selected messages
-  List<String> selectedMessages = []; // To store selected message ids
+  false;
+  List<String> selectedMessages = [];
+
+  bool isSearching = false;
+  String searchQuery = "";
+  double messageHeight = 100.0; // Define a fixed height for each message
+
+  Color backgroundColor = Colors.white;
+  String? editedMessageText; // Store text for editing
+  final TextEditingController messageController = TextEditingController();
 
   // Function to handle message selection (add/remove from selectedMessages)
   void toggleMessageSelection(String messageId) {
@@ -49,31 +58,50 @@ class _ChatLayoutState extends State<ChatLayout> {
   // Function to handle pinning a message (store it in database)
   Future<void> pinMessages() async {
     for (String messageId in selectedMessages) {
+      var message =
+      messages.firstWhere((msg) => msg.id == messageId, orElse: () => null);
+      bool isPinned =
+          message['isPinned'] ?? false; // Check current pinned status
       await widget.databaseRef.collection("messages").doc(messageId).update({
-        "isPinned": true, // Example field to indicate a pinned message
+        "isPinned": !isPinned, // Toggle pinned status
       });
     }
-
     setState(() {
       selectedMessages.clear();
       isAppBarForSelectedMessages = false;
     });
   }
 
-  // Function to handle marking a message as favorite
-  Future<void> favoriteMessages(id) async {
-    for (var messageId in selectedMessages) {
-      var message =
-          messages.firstWhere((msg) => msg.id == messageId, orElse: () => null);
-      if (message != null) {
-        favoriteMessages(message
-            .id); // Implement favoriteMessage functionality to update the star status in your database
-      }
-    }
+  void startSearch() => setState(() => isSearching = true);
 
-    setState(() {
-      selectedMessages.clear();
-      isAppBarForSelectedMessages = false;
+  void stopSearch() => setState(() => isSearching = false);
+
+  void searchMessage(String query) {
+    int index = messages.indexWhere((msg) => msg['message'].contains(query));
+    if (index != -1) {
+      scrollToMessage(index);
+    }
+  }
+
+  void scrollToMessage(int index) {
+    // Calculate the position of the message
+    double position =
+        index * messageHeight; // messageHeight is the height of each message
+    scrollController.animateTo(
+      position,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  // Function to handle marking a message as favorite
+  Future<void> favoriteMessages(String messageId) async {
+    var message =
+    messages.firstWhere((msg) => msg.id == messageId, orElse: () => null);
+    bool isFavorite =
+        message['isFavorite'] ?? false; // Check current favorite status
+    await widget.databaseRef.collection("messages").doc(messageId).update({
+      "isFavorite": !isFavorite, // Toggle favorite status
     });
   }
 
@@ -89,6 +117,8 @@ class _ChatLayoutState extends State<ChatLayout> {
       "deliveredAt": timestamp, // Delivery time
       "readAt": null, // Read time
       "seen": false,
+      "isPinned": false, // Default value for new messages
+      "isFavorite": false, // Default value for new messages
     });
     setState(() {
       replyToMessage = null;
@@ -137,17 +167,15 @@ class _ChatLayoutState extends State<ChatLayout> {
       print("Failed to delete message: $e");
     }
   }
+  void editMessage(String messageId) {
+    var message = messages.firstWhere((msg) => msg.id == messageId, orElse: () => null);
 
-  Future<void> editMessage(String messageId, String updatedMessage) async {
-    try {
-      await widget.databaseRef.collection("messages").doc(messageId).update({
-        "message": updatedMessage,
-        "edited": true,
-      });
-      print("Message updated successfully.");
-    } catch (e) {
-      print("Failed to update message: $e");
-    }
+    setState(() {
+      editedMessageText = message['message'];
+      messageController.text =
+      message['message']; // Set message text to the input field for editing
+      selectedMessages.clear();// Clear any selected messages
+    });
   }
 
   Future<Map<String, dynamic>> fetchUserInfo() async {
@@ -161,7 +189,7 @@ class _ChatLayoutState extends State<ChatLayout> {
 
   Future<void> updateOldMessages() async {
     QuerySnapshot snapshot =
-        await widget.databaseRef.collection("messages").get();
+    await widget.databaseRef.collection("messages").get();
     for (var doc in snapshot.docs) {
       if (!(doc.data() as Map<String, dynamic>).containsKey('seen')) {
         await widget.databaseRef.collection("messages").doc(doc.id).update({
@@ -230,7 +258,7 @@ class _ChatLayoutState extends State<ChatLayout> {
       messageWidgets.add(
         Center(
           child: Container(
-            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+            margin: EdgeInsets.symmetric(vertical: 8),
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Text(
               date,
@@ -253,10 +281,17 @@ class _ChatLayoutState extends State<ChatLayout> {
         final messageId = message.id;
 
         bool x = messageData['sentBy'] == widget.currentUser.uid;
-        bool seenStatus =
-            messageData.containsKey('seen') ? messageData['seen'] : false;
-        bool isEdited =
-            messageData.containsKey('edited') ? messageData['edited'] : false;
+        bool seenStatus = messageData.containsKey('seen') ? messageData['seen'] : false;
+        bool isEdited = messageData.containsKey('edited') ? messageData['edited'] : false;
+        bool isPinned = messageData['isPinned'] ??
+            false; // Check if the message is pinned
+        bool isFavorite = messageData['isFavorite'] ??
+            false; // Check if the message is favorite
+
+        bool isSearched = searchQuery.isNotEmpty &&
+            RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b', caseSensitive: false)
+                .hasMatch(messageData['message']);
+
 
         messageWidgets.add(
           GestureDetector(
@@ -266,32 +301,29 @@ class _ChatLayoutState extends State<ChatLayout> {
             onHorizontalDragEnd: (details) {
               setState(() {
                 replyToMessage = messageData['message'];
-                replyToSender =
-                    isCurrentUser ? "You" : widget.user['firstName'];
+                replyToSender = isCurrentUser ? "You" : widget.user['firstName'];
               });
             },
             child: Column(
-              crossAxisAlignment: isCurrentUser
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
+              crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 if (repliedMessage != null)
                   Container(
                     margin: EdgeInsets.only(
                       left: isCurrentUser
                           ? width > 600
-                              ? width * 0.05
-                              : width * 0.2
+                          ? width * 0.05
+                          : width * 0.2
                           : width > 600
-                              ? width * 0.01
-                              : width * 0.04,
+                          ? width * 0.01
+                          : width * 0.04,
                       right: isCurrentUser
                           ? width > 600
-                              ? width * 0.01
-                              : width * 0.04
+                          ? width * 0.01
+                          : width * 0.04
                           : width > 600
-                              ? width * 0.05
-                              : width * 0.2,
+                          ? width * 0.05
+                          : width * 0.2,
                     ),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -322,19 +354,15 @@ class _ChatLayoutState extends State<ChatLayout> {
                     ),
                   ),
                 Container(
-                  color: selectedMessages.contains(messageId)
-                      ? Colors.grey.shade300
-                      : Colors.transparent,
+                  color: selectedMessages.contains(messageId) ? Colors.grey.shade300 : Colors.transparent,
                   child: Align(
-                    alignment: isCurrentUser
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
+                    alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                      padding: EdgeInsets.all(12),
+                      margin: EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       decoration: BoxDecoration(
                         color: isCurrentUser ? Color(0XFFD5FCD0) : Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -342,23 +370,48 @@ class _ChatLayoutState extends State<ChatLayout> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
+                          // Display the message text
                           Text(
                             messageData['message'],
                             style: TextStyle(
                               fontSize: 15,
-                              color:
-                                  isCurrentUser ? Colors.black : Colors.black,
+                              color: isCurrentUser ? Colors.black : Colors.black,
+                              backgroundColor: isSearched ? Colors.green : null,
                             ),
+                            softWrap: true,
+                            maxLines: null,
+                            overflow: TextOverflow.visible,
                           ),
+                          /*Text(
+                            messageData['message'],
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: isCurrentUser ? Colors.black : Colors.black,
+                            ),
+                          ),*/
                           SizedBox(height: 5),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              if (isPinned)
+                                Icon(
+                                  Icons.push_pin,
+                                  color: Colors.black,
+                                  size: 14,
+                                ),
+                              if (isFavorite)
+                                Icon(
+                                  Icons.star,
+                                  color: Colors.yellow,
+                                  size: 14,
+                                ),
+                              SizedBox(
+                                width: 3,
+                              ),
                               Text(
                                 DateFormat.Hm().format(
-                                  (messageData['timestamp'] as Timestamp)
-                                      .toDate(),
+                                  (messageData['timestamp'] as Timestamp).toDate(),
                                 ),
                                 style: TextStyle(
                                   fontSize: 9,
@@ -366,11 +419,12 @@ class _ChatLayoutState extends State<ChatLayout> {
                                 ),
                               ),
                               SizedBox(width: 3),
-                              Icon(
-                                seenStatus ? Icons.done_all : Icons.check,
-                                size: 16,
-                                color: seenStatus ? Colors.blue : Colors.grey,
-                              ),
+                              if(isCurrentUser)
+                                Icon(
+                                  seenStatus ? Icons.done_all : Icons.check,
+                                  size: 16,
+                                  color: seenStatus ? Colors.blue : Colors.grey,
+                                ),
                             ],
                           ),
                         ],
@@ -380,9 +434,11 @@ class _ChatLayoutState extends State<ChatLayout> {
                 ),
                 SizedBox(height: 1),
                 if (x)
-                  Padding(
+                  Container(
+                    // margin: EdgeInsets.only(bottom:  1.0),
                     padding: EdgeInsets.only(
                         right: width > 600 ? width * 0.01 : width * 0.05),
+
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -390,11 +446,11 @@ class _ChatLayoutState extends State<ChatLayout> {
                           if (messageData['edited'] == true)
                             const Text(
                               "Edited",
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
+                              style: TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                       ],
                     ),
+
                   ),
               ],
             ),
@@ -413,30 +469,37 @@ class _ChatLayoutState extends State<ChatLayout> {
               Navigator.of(context).pop();
             },
             icon: Icon(
-              Icons.arrow_back_ios,
+              Icons.arrow_back,
               color: Colors.black,
             ),
           ),
           title: isAppBarForSelectedMessages
               ? Text(
-                  "${selectedMessages.length} selected",
-                  style: TextStyle(color: Colors.black),
-                )
+            "${selectedMessages.length} selected",
+            style: TextStyle(color: Colors.black),
+          ): isSearching
+              ? TextField(
+            autofocus: true,
+            decoration: InputDecoration(
+                hintText: "Search messages",
+                hintStyle: TextStyle(color: Colors.black)),
+            onChanged: (query) => setState(() => searchQuery = query),
+          )
               : GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ContectInfo(
-                                  currentUser: widget.user['firstName'],
-                                  email: widget.user['email'],
-                                )));
-                  },
-                  child: Text(
-                    widget.user['firstName'],
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ContectInfo(
+                        currentUser: widget.user['firstName'],
+                        email: widget.user['email'],
+                      )));
+            },
+            child: Text(
+              widget.user['firstName'],
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
           backgroundColor: Colors.white,
           actions: [
             if (isAppBarForSelectedMessages) ...[
@@ -449,7 +512,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                 onPressed: () {
                   for (var messageId in selectedMessages) {
                     var message = messages.firstWhere(
-                        (msg) => msg.id == messageId,
+                            (msg) => msg.id == messageId,
                         orElse: () => null);
                     if (message != null) {
                       favoriteMessages(message.id);
@@ -466,12 +529,12 @@ class _ChatLayoutState extends State<ChatLayout> {
                   return IconButton(
                     icon: const Icon(Icons.delete, color: Colors.black),
                     onPressed: () {
-                      int index = messages.indexWhere(
-                          (message) => selectedMessages.contains(message.id));
+                      int index = messages.indexWhere((message) =>
+                          selectedMessages.contains(message.id));
                       if (index != -1) {
                         for (var messageId in selectedMessages) {
                           var message = messages.firstWhere(
-                              (msg) => msg.id == messageId,
+                                  (msg) => msg.id == messageId,
                               orElse: () => null);
                           if (message != null) {
                             deleteMessage(message.id);
@@ -489,84 +552,49 @@ class _ChatLayoutState extends State<ChatLayout> {
               PopupMenuButton<String>(
                 icon: Icon(Icons.more_vert, color: Colors.black),
                 onSelected: (value) {
-                  int index = messages.indexWhere(
-                      (message) => selectedMessages.contains(message.id));
+                  int index = messages.indexWhere((message) =>
+                      selectedMessages.contains(message.id));
                   String messageId = selectedMessages.first;
                   if (value == 'edit') {
-                    final TextEditingController editController =
-                        TextEditingController(text: messages[index]['message']);
+                    // Handle edit action
+
+
+
                     if (selectedMessages.length == 1) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            title: const Text("Edit Message"),
-                            content: TextField(
-                              controller: editController,
-                              decoration: const InputDecoration(
-                                  focusColor: Colors.green,
-                                  border: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.green)),
-                                  focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                      BorderSide(color: Colors.green)),
-                                  enabledBorder: UnderlineInputBorder(
-                                      borderSide:
-                                      BorderSide(color: Colors.green)),
-                                  labelText: "Message",labelStyle: TextStyle(color: Colors.black)),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text(
-                                  "Cancel",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  final updatedMessage =
-                                      editController.text.trim();
-                                  if (updatedMessage.isNotEmpty) {
-                                    await editMessage(
-                                        messages[index].id, updatedMessage);
-                                    Navigator.of(context).pop();
-                                  }
-                                },
-                                child: const Text(
-                                  "Save",
-                                  style: TextStyle(color: Colors.green),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      final TextEditingController editController =
+                      TextEditingController(text: messages[index]['message']);
+                      final updatedMessage =
+                      editController.text.trim();
+                      // editMessage(messages[index].id);
+                      editMessage(messages[index].id); // Pass the message ID and text
+
+
                       setState(() {
-                        selectedMessages.clear();
+                        selectedMessages
+                            .clear(); // Clear selected messages after delete
                         isAppBarForSelectedMessages = false;
+                        // Reset any other necessary state for your AppBar or layout
                       });
                     } else {
                       final snackbar = SnackBar(
                           content: const Text('updated only on 1 message'));
                       ScaffoldMessenger.of(context).showSnackBar(snackbar);
                       setState(() {
-                        selectedMessages.clear();
+                        selectedMessages
+                            .clear(); // Clear selected messages after delete
                         isAppBarForSelectedMessages = false;
+                        // Reset any other necessary state for your AppBar or layout
                       });
                     }
-                  } else if (value == 'copy') {
+                  }
+                  else if (value == 'copy') {
                     Clipboard.setData(
                       ClipboardData(
                           text: selectedMessages.map((messageId) {
-                        var msgData =
+                            var msgData =
                             messages.firstWhere((msg) => msg.id == messageId);
-                        return msgData['message'];
-                      }).join("\n")),
+                            return msgData['message'];
+                          }).join("\n")),
                     );
                     setState(() {
                       selectedMessages.clear();
@@ -579,7 +607,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                         MaterialPageRoute(
                           builder: (context) => UserInfoPage(
                             messageData:
-                                messages[index].data() as Map<String, dynamic>,
+                            messages[index].data() as Map<String, dynamic>,
                             deliveredAt: messages[index]['deliveredAt'],
                             readAt: messages[index]['readAt'],
                           ),
@@ -597,6 +625,7 @@ class _ChatLayoutState extends State<ChatLayout> {
                   }
                 },
                 itemBuilder: (context) => [
+
                   PopupMenuItem(
                     value: 'edit',
                     child: ListTile(
@@ -621,117 +650,257 @@ class _ChatLayoutState extends State<ChatLayout> {
                 ],
                 offset: Offset(30, 58),
               ),
+            ]else ...[
+              if (!isSearching)
+                IconButton(
+                    icon: const Icon(Icons.search, color: Colors.black),
+                    onPressed: startSearch),
+              if (isSearching)
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.black),
+                  onPressed:
+                  // () {
+                  stopSearch,
+                ),
             ],
+
           ],
         ),
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: Colors.black))
           : Column(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 5, bottom: 5),
-                    child: messages.isNotEmpty
-                        ? ListView.builder(
-                            controller: scrollController,
-                            itemCount: messageWidgets.length,
-                            itemBuilder: (context, index) {
-                              return messageWidgets[index];
-                            },
-                          )
-                        : const Center(
-                            child: Text("No messages yet."),
+        children: [
+          // Check for pinned messages
+          if (messages.any((msg) => msg['isPinned'] ?? false))
+            Builder(
+              builder: (context) {
+                // Get all pinned messages
+                var pinnedMessages = messages
+                    .where((msg) => msg['isPinned'] ?? false)
+                    .toList();
+
+                return pinnedMessages.isNotEmpty
+                    ? GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor:
+                          Colors.white, // Background color
+                          title: Text(
+                            "Pinned Messages",
+                            style: TextStyle(
+                                color: Colors
+                                    .black), // White text for visibility
                           ),
-                  ),
-                ),
-                if (replyToMessage != null)
-                  Container(
-                    color: Colors.grey.shade200,
-                    padding: const EdgeInsets.all(8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                replyToSender ?? "Unknown",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black54),
-                              ),
-                              Text(
-                                replyToMessage!,
-                                style: const TextStyle(color: Colors.black54),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.black54),
-                          onPressed: () => setState(() {
-                            replyToMessage = null;
-                            replyToSender = null;
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          child: Icon(Icons.camera_alt, color: Colors.grey),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            controller: message,
-                            decoration: InputDecoration(
-                              hintText: "Type a message",
-                              hintStyle: TextStyle(color: Colors.grey),
-                              border: InputBorder.none,
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: pinnedMessages.length,
+                              itemBuilder: (context, index) {
+
+                                return Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5),
+                                  // Add spacing
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    // Dark background for each message
+                                    borderRadius:
+                                    BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${pinnedMessages[index]['sentBy'] == widget.currentUser.uid ? "You" : widget.user['firstName']}",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight:
+                                            FontWeight.bold),
+                                      ),
+
+                                      SizedBox(height: 3),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.push_pin,
+                                              color: Colors.green,
+                                              size: 18), // Pin icon
+                                          SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              "${pinnedMessages[index]['message']}",
+                                              style: TextStyle(
+                                                  color:
+                                                  Colors.black),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
+                          actions: [
+                            TextButton(
+                              onPressed: () =>
+                                  Navigator.pop(context),
+                              child: Text("Close",
+                                  style: TextStyle(
+                                      color: Colors.green)),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    margin: EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: Offset(
+                              0, 3), // changes position of shadow
                         ),
-                        GestureDetector(
-                          onTap: () async {
-                            setState(() {
-                              messages = [];
-                            });
-                            if (message.text.isNotEmpty) {
-                              await sendMessage(message.text.trim());
-                            } else {
-                              final snackbar = SnackBar(
-                                  content:
-                                      const Text('Not send empty message'));
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackbar);
-                              setState(() {
-                                selectedMessages.clear();
-                                isAppBarForSelectedMessages = false;
-                              });
-                            }
-                            fetchMessagesByCurrentUser();
-                            message.clear();
-                          },
-                          child: Icon(Icons.send, color: Colors.grey),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.push_pin,
+                            color: Colors.black, size: 16),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            pinnedMessages.last['message'],
+                            // Show the last pinned message
+                            style: TextStyle(color: Colors.black),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                )
+                    : SizedBox.shrink();
+              },
             ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(top: 5, bottom: 5),
+              child: messages.isNotEmpty
+                  ? ListView.builder(
+                controller: scrollController,
+                itemCount: messageWidgets.length,
+                itemBuilder: (context, index) {
+                  return messageWidgets[index];
+                },
+              )
+                  : const Center(
+                child: Text("No messages yet."),
+              ),
+            ),
+          ),
+          if (replyToMessage != null)
+            Container(
+              color: Colors.grey.shade200,
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          replyToSender ?? "Unknown",
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54),
+                        ),
+                        Text(
+                          replyToMessage!,
+                          style: const TextStyle(color: Colors.black54),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black54),
+                    onPressed: () => setState(() {
+                      replyToMessage = null;
+                      replyToSender = null;
+                    }),
+                  ),
+                ],
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    child: Icon(Icons.camera_alt, color: Colors.grey),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: message,
+                      decoration: InputDecoration(
+                        hintText: "Type a message",
+                        hintStyle: TextStyle(color: Colors.grey),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      setState(() {
+                        messages = [];
+                      });
+                      if (message.text.isNotEmpty) {
+                        await sendMessage(message.text.trim());
+                      } else {
+                        final snackbar = SnackBar(
+                            content: const Text('Not send empty message'));
+                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                        setState(() {
+                          selectedMessages.clear();
+                          isAppBarForSelectedMessages = false;
+                        });
+                      }
+                      fetchMessagesByCurrentUser();
+                      message.clear();
+                    },
+                    child: Icon(Icons.send, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
+
 }

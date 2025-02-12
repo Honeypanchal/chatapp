@@ -67,7 +67,7 @@ class _MessageInfoPageState extends State<MessageInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: Text("Message Info")),
+      appBar: AppBar(title: Text("Message Info"), backgroundColor: Colors.white,leading: IconButton(onPressed: (){Navigator.of(context).pop();}, icon: Icon(Icons.arrow_back_ios)),) ,
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('groups')
@@ -86,14 +86,18 @@ class _MessageInfoPageState extends State<MessageInfoPage> {
 
           return Column(
             children: [
-              _buildMessageCard(messageText, timestamp), // 📨 Message Display
+              _buildMessageCard(messageText, timestamp),
 
-              Divider(),
+              Divider(
+                color: Colors.grey[300]
+
+              ),
 
               _buildSectionHeader("Read By"),
-              _buildUserList(readBy, seen: true), // ✅ Show Read Users
+              _buildUserList(readBy, seen: true), 
 
-              Divider(),
+              Divider( color: Colors.grey[300],
+              ),
 
               _buildSectionHeader("Delivered To"),
               _buildUserList(deliveredTo.where((uid) => !readBy.contains(uid)).toList(), seen: false),
@@ -105,15 +109,29 @@ class _MessageInfoPageState extends State<MessageInfoPage> {
   }
 
   Widget _buildMessageCard(String messageText, Timestamp? timestamp) {
-    return Card(
-      margin: EdgeInsets.all(12),
-      color: Color.fromARGB(255, 213, 252, 208), // ✅ Background Color
-      child: ListTile(
-        title: Text("Message", style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(messageText, style: TextStyle(fontSize: 16)),
-        trailing: Text(
-          timestamp != null ? _formatTimestamp(timestamp) : "Time Unknown",
-          style: TextStyle(color: Colors.grey),
+    return Align(
+      alignment: Alignment.topRight,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: EdgeInsets.only(right: 12, top: 8, left: 50),
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 213, 252, 208),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              messageText,
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
+            SizedBox(height: 4),
+            Text(
+              timestamp != null ? _formatTimestamp(timestamp) : "Time Unknown",
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
         ),
       ),
     );
@@ -125,10 +143,39 @@ class _MessageInfoPageState extends State<MessageInfoPage> {
   }
 
   Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
-      child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-    );
+    // return Padding(
+    //   padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 4),
+    //   child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    // );
+   return Padding(
+     padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+     child: Row(
+        children: [
+          if(title=='Read By')
+          CircleAvatar(
+            backgroundColor: Colors.blue.withOpacity(0.1),
+            child: Icon(Icons.done_all, color: Colors.blue, size: 22),
+          )
+          else
+            CircleAvatar(
+              backgroundColor: Colors.grey.withOpacity(0.1),
+              child: Icon(Icons.done, color: Colors.grey, size: 22),
+            ),
+          SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500)),
+
+            ],
+          ),
+        ],
+      ),
+   );
   }
 
 
@@ -141,6 +188,7 @@ class _MessageInfoPageState extends State<MessageInfoPage> {
           String name = participantNames[uid] ?? "Fetching...";
 
           return ListTile(
+
             leading: _buildUserAvatar(name),
             title: Text(name),
            // subtitle: Text(seen ? "✔✔ Seen" : "✔ Delivered"),
@@ -155,7 +203,7 @@ class _MessageInfoPageState extends State<MessageInfoPage> {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.green, width: 2), // Green border
+        border: Border.all(color: Colors.green, width: 1), // Green border
       ),
       child: CircleAvatar(
         backgroundColor: Colors.white, // White background
