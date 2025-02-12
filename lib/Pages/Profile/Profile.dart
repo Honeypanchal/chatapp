@@ -106,16 +106,17 @@ class _ProfileState extends State<Profile> {
       ),
       body:
       Container(
-        decoration: BoxDecoration(
-            // color: Color.fromARGB(255, 246, 241, 235),
-          color: Colors.white,
-        boxShadow: [
-          new BoxShadow(color:Colors.black26, blurRadius: 20) ],
-        borderRadius: BorderRadius.circular(10)),
+        decoration:
+            kIsWeb ? BoxDecoration(
+              color: Colors.white,boxShadow: [BoxShadow(color: Colors.black26,blurRadius: 20),
+            ],
+              borderRadius: BorderRadius.circular(10),
+            ): null,
         height: kIsWeb ? height*0.7 : height*0.6,
         width: kIsWeb ? width*width*0.5:width*0.85,
-        margin: EdgeInsets.symmetric(horizontal:kIsWeb? width*0.3:width*0.08,
-        vertical: kIsWeb?height*0.04:height*0.05),
+        margin: EdgeInsets.symmetric(horizontal:kIsWeb? width*0.3:width*0.03,
+        vertical: kIsWeb?height*0.04:
+        height*0),
         child: Padding(
 
           padding:kIsWeb?EdgeInsets.only(left: width*0.03,right: width*0.1,top: height*0.05):
@@ -129,11 +130,31 @@ class _ProfileState extends State<Profile> {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(left: kIsWeb? 150 : 8,right: kIsWeb? 50:8),
-                    child: CircleAvatar(
-                      radius: kIsWeb ? width *0.05 : width *0.12,
-                      backgroundColor: Colors.grey.shade300,
-                      child: Icon(Icons.person,color: Colors.white,
-                        size: width>600 ? width *0.08: width*0.16,),
+                    child:
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        CircleAvatar(
+
+                          radius: kIsWeb ? width *0.05 : width *0.16,
+                          backgroundColor: Colors.grey.shade300,
+                          child: Icon(Icons.person,color: Colors.white,
+                            size: width>600 ? width *0.08: width*0.2,),
+
+                        ),
+                        Positioned(
+                          bottom: kIsWeb? height*0.022:3,
+                            right: kIsWeb? width*-0.015:-8,
+                            child: Container(
+                              height: kIsWeb? height*0.065:height*0.095,
+                          width: kIsWeb?width*0.065:width*0.095,
+                          decoration: BoxDecoration(shape: BoxShape.circle,
+                          color: Colors.green,
+                          ),
+                              child: Icon(Icons.add_a_photo,color: Colors.white,
+                                size: kIsWeb? width*0.02:width*0.05,),
+                        ))
+                      ],
                     ),
                   ),
                 ),
@@ -221,6 +242,7 @@ class _ProfileState extends State<Profile> {
                           SizedBox(
                             height: height * 0.005,
                           ),
+
                           Text(
                             email.isNotEmpty ? email : "",
                             style: TextStyle(
@@ -234,6 +256,7 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                 ),
+
               ),
               SizedBox(height: width>600 ? height*0: height*0),
               Container(
