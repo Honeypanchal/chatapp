@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import '../../models/CustomClass.dart';
 import '../../services/auth_services.dart';
 import '../../services/groupChat_services.dart';
+import 'GroupChatInfoPage.dart';
 
 class Groupchatpage extends StatefulWidget {
   final String groupId;
@@ -27,11 +28,9 @@ class Groupchatpage extends StatefulWidget {
   _GroupchatpageState createState() => _GroupchatpageState();
 }
 
-
 class _GroupchatpageState extends State<Groupchatpage> {
   dynamic group;
   List<String> admins = [];
-
 
   Future<void> getGroup() async {
     try {
@@ -107,9 +106,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
     }
   }
 
-
-
-
   final TextEditingController _messageController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -123,76 +119,178 @@ class _GroupchatpageState extends State<Groupchatpage> {
   String? replyingToMessageId; // Store the message ID for replying
   String? selectedReplyMessageId;
   String? selectedReplyMessageText;
+  String? selectedMessageId;
 
-  void sendMessage({bool isPoll = false, List<
-      String>? pollOptions, String? question}) async {
+  Future<void> getGroupParticipants(String groupId) async {
+    if (isFetching) return;
+    isFetching = true;
+
+    try {
+      print("Fetching participants for group: $groupId");
+
+      DocumentSnapshot groupSnapshot =
+          await _firestore.collection('groups').doc(groupId).get();
+      if (!groupSnapshot.exists) {
+        print("⚠️ Group $groupId does not exist.");
+        return;
+      }
+
+      Map<String, dynamic>? groupData =
+          groupSnapshot.data() as Map<String, dynamic>?;
+      if (groupData == null || !groupData.containsKey('participants')) {
+        print("No participants found for group $groupId.");
+        return;
+      }
+
+      List<String> newParticipants =
+          List<String>.from(groupData['participants']);
+
+      newParticipants.sort();
+      participants.sort();
+
+      if (listEquals(participants, newParticipants)) {
+        print(" Participants unchanged, skipping fetch.");
+        return;
+      }
+
+      participants = List.from(newParticipants);
+      print("Participants updated: $participants");
+    } catch (e) {
+      print("Error fetching participants: $e");
+    } finally {
+      isFetching = false;
+    }
+  }
+
+  void sendMessage(
+      {bool isPoll = false,
+      List<String>? pollOptions,
+      String? question}) async {
     String userId = _auth.currentUser!.uid;
-
-
     List<String> userNameList = await getUserNames([userId]);
     String username = userNameList.isNotEmpty ? userNameList.first : "Unknown";
-
-
     String? replyToMessageId = selectedReplyMessageId;
     String? replyToMessageText = selectedReplyMessageText;
+    await getGroupParticipants(group['groupId']);
+    List<String> groupMembers = List.from(participants);
+    if (selectedMessageId != null) {
+      editMessage(selectedMessageId!, _messageController.text.trim());
+
+      setState(() {
+        selectedMessageId = null;
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _messageController.clear();
+      });
+
+      return;
+    }
+
+    Map<String, dynamic> messageData = {
+      'senderUid': userId,
+      'sender': username,
+      'timestamp': FieldValue.serverTimestamp(),
+      'pinned': false,
+      'favorite': false,
+      'isPoll': isPoll,
+      'isEdited': false,
+      'replyToMessageId': replyToMessageId,
+      'replyToMessageText': replyToMessageText,
+      'status': 'sent',
+      'deliveredTo': groupMembers, // ✅ Dynamically fetched participants
+      'readBy': [userId] // Empty initially, updated when users see the message
+    };
 
     if (isPoll) {
-      await _firestore.collection('groups')
-          .doc(group['groupId'])
-          .collection('messages')
-          .add({
-        'senderUid': userId,
-        'sender': username,
-        // Store username instead of UID
-        'message': question,
-        // Poll question
-        'timestamp': FieldValue.serverTimestamp(),
-        'isPoll': true,
-        'pinned': false,
-        'favorite': false,
-        'pollOptions': {for (var option in pollOptions!) option: []},
-        // Ensure options start empty
-        'replyToMessageId': replyToMessageId,
-        // Store replied message ID
-        'replyToMessageText': replyToMessageText,
-        // Store replied message text
-        'status': 'sent',
-      });
+      messageData['message'] = question;
+      messageData['pollOptions'] = {
+        for (var option in pollOptions!) option: []
+      };
+    } else {
+      messageData['message'] = _messageController.text.trim();
+    }
 
-      setState(() {
-        selectedReplyMessageId = null;
-        selectedReplyMessageText = null;
-      });
-    } else if (_messageController.text
-        .trim()
-        .isNotEmpty) {
-      await _firestore.collection('groups')
-          .doc(group['groupId'])
-          .collection('messages')
-          .add({
-        'senderUid': userId,
-        'sender': username, // Store username instead of UID
-        'message': _messageController.text.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
-        'pinned': false,
-        'favorite': false,
-        'isPoll': false,
-        'replyToMessageId': replyToMessageId, // Store replied message ID
-        'replyToMessageText': replyToMessageText, // Store replied message text
-        'status': 'sent'
-      });
+    await _firestore
+        .collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .add(messageData);
 
-      _messageController.clear();
+    setState(() {
+      selectedReplyMessageId = null;
+      selectedReplyMessageText = null;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _messageController.clear();
+    });
+  }
 
-      setState(() {
-        selectedReplyMessageId = null;
-        selectedReplyMessageText = null;
+  void markMessagesAsRead() async {
+    String userId = _auth.currentUser!.uid;
+
+    var messages = await _firestore
+        .collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .where("deliveredTo", arrayContains: userId)
+        .get();
+
+    for (var doc in messages.docs) {
+      List<String> readBy = List<String>.from(doc["readBy"] ?? []);
+      if (!readBy.contains(userId)) {
+        // ✅ Prevents duplicate updates
+        await _firestore
+            .collection('groups')
+            .doc(group['groupId'])
+            .collection('messages')
+            .doc(doc.id)
+            .update({
+          "readBy": FieldValue.arrayUnion([userId]),
+          "deliveredTo": FieldValue.arrayRemove([userId]),
+        });
+      }
+    }
+  }
+
+  FocusNode _messageFocusNode = FocusNode();
+
+  void editMessage(String messageId, String newMessage) async {
+    if (messageId.isEmpty || newMessage.trim().isEmpty)
+      return; // Prevent empty edits
+
+    await _firestore
+        .collection('groups')
+        .doc(group['groupId'])
+        .collection('messages')
+        .doc(messageId)
+        .update({
+      'message': newMessage.trim(),
+      'isEdited': true,
+      'editedAt': FieldValue.serverTimestamp(),
+    });
+
+    setState(() {
+      selectedMessageId = null;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _messageController.clear();
+    });
+
+    if (mounted && !_messageFocusNode.hasFocus) {
+      Future.microtask(() {
+        _messageFocusNode.requestFocus();
       });
     }
   }
 
-
-
+  void submitEditedMessage() {
+    if (selectedMessageId != null &&
+        _messageController.text.trim().isNotEmpty) {
+      editMessage(selectedMessageId!, _messageController.text);
+    }
+  }
 
 //  Function to handle the reply
   void replyToMessage(String message, String messageId) {
@@ -204,14 +302,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
   }
 
   // Function to handle edit
-  void editMessage(String message, String messageId) {
-    setState(() {
-      editedMessageText = message;
-      _messageController.text =
-          message; // Set message text to the input field for editing
-      selectedMessages.clear(); // Clear any selected messages
-    });
-  }
 
   void showMessageInfoDialog(BuildContext context, String messageId) {
     showModalBottomSheet(
@@ -238,8 +328,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.black,
-                    borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -266,7 +356,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                       Divider(color: Colors.grey),
                       Text(
                         "Read by:",
-                        style: TextStyle(fontSize: 16,
+                        style: TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white),
                       ),
@@ -289,7 +380,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                       Divider(color: Colors.grey),
                       Text(
                         "Not read by:",
-                        style: TextStyle(fontSize: 16,
+                        style: TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.white),
                       ),
@@ -353,8 +445,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
       DocumentSnapshot pollDoc = await transaction.get(pollRef);
       if (!pollDoc.exists) return;
 
-      Map<String, dynamic> pollOptions = Map<String, dynamic>.from(
-          pollDoc['pollOptions']);
+      Map<String, dynamic> pollOptions =
+          Map<String, dynamic>.from(pollDoc['pollOptions']);
       String userId = _auth.currentUser!.uid;
 
       // Remove vote from other options
@@ -367,8 +459,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
       });
 
       // Add vote to the selected option
-      List<String> selectedVoters = List<String>.from(
-          pollOptions[option] ?? []);
+      List<String> selectedVoters =
+          List<String>.from(pollOptions[option] ?? []);
       if (!selectedVoters.contains(userId)) {
         selectedVoters.add(userId);
         pollOptions[option] = selectedVoters;
@@ -378,9 +470,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     });
   }
 
-
   void startSearch() => setState(() => isSearching = true);
-
 
   void stopSearch() => setState(() => isSearching = false);
 
@@ -399,7 +489,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
       selectedMessages.clear(); // Clear selected messages after pinning
     });
   }
-
 
   void favoriteMessages() {
     selectedMessages.forEach((messageId) async {
@@ -444,18 +533,16 @@ class _GroupchatpageState extends State<Groupchatpage> {
     });
   }
 
-
   void handleMessageLongPress(String messageId) {
     setState(() {
       if (selectedMessages.contains(messageId)) {
-        selectedMessages.remove(
-            messageId); // Deselect message if already selected
+        selectedMessages
+            .remove(messageId); // Deselect message if already selected
       } else {
         selectedMessages.add(messageId); // Select message if not selected
       }
     });
   }
-
 
 //Listening to real time changes
   bool isLoading = true;
@@ -475,7 +562,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
     }
   }
 
-
   @override
   void initState() {
     super.initState();
@@ -485,19 +571,21 @@ class _GroupchatpageState extends State<Groupchatpage> {
     listenToDatabaseUpdates();
   }
 
-
   StreamSubscription? _groupSubscription;
 
-
   void listenToDatabaseUpdates() {
-    final groupRef = FirebaseFirestore.instance.collection("groups").doc(widget.groupId);
+    final groupRef =
+        FirebaseFirestore.instance.collection("groups").doc(widget.groupId);
 
     _groupSubscription = groupRef.snapshots().listen((snapshot) async {
       print("Listening to changes...");
 
       if (snapshot.exists && mounted) {
         var updatedGroupData = snapshot.data() as Map<String, dynamic>;
-        List<String> newParticipants = (updatedGroupData['participants'] as List<dynamic>).map((e) => e.toString()).toList();
+        List<String> newParticipants =
+            (updatedGroupData['participants'] as List<dynamic>)
+                .map((e) => e.toString())
+                .toList();
 
         // ✅ Sort lists before comparing
         newParticipants.sort();
@@ -524,14 +612,13 @@ class _GroupchatpageState extends State<Groupchatpage> {
     });
   }
 
-
   @override
   void dispose() {
     _groupSubscription?.cancel(); //  Stop listening when widget is removed
     _groupSubscription = null; // Ensure it's set to null
     super.dispose();
-
   }
+
 //change color theme
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -569,20 +656,19 @@ class _GroupchatpageState extends State<Groupchatpage> {
                 )),
             title: selectedMessages.isNotEmpty
                 ? Text("${selectedMessages.length} selected",
-                style: TextStyle(color: Colors.black))
+                    style: TextStyle(color: Colors.black))
                 : isSearching
-                ? TextField(
-              autofocus: true,
-              decoration: InputDecoration(
-                  focusColor: Colors.green,
-
-                  hintText: "Search messages",
-                  hintStyle: TextStyle(color: Colors.black)),
-              onChanged: (query) =>
-                  setState(() => searchQuery = query),
-            )
-                : Text(group['groupName'],
-                style: TextStyle(color: Colors.black)),
+                    ? TextField(
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            focusColor: Colors.green,
+                            hintText: "Search messages",
+                            hintStyle: TextStyle(color: Colors.black)),
+                        onChanged: (query) =>
+                            setState(() => searchQuery = query),
+                      )
+                    : Text(group['groupName'],
+                        style: TextStyle(color: Colors.black)),
             backgroundColor: Colors.white,
             actions: [
               if (selectedMessages.isNotEmpty) ...[
@@ -603,25 +689,37 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   color: Colors.white,
                   icon: Icon(Icons.more_vert, color: Colors.black),
                   onSelected: (value) async {
-                    String messageId = selectedMessages.first; // Using the first selected message as an example
+                    String messageId = selectedMessages
+                        .first; // Using the first selected message as an example
                     if (value == 'reply') {
                       // Perform reply action on selected message
                       String messageText = await getMessageTextById(messageId);
                       replyToMessage(messageText, messageId);
                     } else if (value == 'edit') {
-                      // Perform edit action on selected message
                       String messageText = await getMessageTextById(messageId);
-                      editMessage(messageText, messageId);
+
+                      setState(() {
+                        selectedMessageId =
+                            messageId; // Store the message ID being edited
+                        _messageController.text =
+                            messageText; // Load message in input field
+                      });
                     } else if (value == 'copy') {
-                      // Perform copy action on selected message
                       copyMessage(messageId);
                     } else if (value == 'info') {
-                      showMessageInfoDialog(context, messageId); // Show info dialog
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MessageInfoPage(
+                                messageId: messageId,
+                                groupId: group['groupId'],
+                                markMessagesAsRead: () =>
+                                    markMessagesAsRead())),
+                      );
                     }
                   },
                   itemBuilder: (context) => [
                     PopupMenuItem(
-
                       value: 'reply',
                       child: ListTile(
                         leading: Icon(Icons.reply),
@@ -668,7 +766,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
       body: Column(
         children: [
           Expanded(
-            child:      StreamBuilder(
+            child: StreamBuilder(
               stream: _firestore
                   .collection('groups')
                   .doc(group['groupId'])
@@ -676,26 +774,27 @@ class _GroupchatpageState extends State<Groupchatpage> {
                   .orderBy('timestamp', descending: false)
                   .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData)
+                  return Center(child: CircularProgressIndicator());
 
                 var messages = snapshot.data!.docs;
 
                 Map<String, List<QueryDocumentSnapshot>> groupedMessages = {};
 
                 for (var message in messages) {
-                  Map<String, dynamic> messageData = message.data() as Map<String, dynamic>;
-
+                  Map<String, dynamic> messageData =
+                      message.data() as Map<String, dynamic>;
 
                   Timestamp? timestamp = messageData['timestamp'] as Timestamp?;
-
 
                   String messageDate = timestamp != null
                       ? formatDateForGrouping(timestamp)
                       : ''; // Fallback value
 
-                  groupedMessages.putIfAbsent(messageDate, () => []).add(message);
+                  groupedMessages
+                      .putIfAbsent(messageDate, () => [])
+                      .add(message);
                 }
-
 
                 List<String> sortedDates = groupedMessages.keys.toList()
                   ..sort((a, b) {
@@ -704,11 +803,12 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     if (a == 'Yesterday') return -1;
                     if (b == 'Yesterday') return 1;
 
-
                     if (a.isEmpty || b.isEmpty) return 0;
 
                     try {
-                      return DateFormat('MMM dd').parse(a).compareTo(DateFormat('MMM dd').parse(b));
+                      return DateFormat('MMM dd')
+                          .parse(a)
+                          .compareTo(DateFormat('MMM dd').parse(b));
                     } catch (e) {
                       return 0;
                     }
@@ -716,38 +816,45 @@ class _GroupchatpageState extends State<Groupchatpage> {
 
                 return Column(
                   children: [
-                    if (groupedMessages.values.expand((messages) => messages).any((msg) => msg['pinned'] ?? false))
+                    if (groupedMessages.values
+                        .expand((messages) => messages)
+                        .any((msg) => msg['pinned'] ?? false))
                       Builder(
                         builder: (context) {
-                          var pinnedMessages = groupedMessages.values.expand((messages) => messages)
+                          var pinnedMessages = groupedMessages.values
+                              .expand((messages) => messages)
                               .where((msg) => msg['pinned'] ?? false)
                               .toList();
 
-                          var latestPinnedMessage = pinnedMessages.isNotEmpty ? pinnedMessages.last : null;
+                          var latestPinnedMessage = pinnedMessages.isNotEmpty
+                              ? pinnedMessages.last
+                              : null;
 
                           return latestPinnedMessage != null
                               ? Container(
-                            padding: EdgeInsets.all(8),
-                            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.push_pin, color: Colors.black, size: 16),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    latestPinnedMessage['message'],
-                                    style: TextStyle(color: Colors.black),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
+                                  padding: EdgeInsets.all(8),
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.push_pin,
+                                          color: Colors.black, size: 16),
+                                      SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          latestPinnedMessage['message'],
+                                          style: TextStyle(color: Colors.black),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                               : SizedBox.shrink();
                         },
                       ),
@@ -760,7 +867,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                           return Column(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
                                 child: Text(
                                   date,
                                   style: TextStyle(
@@ -771,116 +879,210 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                 ),
                               ),
                               ...groupedMessages[date]!.map((message) {
-                                bool isMe = message['senderUid'] == _auth.currentUser!.uid;
+                                bool isMe = message['senderUid'] ==
+                                    _auth.currentUser!.uid;
                                 bool isPoll = message['isPoll'] ?? false;
-                                bool isSelected = selectedMessages.contains(message.id);
+                                bool isSelected =
+                                    selectedMessages.contains(message.id);
                                 bool isPinned = message['pinned'] ?? false;
                                 bool isFavorite = message['favorite'] ?? false;
                                 bool isSearched = searchQuery.isNotEmpty &&
-                                    RegExp(r'\b' + RegExp.escape(searchQuery) + r'\b', caseSensitive: false)
+                                    RegExp(
+                                            r'\b' +
+                                                RegExp.escape(searchQuery) +
+                                                r'\b',
+                                            caseSensitive: false)
                                         .hasMatch(message['message']);
 
                                 return Column(
-                                  crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                  crossAxisAlignment: isMe
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
                                   children: [
                                     GestureDetector(
                                       onLongPress: () {
                                         handleMessageLongPress(message.id);
                                       },
                                       child: Container(
-                                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                                        margin: EdgeInsets.only(left:5,right:5),
-                                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 10),
+                                        margin:
+                                            EdgeInsets.only(left: 5, right: 5),
+                                        alignment: isMe
+                                            ? Alignment.centerRight
+                                            : Alignment.centerLeft,
                                         decoration: BoxDecoration(
-                                          color: isSelected ? Colors.grey[300] : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(10),
+                                          color: isSelected
+                                              ? Colors.grey[300]
+                                              : Colors.transparent,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-
-
                                             isPoll
                                                 ? buildPollWidget(message, isMe)
                                                 : IntrinsicWidth(
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-
-                                                margin: EdgeInsets.only(left:5,right:5),
-                                                decoration: BoxDecoration(
-                                                  color: isMe ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
-                                                  borderRadius: BorderRadius.circular(10),
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Align(
-                                                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 8,
+                                                          horizontal: 12),
+                                                      margin: EdgeInsets.only(
+                                                          left: 5, right: 5),
+                                                      decoration: BoxDecoration(
+                                                        color: isMe
+                                                            ? Color.fromARGB(
+                                                                255,
+                                                                213,
+                                                                252,
+                                                                208)
+                                                            : Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
                                                       child: Column(
-                                                        crossAxisAlignment:   CrossAxisAlignment.start,
-                                                        mainAxisSize: MainAxisSize.min,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .end,
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
                                                         children: [
-                                                          // Sender name inside the message container (top left)
-                                                          if (!isMe)
-                                                            Padding(
-                                                              padding: const EdgeInsets.only(bottom: 1),
-                                                              child: Text(
-                                                                (message.data() as Map<String, dynamic>)['sender'] ?? 'Unknown',
-                                                                style: TextStyle(
-                                                                  fontSize: 12,
-                                                                  fontWeight: FontWeight.bold,
-                                                                  color: Colors.grey[600],
+                                                          Align(
+                                                            alignment: isMe
+                                                                ? Alignment
+                                                                    .centerRight
+                                                                : Alignment
+                                                                    .centerLeft,
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                // Sender name inside the message container (top left)
+                                                                if (!isMe)
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        bottom:
+                                                                            1),
+                                                                    child: Text(
+                                                                      (message.data() as Map<
+                                                                              String,
+                                                                              dynamic>)['sender'] ??
+                                                                          'Unknown',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            12,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Colors
+                                                                            .grey[600],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+
+                                                                if (isPinned)
+                                                                  SizedBox(
+                                                                      width: 5),
+                                                                Flexible(
+                                                                  child: Text(
+                                                                    message[
+                                                                        'message'],
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: isMe
+                                                                          ? Colors
+                                                                              .black
+                                                                          : Colors
+                                                                              .black,
+                                                                      backgroundColor: isSearched
+                                                                          ? Colors
+                                                                              .green
+                                                                          : null,
+                                                                    ),
+                                                                    softWrap:
+                                                                        true,
+                                                                    maxLines:
+                                                                        null,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .visible,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .end,
+                                                            children: [
+                                                              if (isPinned)
+                                                                Icon(
+                                                                    Icons
+                                                                        .push_pin,
+                                                                    color: Colors
+                                                                        .black,
+                                                                    size: 16),
+                                                              if (isFavorite)
+                                                                Icon(
+                                                                  Icons.star,
+                                                                  color: Colors
+                                                                      .yellow
+                                                                      .shade500,
+                                                                  size: 14,
+                                                                ),
+                                                              SizedBox(
+                                                                  width: 4),
+                                                              Align(
+                                                                alignment: Alignment
+                                                                    .bottomRight,
+                                                                child: Text(
+                                                                  formatMessageTime(
+                                                                      message[
+                                                                          'timestamp']),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: isMe
+                                                                        ? Colors
+                                                                            .black
+                                                                        : Colors
+                                                                            .black,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-
-
-                                                          if (isPinned) SizedBox(width: 5),
-                                                          Flexible(
-                                                            child: Text(
-                                                              message['message'],
-                                                              style: TextStyle(
-                                                                color: isMe ? Colors.black : Colors.black,
-                                                                backgroundColor: isSearched ? Colors.green : null,
-                                                              ),
-                                                              softWrap: true,
-                                                              maxLines: null,
-                                                              overflow: TextOverflow.visible,
-                                                            ),
+                                                              if (message[
+                                                                      'isEdited'] ==
+                                                                  true) // Display "Edited" if the message is modified
+                                                                Text(
+                                                                    '  (Edited)',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          10,
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .italic,
+                                                                    )),
+                                                            ],
                                                           ),
                                                         ],
                                                       ),
                                                     ),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.end,
-                                                      children: [
-                                                        if (isPinned)
-                                                          Icon(Icons.push_pin, color: Colors.black, size: 16),
-                                                        if (isFavorite)
-                                                          Icon(
-                                                            Icons.star,
-                                                            color: Colors.yellow.shade500,
-                                                            size: 14,
-                                                          ),
-                                                        SizedBox(width: 4),
-                                                        Align(
-                                                          alignment: Alignment.bottomRight,
-                                                          child: Text(
-                                                            formatMessageTime(message['timestamp']),
-                                                            style: TextStyle(
-                                                              fontSize: 12,
-                                                              color: isMe ? Colors.black : Colors.black,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
+                                                  ),
                                           ],
                                         ),
                                       ),
@@ -895,20 +1097,16 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     ),
                   ],
                 );
-
-
               },
             ),
-
-
-
-
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: width * 0.012, vertical: height * 0.01),
+            padding: EdgeInsets.symmetric(
+                horizontal: width * 0.012, vertical: height * 0.01),
             child: Row(
               children: [
-                if (!group['sendMessages'] && !admins.contains(widget.currentUser)) ...[
+                if (!group['sendMessages'] &&
+                    !admins.contains(widget.currentUser)) ...[
                   Expanded(
                     child: Container(
                       padding: EdgeInsets.all(12),
@@ -919,7 +1117,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
                       child: Text(
                         "Only Admins can send messages",
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontFamily: 'Raleway', color: Colors.black),
+                        style: TextStyle(
+                            fontFamily: 'Raleway', color: Colors.black),
                       ),
                     ),
                   ),
@@ -952,7 +1151,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
                               decoration: InputDecoration(
                                 hintText: "Type a message",
                                 focusColor: Colors.green,
-
                                 border: InputBorder.none,
                               ),
                             ),
@@ -973,18 +1171,16 @@ class _GroupchatpageState extends State<Groupchatpage> {
       ),
     );
   }
+
   String formatMessageTime(Timestamp? timestamp) {
     try {
       if (timestamp == null) return 'Invalid Time'; // Handle null timestamps
       DateTime dateTime = timestamp.toDate();
       return DateFormat('HH:mm').format(dateTime); // 24-hour format
     } catch (e) {
-      return 'Invalid Time';  // Fallback for error handling
+      return 'Invalid Time'; // Fallback for error handling
     }
   }
-
-
-
 
   // String formatMessageTime(Timestamp? timestamp) {
   //   try {
@@ -1000,7 +1196,9 @@ class _GroupchatpageState extends State<Groupchatpage> {
     final now = DateTime.now();
     final messageTime = timestamp.toDate();
 
-    if (messageTime.year == now.year && messageTime.month == now.month && messageTime.day == now.day) {
+    if (messageTime.year == now.year &&
+        messageTime.month == now.month &&
+        messageTime.day == now.day) {
       return 'Today';
     } else if (messageTime.year == now.year &&
         messageTime.month == now.month &&
@@ -1016,7 +1214,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
       return SizedBox.shrink(); // Don't show sender name for the current user
     }
 
-    String senderName = message['sender']?.toString() ?? 'Unknown'; // Safely fetch sender name
+    String senderName =
+        message['sender']?.toString() ?? 'Unknown'; // Safely fetch sender name
 
     return Padding(
       padding: const EdgeInsets.only(left: 10, bottom: 2),
@@ -1031,14 +1230,15 @@ class _GroupchatpageState extends State<Groupchatpage> {
     );
   }
 
-
   //poll  display method
   Widget buildPollWidget(QueryDocumentSnapshot message, bool isSender) {
-    Map<String, dynamic> pollOptions = Map<String, dynamic>.from(message['pollOptions'] ?? {});
+    Map<String, dynamic> pollOptions =
+        Map<String, dynamic>.from(message['pollOptions'] ?? {});
     ValueNotifier<bool> showVotes = ValueNotifier<bool>(false);
     Map<String, String> voterNames = {};
 
-    List<dynamic> allVoters = pollOptions.values.expand((voters) => voters).toSet().toList();
+    List<dynamic> allVoters =
+        pollOptions.values.expand((voters) => voters).toSet().toList();
 
     Future<void> fetchVoterNames(List<dynamic> voters) async {
       try {
@@ -1057,11 +1257,14 @@ class _GroupchatpageState extends State<Groupchatpage> {
         return Align(
           alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
-            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-            padding: EdgeInsets.all(12),
-            width: MediaQuery.of(context).size.width * 0.75,
+            constraints: BoxConstraints(
+              maxWidth: 400, // Limit width for web responsiveness
+            ),
+            margin: EdgeInsets.only(left: 5, right: 5),
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             decoration: BoxDecoration(
-              color: isSender ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
+              color:
+                  isSender ? Color.fromARGB(255, 213, 252, 208) : Colors.white,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -1081,7 +1284,10 @@ class _GroupchatpageState extends State<Groupchatpage> {
               children: [
                 Text(
                   message['message'],
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
                 ),
                 SizedBox(height: 8),
                 Column(
@@ -1108,8 +1314,14 @@ class _GroupchatpageState extends State<Groupchatpage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(option, style: TextStyle(fontSize: 14, color: Colors.black)),
-                                Text("$voteCount votes", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
+                                Text(option,
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.black)),
+                                Text("$voteCount votes",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black)),
                               ],
                             ),
                           ),
@@ -1123,10 +1335,15 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                   Padding(
                                     padding: EdgeInsets.only(left: 10, top: 5),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: voters.map((uid) {
-                                        String voterName = voterNames[uid] ?? "Fetching...";
-                                        return Text("- $voterName", style: TextStyle(fontSize: 14, color: Colors.black));
+                                        String voterName =
+                                            voterNames[uid] ?? "Fetching...";
+                                        return Text("- $voterName",
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black));
                                       }).toList(),
                                     ),
                                   ),
@@ -1155,13 +1372,14 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     );
                   },
                 ),
-
                 Align(
-                  alignment: Alignment.bottomRight,  // Align timestamp to the bottom right
+                  alignment: Alignment.bottomRight,
+                  // Align timestamp to the bottom right
                   child: Padding(
                     padding: EdgeInsets.only(top: 5, right: 5),
                     child: Text(
-                      formatMessageTime(message['timestamp']),  // Display formatted time
+                      formatMessageTime(message['timestamp']),
+                      // Display formatted time
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ),
@@ -1173,7 +1391,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
       },
     );
   }
-
 
   Stream<List<String>> getReadReceipts(String messageId) {
     return _firestore
@@ -1206,7 +1423,8 @@ class _GroupchatpageState extends State<Groupchatpage> {
         List<String> allMembers = List<String>.from(group['participants']);
 
         // Exclude read users and sender from unread list
-        List<String> unreadUsers = allMembers.where((uid) => !readBy.contains(uid)).toList();
+        List<String> unreadUsers =
+            allMembers.where((uid) => !readBy.contains(uid)).toList();
         unreadUsers.remove(messageSnapshot['senderUid']);
 
         return await getUserNames(unreadUsers); // Await here
@@ -1214,8 +1432,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
       return [];
     });
   }
-
-
 
   Future<String> getMessageTextById(String messageId) async {
     DocumentSnapshot messageDoc = await _firestore
@@ -1228,11 +1444,12 @@ class _GroupchatpageState extends State<Groupchatpage> {
     return messageDoc['message'] ?? ''; // Return the actual message content
   }
 }
+
 class CreatePollPage extends StatefulWidget {
   final Function({
-  bool isPoll,
-  List<String>? pollOptions,
-  String? question,
+    bool isPoll,
+    List<String>? pollOptions,
+    String? question,
   }) sendMessage;
 
   CreatePollPage({required this.sendMessage});
@@ -1250,16 +1467,11 @@ class _CreatePollPageState extends State<CreatePollPage> {
 
   void createPoll() {
     List<String> pollOptions = optionControllers
-        .where((controller) =>
-    controller.text
-        .trim()
-        .isNotEmpty)
+        .where((controller) => controller.text.trim().isNotEmpty)
         .map((controller) => controller.text.trim())
         .toList();
 
-    if (questionController.text
-        .trim()
-        .isNotEmpty && pollOptions.length >= 2) {
+    if (questionController.text.trim().isNotEmpty && pollOptions.length >= 2) {
       widget.sendMessage(
         isPoll: true,
         pollOptions: pollOptions,
@@ -1290,12 +1502,10 @@ class _CreatePollPageState extends State<CreatePollPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-
               controller: questionController,
               style: TextStyle(color: Colors.black, fontSize: 14),
               decoration: InputDecoration(
                 focusColor: Colors.green,
-
                 hintText: "Ask a question...",
                 hintStyle: TextStyle(color: Colors.grey.shade600),
                 filled: true,
@@ -1304,8 +1514,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               ),
             ),
             SizedBox(height: 8),
@@ -1324,24 +1534,22 @@ class _CreatePollPageState extends State<CreatePollPage> {
                         filled: true,
                         fillColor: Colors.grey.shade100,
                         focusColor: Colors.green,
-
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none,
                         ),
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 8),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         suffixIcon: index >= 2
                             ? IconButton(
-                          icon: Icon(
-                              Icons.remove_circle, color: Colors.green.shade200,
-                              size: 18),
-                          onPressed: () {
-                            setState(() {
-                              optionControllers.removeAt(index);
-                            });
-                          },
-                        )
+                                icon: Icon(Icons.remove_circle,
+                                    color: Colors.green.shade200, size: 18),
+                                onPressed: () {
+                                  setState(() {
+                                    optionControllers.removeAt(index);
+                                  });
+                                },
+                              )
                             : null,
                       ),
                     ),
@@ -1362,7 +1570,8 @@ class _CreatePollPageState extends State<CreatePollPage> {
                 },
                 icon: Icon(Icons.add, color: Colors.green, size: 16),
                 label: Text("Add Option",
-                    style: TextStyle(color: Colors.green,
+                    style: TextStyle(
+                        color: Colors.green,
                         fontSize: 15,
                         fontWeight: FontWeight.bold)),
                 style: TextButton.styleFrom(
@@ -1386,25 +1595,27 @@ class _CreatePollPageState extends State<CreatePollPage> {
                     minimumSize: Size(0, 0),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: Text("Cancel", style: TextStyle(color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+                  child: Text("Cancel",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 12),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                       backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      minimumSize: Size(0, 0)
-                  ),
+                      minimumSize: Size(0, 0)),
                   onPressed: createPoll,
-                  child: Text("Create Poll", style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+                  child: Text("Create Poll",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
