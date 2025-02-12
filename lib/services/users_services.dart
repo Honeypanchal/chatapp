@@ -6,11 +6,11 @@ final CollectionReference usersDb =
 
 Future<List<String>> getUserNames(List<String> usersUid) async {
   List<String> userNames = [];
-  print("here to fetch firstnames");
+
   for (String user in usersUid) {
     DocumentSnapshot snapshot = await usersDb.doc(user).get();
     if (snapshot.exists) {
-      print('here');
+
       String firstName =
           snapshot.get("firstName") ?? "Unknown"; // Handle null values
       userNames.add(firstName);
