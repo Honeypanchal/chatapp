@@ -77,17 +77,9 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
               color: Colors.black,
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
-              fontSize:kIsWeb ? width * 0.02 : width * 0.06,
+              fontSize:14,
             ),
           ),
-          Text(
-            "Add members",
-            style: TextStyle(
-              color: Colors.black,
-              fontFamily: 'Poppins',
-              fontSize: kIsWeb ? width * 0.01 : width * 0.032,
-            ),
-          )
         ],
       ),
       actions: [
@@ -137,7 +129,6 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
       body: Column(
         children: [
           Expanded(
-            flex: 6,
             child: Padding(
               padding: EdgeInsets.symmetric(
                   horizontal:  width * 0.012, vertical: height * 0.012),
@@ -165,7 +156,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                                     ),
                                   ),
                                   child: CircleAvatar(
-                                    radius: kIsWeb?width*0.019:  width * 0.067,
+                                    radius: kIsWeb?width*0.049:  width * 0.067,
                                     backgroundColor: Colors.white,
                                     child: Text(
                                       firstNames[index][0].toUpperCase(),
@@ -182,8 +173,10 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                       ),
                     ),
                   Divider(
-                    thickness: width * 0.00015,
-                    color: Colors.grey,
+
+                    color: Colors.grey.shade100,
+                    endIndent: 16,
+                    indent: 16,
                   ),
                   Expanded(
                     child: StreamBuilder<List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
@@ -218,7 +211,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                                       ),
                                       child: CircleAvatar(
                                         backgroundColor:Colors.white,
-                                        radius: kIsWeb?width*0.019:  width * 0.067,
+                                        radius: kIsWeb?width*0.049:  width * 0.067,
                                         child: Text(
                                           user['firstName'][0].toUpperCase(),
                                           style: TextStyle(color:  Color.fromRGBO(21, 171, 97, 1)),

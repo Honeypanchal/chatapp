@@ -1,88 +1,58 @@
-# 📱 ChatApp
+# 📚 Learning App
 
-A modern **group chat application** built with **Flutter** and **Firebase**.
+An interactive **educational application** built with **Flutter** and **Firebase**.
 
 ## 🚀 Features
 
 ### 🔹 Authentication & Security
 - Users can **Sign In / Register** using:
-  - **Google Sign-In**
   - **Email & Password** (via Firebase Authentication)
-- If a user is already signed in, they are redirected to the **chat page**.
 - Secure authentication with Firebase.
 
 ---
 
 ## 🖥️ Screens & Functionality
 
-### 1️⃣ **Login / Sign-Up Page**
-- If the user has an account, they are redirected to the **Chat Page**.
-- New users can register using **Google Sign-In** or **Email & Password**.
+### 1️⃣ **Splash & Loading Screens**
+- Animated splash screen with branding elements.
+- Loading screen with smooth transitions.
+- Designed by **Honey Panchal**.
+
+### 2️⃣ **Login / Sign-Up Page**
+- Users can register and log in using **Email & Password**.
+- Error handling for incorrect credentials.
 - Secure authentication powered by Firebase.
+- Designed by **Krisha Patel**.
 
-### 2️⃣ **One-to-One Chat**
-- Displays a list of **recent chats** with users.
-- Users can **start a new chat** with other users.
-- Real-time messaging powered by **Cloud Firestore**.
-- **Message Features:**
-  - Send & receive messages.
-  - **Delete messages** (single/multiple delete).
-  - **Edit messages**.
-  - **Copy messages** to clipboard.
-  - **Reply** to messages.
-  - **Star & Pin** messages.
-  - **Message Info** (shows if the message was read or not).
-  - **Read Receipts:**
-    - **Single Tick**: Message sent but not seen.
-    - **Blue Double Tick**: Message seen.
-  - **Timestamps** for messages sent.
-- Clicking on the **user’s name** opens the **Chat Description Page** showing:
-  - User’s **name & email**.
+### 3️⃣ **Dark Theme Management**
+- Global dark theme support applied across all files.
+- Ensures smooth theme switching without UI inconsistencies.
+- Implemented by **Krisha Patel**.
 
----
+### 4️⃣ **App Screens**
+- Well-structured and intuitive UI for smooth navigation.
+- Consistent theme and color scheme.
+- Designed by **Honey Panchal**.
 
-### 3️⃣ **Group Chat**
-- Displays **all groups** the user is a member of.
-- **Last message & sender’s name** shown in the group list.
-- Users can **search for groups** by name.
-- Users can **create new groups**, add members, and modify settings.
-- **Group Settings (Admin Controls):**
-  - **Control who can send messages**.
-  - **Control who can add new members**.
-  - **Edit group info** (name, description, image).
-  - **Promote/Demote Admins**.
-  - **Remove participants**.
-- **Inside a Group Chat:**
-  - All one-to-one chat features apply.
-  - Additional Features:
-    - **Poll Creation:** Ask questions & view votes.
-    - **Message Search**: Users can search for messages; found chats are highlighted.
-- Clicking on the **Group Name** opens the **Group Description Page**, showing:
-  - Group **name & description**.
-  - List of **members**.
-  - Admin **settings & permissions**.
-  - **Add & search for new members**.
-  - **Exit the group**.
-- Admin can restrict **message sending** to **admins only**.
+### 5️⃣ **User's Page & Chat Page**
+- User profiles displayed with personalized data.
+- Chat functionality integrated using Firebase for real-time messaging.
+- Implemented by **Honey Panchal**.
 
----
+### 6️⃣ **Premium & Video Screens**
+- Premium screen displaying exclusive content options.
+- Video screen with smooth playback and interactive controls.
+- Designed by **Neha Patel**.
 
-### 4️⃣ **Status Feature**
-- Users can post **statuses** with:
-  - **Different fonts & colors**.
-- **Other Users Can:**
-  - View the **recently added status**.
-  - See the **time** when it was posted.
-  - Reply to the status.
-  - View statuses in a **"Viewed Status" section**.
-- **Status disappears after 24 hours**.
-- Users can **delete their own status**.
+### 7️⃣ **Bottom Navigation Bar**
+- Easy navigation with a bottom menu.
+- Smooth transitions between screens.
+- Implemented by **Neha Patel**.
 
----
-
-### 5️⃣ **Profile Page**
-- Displays **current user details** (First Name, Email).
-- Users can **log out** and will be redirected to the **Sign-In / Register Page**.
+### 8️⃣ **Start Screen with Interactive Containers**
+- Different containers allowing users to navigate to the Video Screen.
+- Interactive UI providing an engaging user experience.
+- Implemented by **Neha Patel**.
 
 ---
 
@@ -94,31 +64,12 @@ A modern **group chat application** built with **Flutter** and **Firebase**.
 
 ---
 
-## 🔧 Installation
-```sh
-# Clone the repository
-git clone https://github.com/your-repo/chatapp.git
-
-# Navigate to the project folder
-cd chatapp
-
-# Install dependencies
-flutter pub get
-
-# Run the app
-flutter run
-```
-
----
 
 ## 📌 Future Enhancements
-- Voice & Video Calling.
-- Media Sharing (Images, Videos, Documents).
-- End-to-End Encryption for Messages.
+- AI-powered learning recommendations.
+- Voice & Video Lessons.
+- Interactive quizzes with real-time feedback.
 
 ---
 
-
-
-### 🚀 Happy Coding! 🎉
 

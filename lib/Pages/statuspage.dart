@@ -450,7 +450,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
     if(_isTyping) return;
     if (!currentStatus.viewedBy.contains(currentUserId)) {
       _viewTimer?.cancel();
-      _viewTimer = Timer(Duration(seconds: 3), () async {
+      _viewTimer = Timer(Duration(seconds: 3), () async  {
         await _statusService.markStatusAsViewed(
             currentStatus.uid, currentUserId);
         setState(() {
@@ -484,7 +484,14 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
     try {
       await _statusService.sendStatusReply(statusId, replyText);
       _replyController.clear();
-      setState(() {});
+      setState(() {
+        _isTyping=false;
+      });
+      _viewTimer?.cancel();
+      _viewTimer=Timer(Duration(seconds: 3),
+          (){
+        Navigator.pop(context);
+          });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(" sent successfully!")),
       );
@@ -514,7 +521,11 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
     Status status = widget.statuses[currentIndex];
 
     return GestureDetector(
-      onTap: _nextStatus,
+      onTap: (){
+        if(!_isTyping){
+          _markStatusAsViewed();
+        }
+      },
       onLongPress: () {
         _viewTimer?.cancel();
       },
@@ -666,6 +677,14 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                         color: Colors.white,
                       ),
                       controller: _replyController,
+                      onChanged: (value){
+                        setState(() {
+                          _isTyping=value.isNotEmpty;
+                        });
+                        if(_isTyping){
+                          _viewTimer!.cancel();
+                        }
+                      },
                       decoration: InputDecoration(
                         prefixIcon: Padding(
                           padding: const EdgeInsets.only(left: kIsWeb? 10:2,right: kIsWeb?10:1),
@@ -704,6 +723,7 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
                         ),
                       ),
                     ),
+
                   ),
                 ],
               ),
@@ -714,7 +734,8 @@ class _ViewStatusScreenState extends State<ViewStatusScreen> {
     );
   }
 
-  TextStyle _getTextStyle(String styleIndex) {
+  TextStyle _getTextStyle(String styleIndex)
+  {
     int index = int.tryParse(styleIndex) ?? 0;
     return _textStyles[index % _textStyles.length];
   }
@@ -920,4 +941,4 @@ class _EnterStatusState extends State<EnterStatus> {
       ),
     );
   }
-}
+}//https://github.com/Nehacodemaestro451/learningapp.git

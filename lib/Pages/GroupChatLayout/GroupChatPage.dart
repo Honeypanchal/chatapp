@@ -617,6 +617,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
     _groupSubscription = null; // Ensure it's set to null
     super.dispose();
   }
+
   Stream<int> getGroupMemberCountStream(String groupId) {
     return FirebaseFirestore.instance
         .collection('groups')
@@ -630,6 +631,7 @@ class _GroupchatpageState extends State<Groupchatpage> {
       return 1; // Fallback if group does not exist
     });
   }
+
 //change color theme
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -1022,14 +1024,12 @@ class _GroupchatpageState extends State<Groupchatpage> {
                     Expanded(
                         child: StreamBuilder<int>(
                       stream: getGroupMemberCountStream(group['groupId']),
-
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
                           return Center(child: CircularProgressIndicator());
                         }
 
-                        int groupMemberCount =
-                            snapshot.data ?? 1;
+                        int groupMemberCount = snapshot.data ?? 1;
 
                         return ListView(
                           reverse: false,
@@ -1072,7 +1072,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                       message["deliveredTo"] ?? []);
                                   String userId = _auth.currentUser!.uid;
 
-
                                   if (!readBy.contains(userId) &&
                                       deliveredTo.contains(userId)) {
                                     markMessageAsRead(message.id);
@@ -1089,7 +1088,6 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                         },
                                         onHorizontalDragUpdate: (details) {
                                           if (details.primaryDelta! < -20) {
-
                                             replyToMessage(
                                                 message['message'], message.id);
                                           }
@@ -1267,31 +1265,30 @@ class _GroupchatpageState extends State<Groupchatpage> {
                                                                               .italic,
                                                                     ),
                                                                   ),
-                                                                if(isMe)
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          left:
-                                                                              4),
-                                                                  child: Icon(
-                                                                    readBy.length ==
-                                                                            groupMemberCount // ✅ Double Tick if all read
-                                                                        ? Icons
-                                                                            .done_all
-                                                                        : Icons
-                                                                            .check,
-                                                                    // ✅ Single Tick if only delivered
-                                                                    color: readBy.length ==
-                                                                            groupMemberCount
-                                                                        ? Colors
-                                                                            .blue // ✅ Double Tick (blue) if read
-                                                                        : Colors
-                                                                            .grey,
-                                                                    // ✅ Single Tick (grey) if delivered
-                                                                    size: 16,
+                                                                if (isMe)
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            4),
+                                                                    child: Icon(
+                                                                      readBy.length ==
+                                                                              groupMemberCount // ✅ Double Tick if all read
+                                                                          ? Icons
+                                                                              .done_all
+                                                                          : Icons
+                                                                              .check,
+                                                                      // ✅ Single Tick if only delivered
+                                                                      color: readBy.length ==
+                                                                              groupMemberCount
+                                                                          ? Colors
+                                                                              .blue // ✅ Double Tick (blue) if read
+                                                                          : Colors
+                                                                              .grey,
+                                                                      // ✅ Single Tick (grey) if delivered
+                                                                      size: 16,
+                                                                    ),
                                                                   ),
-                                                                ),
                                                               ],
                                                             ),
                                                           ],

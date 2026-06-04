@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:intl/intl.dart';
-
 import '../helpers/MainNavigation.dart';
 
 class GroupDisplayPage extends StatefulWidget {
@@ -16,19 +15,27 @@ class GroupDisplayPage extends StatefulWidget {
 }
 
 class _GroupDisplayPageState extends State<GroupDisplayPage> {
-  int _selectedIndex = 1;
-  TextEditingController _searchText = TextEditingController();
-  CollectionReference groupsDB =
-      FirebaseFirestore.instance.collection("groups");
-  String searchQuery = "";
+  // ─── Theme ────────────────────────────────────────────────────────────────
+  static const Color kGreen       = Color(0xFF4CAF50);
+  static const Color kGreenLight  = Color(0xFFF0FAF4);
+  static const Color kGreenDark   = Color(0xFF2E7D32);
+  static const Color kTextPrimary   = Color(0xFF111111);
+  static const Color kTextSecondary = Color(0xFF888888);
+  static const Color kDivider     = Color(0xFFF0F0F0);
 
+  // ─── State ────────────────────────────────────────────────────────────────
+  int _selectedIndex = 1;
+  final TextEditingController _searchText = TextEditingController();
+  final CollectionReference _groupsDB =
+  FirebaseFirestore.instance.collection('groups');
+  String _searchQuery = '';
+
+  // ─── Lifecycle ────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
     _searchText.addListener(() {
-      setState(() {
-        searchQuery = _searchText.text.toLowerCase();
-      });
+      setState(() => _searchQuery = _searchText.text.toLowerCase());
     });
   }
 
@@ -38,22 +45,17 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     super.dispose();
   }
 
+  // ─── Navigation ───────────────────────────────────────────────────────────
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
+    setState(() => _selectedIndex = index);
     switch (index) {
       case 0:
         Navigator.pushNamed(context, '/chatPage',
             arguments: {'currentUser': widget.currentUser});
         break;
       case 1:
-        Navigator.pushNamed(
-          context,
-          '/groupDisplay',
-          arguments: {'currentUser': widget.currentUser},
-        );
+        Navigator.pushNamed(context, '/groupDisplay',
+            arguments: {'currentUser': widget.currentUser});
         break;
       case 2:
         Navigator.pushNamed(context, '/statusPage');
@@ -65,248 +67,426 @@ class _GroupDisplayPageState extends State<GroupDisplayPage> {
     }
   }
 
-  Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchGroups() {
+  // ─── Data ─────────────────────────────────────────────────────────────────
+  Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>> _fetchGroups() {
     Query query =
-        groupsDB.where("participants", arrayContains: widget.currentUser.uid);
+    _groupsDB.where('participants', arrayContains: widget.currentUser.uid);
 
-    if (searchQuery.isNotEmpty) {
-      String searchLowerBound = searchQuery;
-      String searchUpperBound = searchQuery + '\uf8fff';
-
+    if (_searchQuery.isNotEmpty) {
       query = query
-          .where("groupName", isGreaterThanOrEqualTo: searchLowerBound)
-          .where("groupName", isLessThan: searchUpperBound);
+          .where('groupName', isGreaterThanOrEqualTo: _searchQuery)
+          .where('groupName', isLessThan: '$_searchQuery\uf8fff');
     }
 
-    return query.snapshots().map((querySnapshot) => querySnapshot.docs
-        as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
-  }
-  String formatMessageTime(Timestamp? timestamp) {
-    try {
-      if (timestamp == null) return 'Invalid Time'; // Handle null timestamps
-      DateTime dateTime = timestamp.toDate();
-      return DateFormat('HH:mm').format(dateTime); // 24-hour format
-    } catch (e) {
-      return 'Invalid Time'; // Fallback for error handling
-    }
+    return query.snapshots().map((s) =>
+    s.docs as List<QueryDocumentSnapshot<Map<String, dynamic>>>);
   }
 
-  Future<Map<String, String>> getLastMessage(String groupId) async {
-    var snapshot = await groupsDB
+  Future<Map<String, String>> _getLastMessage(String groupId) async {
+    final snap = await _groupsDB
         .doc(groupId)
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .limit(1)
         .get();
 
-    if (snapshot.docs.isNotEmpty) {
-      var lastMessageData = snapshot.docs.first.data();
-
+    if (snap.docs.isNotEmpty) {
+      final d = snap.docs.first.data();
       return {
-
-        'sender': lastMessageData['sender'] ?? 'Unknown',
-        'message': lastMessageData['message'] ?? '',
-        'timestamp':formatMessageTime(lastMessageData['timestamp'])?? '',
-
+        'sender'   : d['sender']    ?? '',
+        'message'  : d['message']   ?? '',
+        'timestamp': _formatTime(d['timestamp'] as Timestamp?),
       };
     }
-    return {'sender': '', 'message': 'No messages yet','timestamp':''};
+    return {'sender': '', 'message': 'No messages yet', 'timestamp': ''};
   }
 
+  String _formatTime(Timestamp? ts) {
+    if (ts == null) return '';
+    try {
+      final t   = ts.toDate();
+      final now = DateTime.now();
+      if (DateFormat('yyyy-MM-dd').format(t) ==
+          DateFormat('yyyy-MM-dd').format(now)) {
+        return DateFormat('HH:mm').format(t);
+      }
+      if (DateFormat('yyyy-MM-dd').format(t) ==
+          DateFormat('yyyy-MM-dd')
+              .format(now.subtract(const Duration(days: 1)))) {
+        return 'Yesterday';
+      }
+      return DateFormat('MMM d').format(t);
+    } catch (_) {
+      return '';
+    }
+  }
+
+  /// Deterministic color from group name
+  Color _groupColor(String name) {
+    const colors = [
+      Color(0xFF4CAF50),
+      Color(0xFF1976D2),
+      Color(0xFF7B1FA2),
+      Color(0xFFF57C00),
+      Color(0xFF00796B),
+      Color(0xFFD32F2F),
+      Color(0xFF0288D1),
+    ];
+    if (name.isEmpty) return colors[0];
+    return colors[name.codeUnitAt(0) % colors.length];
+  }
+
+  /// Up-to-2-word initials for square avatar
+  String _groupInitials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name.length >= 2
+        ? name.substring(0, 2).toUpperCase()
+        : name.toUpperCase();
+  }
+
+  // ─── Widgets ──────────────────────────────────────────────────────────────
+
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 10, 16, 6),
+      height: 44,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: TextField(
+        controller: _searchText,
+        cursorColor: kGreen,
+        enableSuggestions: false,
+        autocorrect: false,
+        style: const TextStyle(
+            fontSize: 13, color: kTextPrimary, fontFamily: 'Poppins'),
+        decoration: InputDecoration(
+          hintText: 'Search groups…',
+          hintStyle: TextStyle(
+              fontSize: 13,
+              color: kTextSecondary.withOpacity(0.7),
+              fontFamily: 'Poppins'),
+          prefixIcon: Icon(Icons.search_rounded,
+              color: kTextSecondary.withOpacity(0.6), size: 20),
+          border: InputBorder.none,
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: const BoxDecoration(
+                color: kGreenLight, shape: BoxShape.circle),
+            child: const Icon(Icons.group_outlined,
+                color: kGreen, size: 32),
+          ),
+          const SizedBox(height: 16),
+          const Text('No groups yet',
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: kTextPrimary,
+                  fontFamily: 'Poppins')),
+          const SizedBox(height: 6),
+          Text('Tap + to create a new group',
+              style: TextStyle(
+                  fontSize: 13,
+                  color: kTextSecondary,
+                  fontFamily: 'Poppins')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupTile(Map<String, dynamic> groupData) {
+    final groupId   = groupData['groupId'] as String? ?? '';
+    final groupName = groupData['groupName'] as String? ?? 'Unnamed Group';
+    final members   = (groupData['participants'] as List?)?.length ?? 0;
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => Navigator.of(context).pushNamed(
+            '/groupchat',
+            arguments: {
+              'groupId'    : groupId,
+              'currentUser': widget.currentUser.uid,
+            },
+          ),
+          splashColor: kGreenLight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                // Rounded-square avatar
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: _groupColor(groupName),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        _groupInitials(groupName),
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            fontFamily: 'Poppins'),
+                      ),
+                    ),
+                    // Member count badge
+                    if (members > 0)
+                      Positioned(
+                        bottom: -4,
+                        right: -6,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: kGreen, width: 1.5),
+                          ),
+                          child: Text(
+                            '$members',
+                            style: const TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: kGreenDark),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+
+                const SizedBox(width: 14),
+
+                // Content driven by FutureBuilder
+                Expanded(
+                  child: FutureBuilder<Map<String, String>>(
+                    future: _getLastMessage(groupId),
+                    builder: (context, snap) {
+                      final sender  = snap.data?['sender']    ?? '';
+                      final message = snap.data?['message']   ?? '';
+                      final time    = snap.data?['timestamp'] ?? '';
+
+                      final preview = sender.isNotEmpty
+                          ? '$sender: $message'
+                          : message;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  groupName,
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: kTextPrimary,
+                                      fontFamily: 'Poppins'),
+                                ),
+                              ),
+                              if (time.isNotEmpty)
+                                Text(
+                                  time,
+                                  style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: kTextSecondary,
+                                      fontFamily: 'Poppins'),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            preview.isNotEmpty ? preview : 'No messages yet',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 12,
+                                color: kTextSecondary,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Poppins'),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        // Indented divider
+        Padding(
+          padding: const EdgeInsets.only(left: 78),
+          child: Divider(height: 0.5, thickness: 0.5, color: kDivider),
+        ),
+      ],
+    );
+  }
+
+  // ─── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Groups',
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w500,
-
-              ),
-            ),
-          ],
+        elevation: 0,
+        title: const Text(
+          'Groups',
+          style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: kTextPrimary,
+              fontFamily: 'Poppins'),
         ),
         actions: [
-          PopupMenuButton(
-            color: Colors.grey.shade200,
-            offset: Offset(0, height * 0.052),
-            elevation: 2,
-            itemBuilder: (context) => [
+          // Create group shortcut
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(
+              context,
+              '/newGroup',
+              arguments: {'currentUser': widget.currentUser},
+            ),
+            child: Container(
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: const BoxDecoration(
+                  color: kGreenLight, shape: BoxShape.circle),
+              child: const Icon(Icons.group_add_outlined,
+                  color: kGreen, size: 18),
+            ),
+          ),
+          // More menu
+          PopupMenuButton<int>(
+            padding: EdgeInsets.zero,
+            icon: Container(
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.only(right: 16),
+              decoration: const BoxDecoration(
+                  color: kGreenLight, shape: BoxShape.circle),
+              child: const Icon(Icons.more_horiz_rounded,
+                  color: kGreen, size: 20),
+            ),
+            color: Colors.white,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14)),
+            itemBuilder: (_) => [
               PopupMenuItem(
                 value: 0,
-                child: Text("Starred Messages"),
+                child: Row(children: [
+                  const Icon(Icons.star_outline_rounded,
+                      color: kGreen, size: 18),
+                  const SizedBox(width: 10),
+                  Text('Starred Messages',
+                      style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600)),
+                ]),
               ),
               PopupMenuItem(
                 value: 1,
-                child: Text("Create a Group"),
+                child: Row(children: [
+                  const Icon(Icons.group_add_outlined,
+                      color: kGreen, size: 18),
+                  const SizedBox(width: 10),
+                  Text('Create a Group',
+                      style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600)),
+                ]),
               ),
             ],
             onSelected: (val) {
-              switch (val) {
-                case 0: Navigator.pushNamed(
-                    context,
-                    '/starredMessages',
-                    arguments: {'currentUser': widget.currentUser}
-                ); //neha ka code
-                  break;
-                case 1:
-                  Navigator.pushNamed(
-                    context,
-                    '/newGroup',
-                    arguments: {'currentUser': widget.currentUser},
-                  );
-                  break;
+              if (val == 0) {
+                Navigator.pushNamed(context, '/starredMessages',
+                    arguments: {'currentUser': widget.currentUser});
+              } else {
+                Navigator.pushNamed(context, '/newGroup',
+                    arguments: {'currentUser': widget.currentUser});
               }
             },
           ),
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Container(
-
-              width: kIsWeb?width: width * 0.9,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(kIsWeb ? width * 0.013 :width * 0.03),
-              ),
-              child: TextField(
-
-                enableSuggestions: false,
-                autocorrect: false,
-                cursorColor: Color.fromRGBO(21, 171, 97, 1),
-                controller: _searchText,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'Raleway',
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search groups...',
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey),
-                  border: InputBorder.none,
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value.toLowerCase();
-                  });
-                },
-              ),
+          _buildSearchBar(),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 8, 20, 4),
+            child: Text(
+              'YOUR GROUPS',
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFFAAAAAA),
+                  letterSpacing: 1.2,
+                  fontFamily: 'Poppins'),
             ),
           ),
-          SizedBox(height: height * 0.025),
           Expanded(
             child: StreamBuilder<
                 List<QueryDocumentSnapshot<Map<String, dynamic>>>>(
-              stream: fetchGroups(),
+              stream: _fetchGroups(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: Color.fromRGBO(21, 171, 97, 1),
-                    ),
-                  );
+                  return const Center(
+                      child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(kGreen)));
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text("Error fetching groups"));
+                  return Center(
+                      child: Text('Error fetching groups',
+                          style: TextStyle(
+                              color: kTextSecondary,
+                              fontFamily: 'Poppins')));
                 }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text("No groups found"));
-                }
+                final groups = snapshot.data ?? [];
+                if (groups.isEmpty) return _buildEmptyState();
 
-                var groups = snapshot.data!;
                 return ListView.builder(
                   itemCount: groups.length,
-                  itemBuilder: (context, index) {
-                    var groupData = groups[index].data();
-                    var groupId = groupData['groupId'];
-
-                    return FutureBuilder<Map<String, String>>(
-                      future: getLastMessage(groupId),
-                      builder: (context, lastMessageSnapshot) {
-                        String lastMessageText = "No messages yet";
-                        String sender = "";
-                        String lastTimeStamp='';
-
-                        if (lastMessageSnapshot.hasData) {
-                          sender = lastMessageSnapshot.data!['sender']!;
-                          lastMessageText =
-                              lastMessageSnapshot.data!['message']!;
-                          lastTimeStamp=lastMessageSnapshot.data!['timestamp']!;
-                        }
-
-                        return ListTile(
-
-
-                          leading: CircleAvatar(
-                            backgroundColor: Color.fromRGBO(207, 214, 220, 1),
-                            child: Icon(Icons.group, color: Colors.white),
-                          ),
-                          title:
-                              Text(groupData["groupName"] ?? "Unnamed Group"),
-                          subtitle: Row(
-                            children: [
-                              sender.isNotEmpty
-                                  ? Text('$sender: $lastMessageText')
-                                  : Text(lastMessageText),
-                              Spacer(),
-                              Text(lastTimeStamp,  style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                                fontFamily: 'Raleway',
-                              ),)
-                            ],
-                          ),
-                          onTap: () {
-                            Navigator.of(context).pushNamed('/groupchat',
-                                arguments: {
-                                  'groupId': groupId,
-                                  "currentUser": widget.currentUser.uid
-                                });
-                          },
-                        );
-                      },
-                    );
-                  },
+                  itemBuilder: (_, i) =>
+                      _buildGroupTile(groups[i].data()),
                 );
               },
             ),
           ),
         ],
       ),
+
       bottomNavigationBar: MainNavigationPage(
           currentIndex: _selectedIndex, onTap: _onItemTapped),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(
-            context,
-            '/newGroup',
-            arguments: {'currentUser': widget.currentUser},
-          );
-        },
-        backgroundColor: Color.fromRGBO(21, 171, 97, 1),
-        tooltip: 'Create New Group',
-        child: Icon(
-          Icons.group_add,
-          color: Colors.white,
-          size: width < 600 ? width * 0.08 : width * 0.02
-        ),
-      ),
     );
   }
 }

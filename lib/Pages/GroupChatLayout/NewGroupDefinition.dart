@@ -1,4 +1,3 @@
-
 import 'package:chatapp/models/CustomClass.dart';
 import 'package:chatapp/models/Group.dart';
 import 'package:chatapp/services/users_services.dart';
@@ -6,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:chatapp/services/groupChat_services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+const kGreen = Color(0xFF15AB61);
+const kGreenLight = Color(0xFFE8F5EE);
+
 class NewGroupDefinition extends StatefulWidget {
   final List<String> members;
-
   final CustomClass createdBy;
 
   const NewGroupDefinition(
@@ -20,351 +21,487 @@ class NewGroupDefinition extends StatefulWidget {
 
 class _NewGroupDefinitionState extends State<NewGroupDefinition> {
   List<String> membersFirstNameList = [];
-
-  Future<void> memebersFirstName() async {
-    List<String> fetchedNames = await getUserNames(widget.members);
-    setState(() {
-      membersFirstNameList = fetchedNames;
-    });
-  }
-
   bool groupSettings = true;
-
   bool sendMessages = true;
-
   bool addOtherMembers = true;
   String currentUser = '';
   List<String> admins = [];
+  final TextEditingController _groupName = TextEditingController();
 
-  TextEditingController _groupName = TextEditingController();
+  // Distinct colors for member avatars
+  final List<Color> _avatarColors = [
+    const Color(0xFF15AB61),
+    const Color(0xFF3B82F6),
+    const Color(0xFF8B5CF6),
+    const Color(0xFFF59E0B),
+    const Color(0xFFEF4444),
+    const Color(0xFF06B6D4),
+  ];
 
-  Future<void> fetchCurrentUser() async {
-    String user = await getCurrentUser(); // Wait for the value
-    setState(() {
-      currentUser = user; // Update state
-    });
+  Future<void> _fetchMembers() async {
+    List<String> names = await getUserNames(widget.members);
+    setState(() => membersFirstNameList = names);
+  }
+
+  Future<void> _fetchCurrentUser() async {
+    String user = await getCurrentUser();
+    setState(() => currentUser = user);
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase();
   }
 
   @override
   void initState() {
     super.initState();
-    fetchCurrentUser();
-    memebersFirstName();
-    setState(() {
-      admins.add(widget.createdBy.uid);
-    });
+    _fetchCurrentUser();
+    _fetchMembers();
+    admins.add(widget.createdBy.uid);
+  }
+
+  @override
+  void dispose() {
+    _groupName.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF2F2F7),
       appBar: AppBar(
-        title: Text(
-          'New  Group',
-          style: TextStyle(fontFamily: 'Raleway', color: Colors.black),
-        ),
+        backgroundColor: const Color(0xFFF2F2F7),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        titleSpacing: 0,
         leading: Padding(
-          padding: EdgeInsets.only(left: kIsWeb?width*0.015:  width * 0.048),
-          child: IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, "/newGroup",
-                    arguments: {'currentUser': widget.createdBy});
-              },
-              icon: Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black,
-              )),
+          padding: EdgeInsets.only(left: kIsWeb ? width * 0.015 : 12),
+          child: GestureDetector(
+            onTap: () => Navigator.pushNamed(
+              context,
+              "/newGroup",
+              arguments: {'currentUser': widget.createdBy},
+            ),
+            child: Container(
+              width: 32,
+              height: 32,
+              margin: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: kGreenLight,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back_ios,
+                  size: 14, color: kGreen),
+            ),
+          ),
         ),
-        backgroundColor:Colors.white,
+        title: const Text(
+          'New Group',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+            letterSpacing: -0.3,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: kIsWeb?width*0.02:  width * 0.042, vertical: kIsWeb?height*0.035:  height * 0.032),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Group Name Section
-            Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center, // Align items properly
-            children: [
-              CircleAvatar(
-                radius: kIsWeb ? width * 0.027 : width * 0.066,
-                backgroundColor: Color.fromRGBO(21, 171, 97, 1),
-                child: Icon(
-                  Icons.camera_alt,
-                  color: Colors.white,
-                  size: kIsWeb ? width * 0.02 : width * 0.06,
-                ),
+        padding: EdgeInsets.symmetric(
+          horizontal: kIsWeb ? width * 0.02 : 14,
+          vertical: 12,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Avatar + Name Card ──────────────────────────────────
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
               ),
-             SizedBox(width: width * 0.015), // Add spacing only on mobile
-              Expanded(
-                child: TextFormField(
-                  cursorColor: Colors.grey,
-                  controller: _groupName,
-                  decoration: InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey, width: 2.0),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                    ),
-                    hintText: 'Group Name',
-                  ),
-                  style: TextStyle(
-                    fontSize:kIsWeb ? width * 0.015 : width * 0.05,
-                    fontFamily: 'Raleway',
-                    color: Colors.black,
-                  ),
-                  validator: (val) {
-                    if (val!.isEmpty) {
-                      return 'Enter Group Name';
-                    } else {
-                      return null;
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-
-              SizedBox(height: kIsWeb?height*0.03:  height * 0.02),
-              Divider(
-                height: height * 0.012,
-                color: Colors.grey.shade100,
-                thickness:width * 0.005,
-              ),
-              SizedBox(
-                height: height * 0.012,
-              ),
-              // Permissions Section
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal:kIsWeb? width*0.012:   width * 0.032, vertical: height * 0.012),
-                child: Container(
-                  width: width,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                children: [
+                  Stack(
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Disappearing messages ',
-                            style: TextStyle(
-                              fontSize: kIsWeb ? width * 0.012 :  width * 0.042,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Spacer(),
-                          IconButton(
-                              onPressed: () {
-                                print(
-                                    "Not implemented disappearing messages yet!");
-                              },
-                              icon: Icon(
-                                Icons.timer,
-                                color: Colors.grey,
-                                size:kIsWeb ? width * 0.015 :  width * 0.06,
-                              ))
-                        ],
-                      ),
-                      Text(
-                        'Off',
-                        style: TextStyle(
-                          fontSize: kIsWeb ? width * 0.01 : width * 0.03,
-                          color: Colors.black87,
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: const BoxDecoration(
+                          color: kGreen,
+                          shape: BoxShape.circle,
                         ),
+                        child: const Icon(Icons.camera_alt,
+                            color: Colors.white, size: 26),
                       ),
-                      SizedBox(
-                        height: height * 0.014,
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            'Group Permissions',
-                            style: TextStyle(
-                              fontSize:  kIsWeb ? width * 0.012 :width * 0.042,
-                              color: Colors.black87,
-                            ),
+                      Positioned(
+                        bottom: 1,
+                        right: 1,
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: kGreen,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
                           ),
-                          Spacer(),
-                          IconButton(
-                              onPressed: () async {
-                                final result =
-                                    await Navigator.of(context).pushNamed(
-                                  '/groupPermissions',
-                                  arguments: {
-                                    'groupSettings': groupSettings,
-                                    'sendMessages': sendMessages,
-                                    'addOtherMembers': addOtherMembers,
-                                    'admins': admins,
-                                    'members': widget.members,
-                                    'currentUser': widget.createdBy.uid,
-
-                                  },
-                                );
-
-                                if (result != null) {
-                                  final data = result as Map<String, dynamic>;
-                                  setState(() {
-                                    groupSettings = data['groupSettings'];
-                                    sendMessages = data['sendMessages'];
-                                    addOtherMembers = data['addOtherMembers'];
-                                  });
-                                }
-                              },
-                              icon: Icon(
-                                Icons.settings,
-                                color: Colors.grey,
-                                size:kIsWeb ? width * 0.015 :width * 0.06,
-                              ))
-                        ],
+                          child: const Icon(Icons.add,
+                              size: 10, color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'GROUP NAME',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: TextField(
+                            controller: _groupName,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                            ),
+                            cursorColor: kGreen,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding:
+                              EdgeInsets.symmetric(vertical: 8),
+                              hintText: 'e.g. Dev Team, Family...',
+                              hintStyle: TextStyle(
+                                  color: Color(0xFF666666), fontSize: 14),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── SETTINGS label ──────────────────────────────────────
+            const Padding(
+              padding: EdgeInsets.only(left: 4, bottom: 8),
+              child: Text(
+                'SETTINGS',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                  letterSpacing: 0.8,
                 ),
               ),
-              SizedBox(height: height * 0.02),
-              Divider(
-                height: height * 0.01,
-                color: Colors.grey.shade100,
-                thickness: width * 0.005,
+            ),
+
+            // ── Settings Card ───────────────────────────────────────
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
               ),
-              // Member Count Section
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal:kIsWeb?width*0.012:   width * 0.032, vertical: height * 0.012),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Members : ${widget.members.length}',
-                      style: TextStyle(
-                        fontSize:  kIsWeb ? width * 0.012 : width * 0.035,
-                        color: Colors.black,
+              child: Column(
+                children: [
+                  // Disappearing Messages
+                  _SettingRow(
+                    iconBg: const Color(0xFFE8F0FE),
+                    icon: Icons.access_time_rounded,
+                    iconColor: const Color(0xFF3B82F6),
+                    title: 'Disappearing Messages',
+                    subtitle: 'Off',
+                    onTap: () {},
+                    showDivider: true,
+                  ),
+                  // Group Permissions
+                  _SettingRow(
+                    iconBg: const Color(0xFFF0EAFF),
+                    icon: Icons.tune_rounded,
+                    iconColor: const Color(0xFF8B5CF6),
+                    title: 'Group Permissions',
+                    subtitle: 'All members can send messages',
+                    onTap: () async {
+                      final result = await Navigator.of(context).pushNamed(
+                        '/groupPermissions',
+                        arguments: {
+                          'groupSettings': groupSettings,
+                          'sendMessages': sendMessages,
+                          'addOtherMembers': addOtherMembers,
+                          'admins': admins,
+                          'members': widget.members,
+                          'currentUser': widget.createdBy.uid,
+                        },
+                      );
+                      if (result != null) {
+                        final data = result as Map<String, dynamic>;
+                        setState(() {
+                          groupSettings = data['groupSettings'];
+                          sendMessages = data['sendMessages'];
+                          addOtherMembers = data['addOtherMembers'];
+                        });
+                      }
+                    },
+                    showDivider: false,
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── MEMBERS label + badge ───────────────────────────────
+            Padding(
+              padding: const EdgeInsets.only(left: 4, right: 4, bottom: 8),
+              child: Row(
+                children: [
+                  const Text(
+                    'MEMBERS',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: kGreenLight,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '${widget.members.length} added',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: kGreen,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              SizedBox(height: height * 0.02),
-              // Member Profiles Section
-              Container(
-                height: height * 0.3, // Adjusted height for members list
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: membersFirstNameList.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          CircleAvatar(
+            ),
 
-                            backgroundColor:Color.fromRGBO(207, 214, 220, 1),
-                            radius: kIsWeb?width*0.027 :  width * 0.1,
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(height: height * 0.01),
-                          Text(
-                            membersFirstNameList[index],
-                            style: TextStyle(
-                              fontSize: kIsWeb ? width * 0.012 : width * 0.04,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+            // ── Members Card ────────────────────────────────────────
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: membersFirstNameList.isEmpty
+                  ? const Center(
+                  child: CircularProgressIndicator(color: kGreen))
+                  : Wrap(
+                spacing: 14,
+                runSpacing: 12,
+                children: List.generate(
+                  membersFirstNameList.length,
+                      (index) => _MemberChip(
+                    name: membersFirstNameList[index],
+                    initials: _initials(membersFirstNameList[index]),
+                    color: _avatarColors[index % _avatarColors.length],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+
+            SizedBox(height: height * 0.1),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          if (_groupName.text.isEmpty) {
+          if (_groupName.text.trim().isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                "Enter Group Name",
-                style: TextStyle(fontFamily: 'Raleway', color: Colors.white),
-              ),
-              backgroundColor: Colors.red.shade300,
+              content: const Text('Enter a group name',
+                  style: TextStyle(color: Colors.white)),
+              backgroundColor: Colors.red.shade400,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ));
-          } else {
-            try {
-              Group? newGroup = await createNewGroup(
-                  _groupName.text.trim(),
-                  "assets/images/images.jpg",
-                  "Group Description",
-                  widget.createdBy.uid,
-                  widget.members,
-                  [widget.createdBy.uid],
-                  groupSettings,
-                  sendMessages,
-                  addOtherMembers);
-
-              if (newGroup != null) {
-                Navigator.of(context).pushNamed(
-                  '/groupchat',
-                  arguments: {
-                    'currentUser': currentUser,
-                    'groupId': newGroup.groupId,
-                  },
-                )
-                    .catchError((error) {
-                  print(error.toString());
-                });
-                //Adding group id to user and participants
-                widget.createdBy
-                    .addGroupAndAddActiveGroup(newGroup.groupId!, true);
-                print(widget.members.length);
-                for (var singleMember in widget.members) {
-                  print(singleMember);
-                  if (singleMember == widget.createdBy.uid) {
-                    print(
-                        'Here adding trur to group admin for person who created the group');
-                    addGroupAndAddActiveGroupInDatabase(
-                        newGroup.groupId!, singleMember, true);
-                  } else {
-                    addGroupAndAddActiveGroupInDatabase(
-                        newGroup.groupId!, singleMember, false);
-                  }
-
-                  //   addGroupAndAddActiveGroupInDatabase(groupId: newGroup.groupId!, path: singleMember,isAdmin:false);
-                }
-
-                print("Group created successfully: ${newGroup.groupId}");
-                // widget.members.clear();
-                _groupName.clear();
-              } else {
-                print("Group creation failed.");
+            return;
+          }
+          try {
+            Group? newGroup = await createNewGroup(
+              _groupName.text.trim(),
+              "assets/images/images.jpg",
+              "Group Description",
+              widget.createdBy.uid,
+              widget.members,
+              [widget.createdBy.uid],
+              groupSettings,
+              sendMessages,
+              addOtherMembers,
+            );
+            if (newGroup != null) {
+              Navigator.of(context).pushNamed('/groupchat', arguments: {
+                'currentUser': currentUser,
+                'groupId': newGroup.groupId,
+              });
+              widget.createdBy
+                  .addGroupAndAddActiveGroup(newGroup.groupId!, true);
+              for (var member in widget.members) {
+                addGroupAndAddActiveGroupInDatabase(
+                  newGroup.groupId!,
+                  member,
+                  member == widget.createdBy.uid,
+                );
               }
-            } catch (e, stackTrace) {
-              print("Unexpected error: $e");
-              print("StackTrace: $stackTrace");
+              _groupName.clear();
             }
+          } catch (e, st) {
+            debugPrint("Error: $e\n$st");
           }
         },
-        backgroundColor:Color.fromRGBO(21, 171, 97, 1),
-        child: Icon(
-          Icons.arrow_forward,
-          color: Colors.white,
+        backgroundColor: kGreen,
+        elevation: 6,
+        child: const Icon(Icons.arrow_forward_rounded,
+            color: Colors.white, size: 26),
+      ),
+    );
+  }
+}
+
+// ── Reusable Setting Row ──────────────────────────────────────────────────────
+class _SettingRow extends StatelessWidget {
+  final Color iconBg;
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+  final bool showDivider;
+
+  const _SettingRow({
+    required this.iconBg,
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+    required this.showDivider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: iconBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: iconColor, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black)),
+                      const SizedBox(height: 1),
+                      Text(subtitle,
+                          style: const TextStyle(
+                              fontSize: 12, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_right,
+                    color: Color(0xFFC7C7CC), size: 20),
+              ],
+            ),
+          ),
         ),
+        if (showDivider)
+          const Divider(
+              height: 0.5, thickness: 0.5,
+              indent: 64, endIndent: 0,
+              color: Color(0xFFE5E5EA)),
+      ],
+    );
+  }
+}
+
+// ── Member Chip ───────────────────────────────────────────────────────────────
+class _MemberChip extends StatelessWidget {
+  final String name;
+  final String initials;
+  final Color color;
+
+  const _MemberChip({
+    required this.name,
+    required this.initials,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 58,
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: color,
+            child: Text(initials,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    letterSpacing: 0.5)),
+          ),
+          const SizedBox(height: 5),
+          Text(name,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12, color: Color(0xFF555555),
+                  fontWeight: FontWeight.w500)),
+        ],
       ),
     );
   }

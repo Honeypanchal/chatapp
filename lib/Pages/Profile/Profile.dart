@@ -1,10 +1,8 @@
 import 'package:chatapp/Pages/helpers/MainNavigation.dart';
 import 'package:chatapp/models/CustomClass.dart';
-import 'package:chatapp/models/CustomClass.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../services/auth_services.dart';
 import '../Authentication/FirstPage.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -21,22 +19,26 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   int _selectedIndex = 3;
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  // ─── Theme Colors ─────────────────────────────────────────────────────────
+  static const Color kGreen       = Color(0xFF4CAF50);
+  static const Color kGreenDark   = Color(0xFF2E7D32);
+  static const Color kGreenLight  = Color(0xFFF0FAF4);
+  static const Color kGreenBorder = Color(0xFFD4EDDA);
+  static const Color kTextPrimary = Color(0xFF111111);
+  static const Color kTextMuted   = Color(0xFFAAAAAA);
+  static const Color kDivider     = Color(0xFFF0F0F0);
+  static const Color kCardBg      = Color(0xFFF8FDF9);
 
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
     switch (index) {
       case 0:
         Navigator.pushNamed(context, '/chatPage',
             arguments: {'currentUser': widget.currentUser});
         break;
       case 1:
-        Navigator.pushNamed(
-          context,
-          '/groupDisplay',
-          arguments: {'currentUser': widget.currentUser},
-        );
+        Navigator.pushNamed(context, '/groupDisplay',
+            arguments: {'currentUser': widget.currentUser});
         break;
       case 2:
         Navigator.pushNamed(context, '/statusPage');
@@ -49,7 +51,8 @@ class _ProfileState extends State<Profile> {
   }
 
   String firstName = "";
-  String email = "";
+  String email     = "";
+  String phone     = "";
 
   @override
   void initState() {
@@ -58,238 +61,347 @@ class _ProfileState extends State<Profile> {
   }
 
   void fetchUserData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection("Users")
-          .doc(user.uid)
-          .get();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-      if (userDoc.exists) {
-        setState(() {
-          firstName = userDoc["firstName"] ?? "";
-          email = userDoc["email"] ?? "";
+    final doc = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(user.uid)
+        .get();
 
-          // Capitalize first letter of firstName
-          if (firstName.isNotEmpty) {
-            firstName = firstName[0].toUpperCase() + firstName.substring(1);
-          }
-        });
-      }
+    if (doc.exists) {
+      setState(() {
+        firstName = doc['firstName'] ?? '';
+        email     = doc['email']     ?? '';
+        phone     = doc['phone']     ?? '';
+        if (firstName.isNotEmpty) {
+          firstName = firstName[0].toUpperCase() + firstName.substring(1);
+        }
+      });
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final height = MediaQuery.sizeOf(context).height;
+  // ─── Helpers ───────────────────────────────────────────────────────────────
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        title: Padding(
+  String get initials {
+    if (firstName.isEmpty) return '?';
+    final parts = firstName.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return firstName[0].toUpperCase();
+  }
 
-          padding:kIsWeb?EdgeInsets.only(left: width*0.45,right: width*0.1,top: height*0.05):
-          EdgeInsets.only(top: height*0.04,left: width*0.03,right: width*0.03),
-          child: Text(
-            "Profile",
-            style: TextStyle(
-                fontFamily: 'poppins',
+  // ─── Widgets ───────────────────────────────────────────────────────────────
 
-                color: Colors.black,
-                fontWeight: FontWeight.bold),
+  Widget _buildStatCard(String value, String label) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          color: kCardBg,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Text(value,
+                style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: kGreenDark,
+                    fontFamily: 'Poppins')),
+            const SizedBox(height: 2),
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 11,
+                    color: kTextMuted,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Poppins')),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow({
+    required IconData icon,
+    required Color iconColor,
+    required Color iconBg,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                    color: iconBg, borderRadius: BorderRadius.circular(12)),
+                child: Icon(icon, color: iconColor, size: 20),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label,
+                        style: const TextStyle(
+                            fontSize: 11,
+                            color: kTextMuted,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Poppins')),
+                    const SizedBox(height: 2),
+                    Text(value.isNotEmpty ? value : '—',
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: kTextPrimary,
+                            fontFamily: 'Poppins')),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded,
+                  color: Color(0xFFCCCCCC), size: 22),
+            ],
           ),
         ),
+        Divider(
+            height: 0.5,
+            thickness: 0.5,
+            indent: 74,
+            endIndent: 0,
+            color: kDivider),
+      ],
+    );
+  }
+
+  // ─── Build ─────────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) {
+    final width  = MediaQuery.sizeOf(context).width;
+    final isWide = width > 600 || kIsWeb;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF6F8F6),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        title: const Text('Profile',
+            style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: kTextPrimary)),
+
       ),
-      body:
-      Container(
-        decoration:
-            kIsWeb ? BoxDecoration(
-              color: Colors.white,boxShadow: [BoxShadow(color: Colors.black26,blurRadius: 20),
-            ],
-              borderRadius: BorderRadius.circular(10),
-            ): null,
-        height: kIsWeb ? height*0.7 : height*0.6,
-        width: kIsWeb ? width*width*0.5:width*0.85,
-        margin: EdgeInsets.symmetric(horizontal:kIsWeb? width*0.3:width*0.03,
-        vertical: kIsWeb?height*0.04:
-        height*0),
-        child: Padding(
-
-          padding:kIsWeb?EdgeInsets.only(left: width*0.03,right: width*0.1,top: height*0.05):
-          EdgeInsets.only(top: height*0.03,left: width*0.03,right: width*0.03),
-          child:
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: isWide ? 480 : double.infinity),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(
+                isWide ? 0 : 0, 0, isWide ? 0 : 0, 16),
             children: [
-
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: kIsWeb? 150 : 8,right: kIsWeb? 50:8),
-                    child:
+              // ── Avatar + name ───────────────────────────────────────
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
+                child: Column(
+                  children: [
+                    // Avatar
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        CircleAvatar(
-
-                          radius: kIsWeb ? width *0.05 : width *0.16,
-                          backgroundColor: Colors.grey.shade300,
-                          child: Icon(Icons.person,color: Colors.white,
-                            size: width>600 ? width *0.08: width*0.2,),
-
-                        ),
-                        Positioned(
-                          bottom: kIsWeb? height*0.022:3,
-                            right: kIsWeb? width*-0.015:-8,
-                            child: Container(
-                              height: kIsWeb? height*0.065:height*0.095,
-                          width: kIsWeb?width*0.065:width*0.095,
-                          decoration: BoxDecoration(shape: BoxShape.circle,
-                          color: Colors.green,
-                          ),
-                              child: Icon(Icons.add_a_photo,color: Colors.white,
-                                size: kIsWeb? width*0.02:width*0.05,),
-                        ))
-                      ],
-                    ),
-                  ),
-                ),
-
-              SizedBox(
-                height: height * 0.04,
-              ),
-              Container(
-                height: kIsWeb? height*0.1:height * 0.09,
-                width: width,
-                decoration: BoxDecoration(
-                   borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.perm_identity,
-                        color: Colors.grey,
-                        size: width > 600 ? width*0.03 : width *0.08,
-                      ),
-                      SizedBox(width:width>600 ? width*0.015: width*0.03),
-
-                      Column(
-                        children: [
-                          Text(
-                            "Name",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: width> 600 ? width*0.013   : width*0.035,
-                                fontFamily: 'poppins',
-                                fontWeight: FontWeight.w700),
-                          ),
-
-                          Text(
-                            firstName.isNotEmpty ? firstName : "",
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Raleways',
-                              fontSize: width> 600 ? width*0.012 : width*0.035,
+                        Container(
+                          width: 96,
+                          height: 96,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [kGreen, kGreenDark],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: width>600 ? height*0.03 : height*0.03),
-              Container(
-                height: kIsWeb? height*0.12:height * 0.1,
-                width: kIsWeb? width*0.3:width,
-                decoration: BoxDecoration(
-                  //color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 8, top: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.email_outlined,
-                        color: Colors.grey,
-                        size: width > 600 ? width*0.025 : width *0.075,
-                      ),
-                      SizedBox(width:width>600 ? width*0.02: width*0.03)
-                      ,
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Email",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: width> 600 ? width*0.013 : width*0.035,
-                                fontFamily: 'poppins',
-                                fontWeight: FontWeight.w700),
-                          ),
-                          SizedBox(
-                            height: height * 0.005,
-                          ),
-
-                          Text(
-                            email.isNotEmpty ? email : "",
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Raleways',
-                              fontSize: width> 600 ? width*0.012 : width*0.035,),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-              ),
-              SizedBox(height: width>600 ? height*0: height*0),
-              Container(
-               // margin: EdgeInsets.symmetric(horizontal: width>600? width*0.02 : width*0.002),
-                child: ListTile(
-                  onTap: (){
-                    logOutUser().then((_){
-                      Navigator.pushAndRemoveUntil
-                        (
-                        context,
-                        MaterialPageRoute
-                          (builder: (context) => Firstpage()
+                          alignment: Alignment.center,
+                          child: Text(initials,
+                              style: const TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  fontFamily: 'Poppins')),
                         ),
-                            (Route<dynamic> route) => false,
-                        );
-                    });
+                        Positioned(
+                          bottom: 0,
+                          right: -4,
+                          child: GestureDetector(
+                            onTap: () {
+                              // TODO: pick photo
+                            },
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                  color: kGreen,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: Colors.white, width: 2.5)),
+                              child: const Icon(Icons.camera_alt,
+                                  color: Colors.white, size: 14),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
 
-                  },
+                    const SizedBox(height: 14),
 
-                  leading: Icon(
-                    Icons.logout,
-                    color: Colors.red,
-                    size: width>600? width*0.018 : width*0.067,
+                    Text(
+                      firstName.isNotEmpty ? firstName.toUpperCase() : "",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Raleways',
+                        fontSize: width> 600 ? width*0.012 : width*0.035,
+                      ),
+                    ),
 
-                  ),
+                    const SizedBox(height: 6),
 
-                  title: Text(
-                    "Log out",
-                    style: TextStyle(fontFamily: 'Raleway', color: Colors.red,
-                        fontSize: width>600? width*0.015: width*0.045),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: kGreenLight,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: kGreenBorder)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            decoration: const BoxDecoration(
+                                color: kGreen, shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text('Online',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: kGreenDark,
+                                  fontFamily: 'Poppins')),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              )
+              ),
+
+              const SizedBox(height: 10),
+
+              // ── Stats row ────────────────────────────────────────────
+              Container(
+                color: Colors.white,
+                padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Row(
+                  children: [
+                    _buildStatCard('142', 'Chats'),
+                    _buildStatCard('8', 'Groups'),
+                    _buildStatCard('24', 'Status'),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // ── Account info ─────────────────────────────────────────
+              Container(
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding:
+                      EdgeInsets.fromLTRB(20, 16, 20, 8),
+                      child: Text('ACCOUNT INFO',
+                          style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: kTextMuted,
+                              letterSpacing: 1.2,
+                              fontFamily: 'Poppins')),
+                    ),
+                    _buildInfoRow(
+                      icon: Icons.person_outline_rounded,
+                      iconColor: kGreen,
+                      iconBg: kGreenLight,
+                      label: 'Full Name',
+                      value: firstName,
+                    ),
+                    _buildInfoRow(
+                      icon: Icons.email_outlined,
+                      iconColor: const Color(0xFF1976D2),
+                      iconBg: const Color(0xFFE8F4FD),
+                      label: 'Email',
+                      value: email,
+                    ),
+                    if (phone.isNotEmpty)
+                      _buildInfoRow(
+                        icon: Icons.phone_outlined,
+                        iconColor: const Color(0xFFF57C00),
+                        iconBg: const Color(0xFFFFF4E8),
+                        label: 'Phone',
+                        value: phone,
+                      ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // ── Log out ──────────────────────────────────────────────
+              Container(
+                color: Colors.white,
+                child: ListTile(
+                  onTap: () {
+                    logOutUser().then((_) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const Firstpage()),
+                            (_) => false,
+                      );
+                    });
+                  },
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        color: const Color(0xFFFFF0F0),
+                        borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.logout_rounded,
+                        color: Color(0xFFE53935), size: 20),
+                  ),
+                  title: const Text('Log Out',
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFE53935),
+                          fontFamily: 'Poppins')),
+                  trailing: const Icon(Icons.chevron_right_rounded,
+                      color: Color(0xFFCCCCCC)),
+                  contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                ),
+              ),
             ],
           ),
         ),
