@@ -4,7 +4,7 @@ import 'package:chatapp/Pages/GroupChatLayout/GroupDescription.dart';
 import 'package:chatapp/Pages/GroupChatLayout/GroupDisplayPage.dart';
 import 'package:chatapp/Pages/GroupChatLayout/UpdateGroupPermissions.dart';
 import 'package:chatapp/Pages/Profile/Profile.dart';
-import 'package:chatapp/Pages/statuspage.dart';
+import 'package:chatapp/status/statuspage.dart';
 import 'package:chatapp/pages/GroupChatLayout/AddNewMembersToGroup.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroup.dart';
 import 'package:chatapp/pages/GroupChatLayout/NewGroupDefinition.dart';

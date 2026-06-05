@@ -29,6 +29,13 @@ class _ProfileState extends State<Profile> {
   static const Color kDivider     = Color(0xFFF0F0F0);
   static const Color kCardBg      = Color(0xFFF8FDF9);
 
+  // ─── Data State ───────────────────────────────────────────────────────────
+  String firstName = "";
+  String email     = "";
+  String phone     = "";
+  bool   _isLoading = true; // ← tracks whether data has loaded yet
+
+  // ─── Navigation ───────────────────────────────────────────────────────────
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
     switch (index) {
@@ -50,50 +57,70 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  String firstName = "";
-  String email     = "";
-  String phone     = "";
-
+  // ─── Lifecycle ────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
-    fetchUserData();
+    _fetchUserData();
   }
 
-  void fetchUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+  // ─── FIX: fetch data correctly and guard against unmounted widget ──────────
+  Future<void> _fetchUserData() async {
+    // Show loader while fetching
+    if (mounted) setState(() => _isLoading = true);
 
-    final doc = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user.uid)
-        .get();
+    try {
+      // First try from widget.currentUser if already populated
+      final User? firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser == null) {
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
 
-    if (doc.exists) {
-      setState(() {
-        firstName = doc['firstName'] ?? '';
-        email     = doc['email']     ?? '';
-        phone     = doc['phone']     ?? '';
-        if (firstName.isNotEmpty) {
-          firstName = firstName[0].toUpperCase() + firstName.substring(1);
+      final DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(firebaseUser.uid)  // always use FirebaseAuth uid — reliable
+          .get();
+
+      if (!mounted) return; // widget may have been disposed while awaiting
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data() as Map<String, dynamic>;
+        String fetchedName  = (data['firstName'] as String? ?? '').trim();
+        String fetchedEmail = (data['email']     as String? ?? '').trim();
+        String fetchedPhone = (data['phone']      as String? ?? '').trim();
+
+        // Capitalise first letter
+        if (fetchedName.isNotEmpty) {
+          fetchedName = fetchedName[0].toUpperCase() + fetchedName.substring(1);
         }
-      });
+
+        setState(() {
+          firstName  = fetchedName;
+          email      = fetchedEmail;
+          phone      = fetchedPhone;
+          _isLoading = false;
+        });
+      } else {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      debugPrint('Profile fetchUserData error: $e');
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
-
-  String get initials {
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+  String get _initials {
     if (firstName.isEmpty) return '?';
-    final parts = firstName.trim().split(' ');
+    final parts = firstName.trim().split(RegExp(r'\s+'));
     if (parts.length >= 2) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return firstName[0].toUpperCase();
   }
 
-  // ─── Widgets ───────────────────────────────────────────────────────────────
-
+  // ─── Sub-widgets ──────────────────────────────────────────────────────────
   Widget _buildStatCard(String value, String label) {
     return Expanded(
       child: Container(
@@ -141,7 +168,8 @@ class _ProfileState extends State<Profile> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                    color: iconBg, borderRadius: BorderRadius.circular(12)),
+                    color: iconBg,
+                    borderRadius: BorderRadius.circular(12)),
                 child: Icon(icon, color: iconColor, size: 20),
               ),
               const SizedBox(width: 14),
@@ -155,13 +183,25 @@ class _ProfileState extends State<Profile> {
                             color: kTextMuted,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'Poppins')),
-                    const SizedBox(height: 2),
-                    Text(value.isNotEmpty ? value : '—',
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: kTextPrimary,
-                            fontFamily: 'Poppins')),
+                    const SizedBox(height: 3),
+                    // ── FIX: show shimmer placeholder while loading ──────────
+                    _isLoading
+                        ? Container(
+                      height: 14,
+                      width: 140,
+                      decoration: BoxDecoration(
+                        color: kCardBg,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    )
+                        : Text(
+                      value.isNotEmpty ? value : '—',
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: kTextPrimary,
+                          fontFamily: 'Poppins'),
+                    ),
                   ],
                 ),
               ),
@@ -180,8 +220,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  // ─── Build ─────────────────────────────────────────────────────────────────
-
+  // ─── Build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final width  = MediaQuery.sizeOf(context).width;
@@ -193,28 +232,28 @@ class _ProfileState extends State<Profile> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Profile',
-            style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: kTextPrimary)),
-
-      ),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: kTextPrimary),
+        ),
+              ),
       body: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: isWide ? 480 : double.infinity),
+          constraints:
+          BoxConstraints(maxWidth: isWide ? 480 : double.infinity),
           child: ListView(
-            padding: EdgeInsets.fromLTRB(
-                isWide ? 0 : 0, 0, isWide ? 0 : 0, 16),
+            padding: const EdgeInsets.only(bottom: 16),
             children: [
-              // ── Avatar + name ───────────────────────────────────────
+              // ── Avatar + Name ────────────────────────────────────────
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
                 child: Column(
                   children: [
-                    // Avatar
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -230,12 +269,24 @@ class _ProfileState extends State<Profile> {
                             ),
                           ),
                           alignment: Alignment.center,
-                          child: Text(initials,
-                              style: const TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  fontFamily: 'Poppins')),
+                          // ── FIX: show spinner inside avatar until loaded ──
+                          child: _isLoading
+                              ? const SizedBox(
+                            width: 28,
+                            height: 28,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2.5,
+                            ),
+                          )
+                              : Text(
+                            _initials,
+                            style: const TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                fontFamily: 'Poppins'),
+                          ),
                         ),
                         Positioned(
                           bottom: 0,
@@ -262,14 +313,23 @@ class _ProfileState extends State<Profile> {
 
                     const SizedBox(height: 14),
 
-                    Text(
-                      firstName.isNotEmpty ? firstName.toUpperCase() : "",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Raleways',
-                        fontSize: width> 600 ? width*0.012 : width*0.035,
+                    // ── FIX: show name clearly in bold, not all-caps grey ──
+                    _isLoading
+                        ? Container(
+                      height: 18,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: kCardBg,
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                    )
+                        : Text(
+                      firstName.isNotEmpty ? firstName : 'Your Name',
+                      style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: kTextPrimary,
+                          fontFamily: 'Poppins'),
                     ),
 
                     const SizedBox(height: 6),
@@ -306,11 +366,11 @@ class _ProfileState extends State<Profile> {
 
               const SizedBox(height: 10),
 
-              // ── Stats row ────────────────────────────────────────────
+              // ── Stats ────────────────────────────────────────────────
               Container(
                 color: Colors.white,
-                padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 16),
                 child: Row(
                   children: [
                     _buildStatCard('142', 'Chats'),
@@ -322,15 +382,14 @@ class _ProfileState extends State<Profile> {
 
               const SizedBox(height: 10),
 
-              // ── Account info ─────────────────────────────────────────
+              // ── Account Info ─────────────────────────────────────────
               Container(
                 color: Colors.white,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Padding(
-                      padding:
-                      EdgeInsets.fromLTRB(20, 16, 20, 8),
+                      padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
                       child: Text('ACCOUNT INFO',
                           style: TextStyle(
                               fontSize: 11,
@@ -367,7 +426,7 @@ class _ProfileState extends State<Profile> {
 
               const SizedBox(height: 10),
 
-              // ── Log out ──────────────────────────────────────────────
+              // ── Log Out ──────────────────────────────────────────────
               Container(
                 color: Colors.white,
                 child: ListTile(
@@ -398,8 +457,8 @@ class _ProfileState extends State<Profile> {
                           fontFamily: 'Poppins')),
                   trailing: const Icon(Icons.chevron_right_rounded,
                       color: Color(0xFFCCCCCC)),
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 4),
                 ),
               ),
             ],
