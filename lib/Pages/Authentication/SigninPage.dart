@@ -87,127 +87,132 @@ class _SigninPageState extends State<SigninPage> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
+
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: isWide ? 420 : double.infinity),
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(
                   horizontal: isWide ? 0 : 24, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Back button ─────────────────────────────────────
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ── Back button ─────────────────────────────────────
 
 
-                  SizedBox(height: height * 0.035),
+                    SizedBox(height: height * 0.035),
 
-                  // ── Logo + heading ───────────────────────────────────
-                  Center(
-                    child: Column(
-                      children: [
-                        Image.asset("assets/images/app_logo.png",height: 120,),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Welcome back!',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w900,
-                            color: kTextPrimary,
-                            fontFamily: 'Poppins',
+                    // ── Logo + heading ───────────────────────────────────
+                    Center(
+                      child: Column(
+                        children: [
+                          Image.asset("assets/images/app_logo.png",height: 120,),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Welcome back!',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              color: kTextPrimary,
+                              fontFamily: 'Poppins',
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Sign in to continue chatting',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: kTextSecondary,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Poppins',
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Sign in to continue chatting',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: kTextSecondary,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Poppins',
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                  SizedBox(height: height * 0.04),
+                    SizedBox(height: height * 0.04),
 
-                  // ── Form ─────────────────────────────────────────────
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Email
-                        _buildLabel('EMAIL ADDRESS'),
-                        const SizedBox(height: 6),
-                        _buildEmailField(),
+                    // ── Form ─────────────────────────────────────────────
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Email
+                          _buildLabel('EMAIL ADDRESS'),
+                          const SizedBox(height: 6),
+                          _buildEmailField(),
 
-                        SizedBox(height: height * 0.022),
+                          SizedBox(height: height * 0.022),
 
-                        // Password
-                        _buildLabel('PASSWORD'),
-                        const SizedBox(height: 6),
-                        _buildPasswordField(),
+                          // Password
+                          _buildLabel('PASSWORD'),
+                          const SizedBox(height: 6),
+                          _buildPasswordField(),
 
-                        const SizedBox(height: 10),
+                          const SizedBox(height: 10),
 
-                        // Forgot password
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              // TODO: forgot password
-                            },
-                            child: const Text(
-                              'Forgot password?',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: kGreen,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(height: height * 0.03),
-
-                        // Sign In button
-                        _buildSignInButton(),
-
-                        SizedBox(height: height * 0.02),
-
-                        // Sign up link
-                        Center(
-                          child: GestureDetector(
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => SignupPage()),
-                            ),
-                            child: RichText(
-                              text: const TextSpan(
-                                text: "Don't have an account?  ",
+                          // Forgot password
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                // TODO: forgot password
+                              },
+                              child: const Text(
+                                'Forgot password?',
                                 style: TextStyle(
-                                    fontSize: 13,
-                                    color: kTextSecondary,
-                                    fontFamily: 'Poppins'),
-                                children: [
-                                  TextSpan(
-                                    text: 'Sign Up',
-                                    style: TextStyle(
-                                        color: kTextPrimary,
-                                        fontWeight: FontWeight.w800),
-                                  ),
-                                ],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: kGreen,
+                                  fontFamily: 'Poppins',
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
 
-                  SizedBox(height: height * 0.04),
-                ],
+                          SizedBox(height: height * 0.03),
+
+                          // Sign In button
+                          _buildSignInButton(),
+
+                          SizedBox(height: height * 0.02),
+
+                          // Sign up link
+                          Center(
+                            child: GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => SignupPage()),
+                              ),
+                              child: RichText(
+                                text: const TextSpan(
+                                  text: "Don't have an account?  ",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: kTextSecondary,
+                                      fontFamily: 'Poppins'),
+                                  children: [
+                                    TextSpan(
+                                      text: 'Sign Up',
+                                      style: TextStyle(
+                                          color: kTextPrimary,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    SizedBox(height: height * 0.04),
+                  ],
+                ),
               ),
             ),
           ),

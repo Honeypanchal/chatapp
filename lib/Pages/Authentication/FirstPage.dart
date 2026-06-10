@@ -97,11 +97,14 @@ class _FirstpageState extends State<Firstpage> {
                   SizedBox(height: height * 0.04),
 
                   // ── Sign In button ────────────────────────────────────
-                  _buildPrimaryButton(
-                    label: 'Sign In',
-                    icon: Icons.login_rounded,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => SigninPage()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _buildPrimaryButton(
+                      label: 'Sign In',
+                      icon: Icons.login_rounded,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => SigninPage()),
+                      ),
                     ),
                   ),
 
@@ -112,6 +115,7 @@ class _FirstpageState extends State<Firstpage> {
                     children: [
                       Expanded(
                           child: Divider(color: Colors.grey.shade200,
+                              endIndent: 16,indent: 16,
                               thickness: 1)),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -131,11 +135,14 @@ class _FirstpageState extends State<Firstpage> {
                   const SizedBox(height: 12),
 
                   // ── Create Account button ─────────────────────────────
-                  _buildOutlineButton(
-                    label: 'Create Account',
-                    icon: Icons.person_add_outlined,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => SignupPage()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: _buildOutlineButton(
+                      label: 'Create Account',
+                      icon: Icons.person_add_outlined,
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => SignupPage()),
+                      ),
                     ),
                   ),
 

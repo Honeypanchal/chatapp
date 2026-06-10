@@ -367,18 +367,18 @@ class _ProfileState extends State<Profile> {
               const SizedBox(height: 10),
 
               // ── Stats ────────────────────────────────────────────────
-              Container(
-                color: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 16),
-                child: Row(
-                  children: [
-                    _buildStatCard('142', 'Chats'),
-                    _buildStatCard('8', 'Groups'),
-                    _buildStatCard('24', 'Status'),
-                  ],
-                ),
-              ),
+              // Container(
+              //   color: Colors.white,
+              //   padding: const EdgeInsets.symmetric(
+              //       horizontal: 16, vertical: 16),
+              //   child: Row(
+              //     children: [
+              //       _buildStatCard('142', 'Chats'),
+              //       _buildStatCard('8', 'Groups'),
+              //       _buildStatCard('24', 'Status'),
+              //     ],
+              //   ),
+              // ),
 
               const SizedBox(height: 10),
 

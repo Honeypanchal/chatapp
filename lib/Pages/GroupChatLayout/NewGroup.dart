@@ -72,7 +72,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'New Group',
+            'New Grouppppp',
             style: TextStyle(
               color: Colors.black,
               fontFamily: 'Poppins',
@@ -156,7 +156,7 @@ cursorColor:              Color.fromRGBO(21, 171, 97, 1),
                                     ),
                                   ),
                                   child: CircleAvatar(
-                                    radius: kIsWeb?width*0.049:  width * 0.067,
+                                    radius: kIsWeb?width*0.0099:  width * 0.067,
                                     backgroundColor: Colors.white,
                                     child: Text(
                                       firstNames[index][0].toUpperCase(),
